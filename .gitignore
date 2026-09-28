@@ -216,3 +216,17 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Dataset và model (quá nặng, không đưa lên Git)
+data/
+*.tar.bz2
+*.dat
+*.jsonl
+*.npy
+*.npz
+*.pkl
+*.joblib
+*.txt.model
+
+# Kết quả thí nghiệm lớn
+results/raw/
