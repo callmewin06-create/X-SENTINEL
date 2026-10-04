@@ -1,0 +1,16 @@
+.git
+.venv
+ember
+ember2018
+ember_2017_2
+data
+models
+outputs
+tmp
+__pycache__
+*.exe
+*.dll
+*.docx
+*.pdf
+build
+dist

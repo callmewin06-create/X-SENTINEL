@@ -1,0 +1,11 @@
+{
+  "frozen_date":"2026-10-04",
+  "scope":"limited_group_only",
+  "sensitive_imports_reference_only":["kernel32.dll:CreateRemoteThread","kernel32.dll:WriteProcessMemory","kernel32.dll:VirtualAllocEx","urlmon.dll:URLDownloadToFileA","urlmon.dll:URLDownloadToFileW"],
+  "branch1_status":"unsupported in primary vector/group-only detector; no API confirmation from hashed buckets",
+  "branch2_candidate_slice":[515,611],
+  "rarity_quantiles":[0.01,0.99],
+  "benign_directed_dominance_strict_cutoff":0.8,
+  "excluded_from_low_semantic_specificity":["byte histograms","entropy","urls","registry","MZ","imports","exports"],
+  "caveat":"Printable distribution is a heuristic proxy; no group is guaranteed irrelevant to security."
+}

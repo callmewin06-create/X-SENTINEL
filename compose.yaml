@@ -1,0 +1,11 @@
+services:
+  dashboard:
+    build: .
+    ports: ["8501:8501"]
+    cpus: 4
+    mem_limit: 8g
+    volumes:
+      - ./outputs:/app/outputs:ro
+      - ./models:/app/models:ro
+      - ./data:/app/data:ro
+    security_opt: ["no-new-privileges:true"]

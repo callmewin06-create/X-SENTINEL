@@ -1,0 +1,15 @@
+{
+  "name":"pilot_not_final",
+  "seeds":[17],
+  "rates":[0.01],
+  "triggers":["concentrated"],
+  "attack_profile":"feasible",
+  "rounds":80,
+  "params":{"objective":"binary","num_leaves":31,"learning_rate":0.08,"max_bin":127,"num_threads":4,"verbosity":-1,"deterministic":true,"force_col_wise":true,"min_data_in_leaf":10},
+  "view_rounds":50,
+  "detector":{"strip_n":50,"strip_alpha":0.5,"seed":17,"malware_threshold":0.5,"fpr":0.01},
+  "selection_samples":500,
+  "evaluation_limit":100,
+  "bootstrap_repeats":100,
+  "latency_samples":10
+}

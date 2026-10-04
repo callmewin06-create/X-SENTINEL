@@ -1,0 +1,16 @@
+{
+  "name": "official_ember2018_research",
+  "seeds": [17,29,43],
+  "rates": [0.005,0.01,0.02],
+  "triggers": ["concentrated","spread","cross"],
+  "attack_profile": "vector_stress",
+  "attack_profile_note": "Experimental vector stress test, NOT authors' feasible profile or proven PE realizability. Must be authorized before run.",
+  "rounds": 500,
+  "params": {"objective":"binary","num_leaves":64,"learning_rate":0.05,"max_bin":255,"feature_fraction":0.9,"bagging_fraction":0.9,"bagging_freq":1,"num_threads":4,"verbosity":-1,"deterministic":true,"force_col_wise":true},
+  "view_rounds": 150,
+  "detector": {"strip_n":50,"strip_alpha":0.5,"seed":17,"malware_threshold":0.5,"fpr":0.01},
+  "selection_samples": 2000,
+  "evaluation_limit": null,
+  "bootstrap_repeats": 1000,
+  "latency_samples": 100
+}

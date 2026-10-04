@@ -1,0 +1,6 @@
+{
+  "version": "v1-replace-after-sharing-is-configured",
+  "profiles": {"demo": [], "research": []},
+  "file_schema": {"path":"bundle/main.txt", "url":"public HTTPS direct download URL", "bytes":0, "sha256":"64 lowercase hex characters"},
+  "status":"No Google Drive access or actual model download URLs configured. Empty profiles are not a usable deployment bundle."
+}
