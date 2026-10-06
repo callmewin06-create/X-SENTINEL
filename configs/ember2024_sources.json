@@ -1,0 +1,14 @@
+{
+  "repository": "joyce8/EMBER2024",
+  "revision": "3d23efef7c0f0b702c5024400cfff4c3744a3832",
+  "scope": "PE only; preserve official train/test; no challenge set",
+  "files": [
+    {"name": "Dot_Net_train.zip", "bytes": 937108923, "sha256": "b9f6e90ab75293a7ceb9339700586dd033a03d19766282755ee31dfa0836e625"},
+    {"name": "Dot_Net_test.zip", "bytes": 220481493, "sha256": "b74c4181dbd77565fce16ba47c8ab0f7c7044ae6d880d859ec2c27365dea6299"},
+    {"name": "Win32_train.zip", "bytes": 12321281336, "sha256": "6cf9dea847960115f65d405d38b6b09d38c87225c8288dafedf00fed2512b1d4"},
+    {"name": "Win32_test.zip", "bytes": 2593425203, "sha256": "c05f6562dee3ace4195087be918eb00181e33bc31464c671fb5ba00c9dd5dfdb"},
+    {"name": "Win64_train.zip", "bytes": 5853142901, "sha256": "7b050100ce7bd87149bbfca442de3e02d4bf97d51251566caec2581eebe799fd"},
+    {"name": "Win64_test.zip", "bytes": 1176459716, "sha256": "52a5a05c1bfa5bb021bb8b44c2e0afcf8983dfa1c6c0a9d76db393e5c682ce10"}
+  ],
+  "preparation_strategy": "stream JSONL inside ZIP; avoid materializing complete decompressed dataset"
+}

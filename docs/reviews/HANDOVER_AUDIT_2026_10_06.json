@@ -1,0 +1,296 @@
+{
+  "verification_type": "read-only saved-artifact inference and metric recalculation; no training and no imports of handed-over scripts",
+  "versions": {
+    "numpy": "1.26.4",
+    "lightgbm": "4.6.0"
+  },
+  "eval_shapes": {
+    "D1": [
+      1000,
+      2381
+    ],
+    "X_test_benign": [
+      1000,
+      2381
+    ],
+    "X_test_malware": [
+      1000,
+      2381
+    ]
+  },
+  "clean": {
+    "benign_correct": 331,
+    "malware_correct": 900,
+    "benign_total": 1000,
+    "malware_total": 1000
+  },
+  "experiments": [
+    {
+      "trigger": "concentrated",
+      "features": 2381,
+      "trees": 150,
+      "saved_prediction_max_abs_error": 0.0,
+      "bypassed_all": 586,
+      "eligible_count": 900,
+      "bypassed_eligible": 492,
+      "clean_trigger_bypassed_all": 1,
+      "clean_trigger_bypassed_eligible": 1,
+      "new_evasions_eligible": 491,
+      "lost_evasions_eligible": 0,
+      "poisoned_clean_benign_correct": 364,
+      "poisoned_clean_malware_correct": 902,
+      "asr_eligible_percent": 54.666666666666664,
+      "tadr": {
+        "tau_from_manifest": 0.6445604562759399,
+        "detected_all": 0,
+        "detected_successful": 0,
+        "fp_count": 5,
+        "mean_score": 0.33552685379981995,
+        "auroc_percent": 39.5903,
+        "recomputed_trigger_score_max_abs_error": 0.0,
+        "recomputed_benign_score_max_abs_error": 0.0,
+        "recomputed_tau": 0.6445604503154755
+      },
+      "strip": {
+        "tau_from_manifest": 0.9579768180847168,
+        "detected_all": 0,
+        "detected_successful": 0,
+        "fp_count": 11,
+        "mean_score": 0.7911401391029358,
+        "auroc_percent": 46.765699999999995
+      }
+    },
+    {
+      "trigger": "spread",
+      "features": 2381,
+      "trees": 150,
+      "saved_prediction_max_abs_error": 0.0,
+      "bypassed_all": 944,
+      "eligible_count": 900,
+      "bypassed_eligible": 845,
+      "clean_trigger_bypassed_all": 1,
+      "clean_trigger_bypassed_eligible": 1,
+      "new_evasions_eligible": 844,
+      "lost_evasions_eligible": 0,
+      "poisoned_clean_benign_correct": 365,
+      "poisoned_clean_malware_correct": 914,
+      "asr_eligible_percent": 93.88888888888889,
+      "tadr": {
+        "tau_from_manifest": 0.6473754644393921,
+        "detected_all": 0,
+        "detected_successful": 0,
+        "fp_count": 7,
+        "mean_score": 0.2704801857471466,
+        "auroc_percent": 25.5975,
+        "recomputed_trigger_score_max_abs_error": 0.0,
+        "recomputed_benign_score_max_abs_error": 0.0,
+        "recomputed_tau": 0.6473754519224166
+      },
+      "strip": {
+        "tau_from_manifest": 0.9545244574546814,
+        "detected_all": 0,
+        "detected_successful": 0,
+        "fp_count": 9,
+        "mean_score": 0.7702593207359314,
+        "auroc_percent": 36.5235
+      }
+    },
+    {
+      "trigger": "cross",
+      "features": 2381,
+      "trees": 150,
+      "saved_prediction_max_abs_error": 0.0,
+      "bypassed_all": 999,
+      "eligible_count": 900,
+      "bypassed_eligible": 899,
+      "clean_trigger_bypassed_all": 1,
+      "clean_trigger_bypassed_eligible": 1,
+      "new_evasions_eligible": 898,
+      "lost_evasions_eligible": 0,
+      "poisoned_clean_benign_correct": 369,
+      "poisoned_clean_malware_correct": 902,
+      "asr_eligible_percent": 99.8888888888889,
+      "tadr": {
+        "tau_from_manifest": 0.6532731056213379,
+        "detected_all": 0,
+        "detected_successful": 0,
+        "fp_count": 7,
+        "mean_score": 0.27181169390678406,
+        "auroc_percent": 27.216800000000003,
+        "recomputed_trigger_score_max_abs_error": 0.0,
+        "recomputed_benign_score_max_abs_error": 0.0,
+        "recomputed_tau": 0.6532731127738952
+      },
+      "strip": {
+        "tau_from_manifest": 0.9568156003952026,
+        "detected_all": 0,
+        "detected_successful": 0,
+        "fp_count": 5,
+        "mean_score": 0.7017055749893188,
+        "auroc_percent": 26.308999999999997
+      }
+    },
+    {
+      "trigger": "stress_metadata_24",
+      "features": 2381,
+      "trees": 150,
+      "saved_prediction_max_abs_error": 0.0,
+      "bypassed_all": 98,
+      "eligible_count": 900,
+      "bypassed_eligible": 6,
+      "clean_trigger_bypassed_all": 95,
+      "clean_trigger_bypassed_eligible": 1,
+      "new_evasions_eligible": 6,
+      "lost_evasions_eligible": 1,
+      "poisoned_clean_benign_correct": 326,
+      "poisoned_clean_malware_correct": 903,
+      "asr_eligible_percent": 0.6666666666666667,
+      "tadr": {
+        "tau_from_manifest": 0.6692420840263367,
+        "detected_all": 1,
+        "detected_successful": 0,
+        "fp_count": 8,
+        "mean_score": 0.395445317029953,
+        "auroc_percent": 34.8413,
+        "recomputed_trigger_score_max_abs_error": 0.0,
+        "recomputed_benign_score_max_abs_error": 0.0,
+        "recomputed_tau": 0.669242087006569
+      },
+      "strip": {
+        "tau_from_manifest": 0.9784506559371948,
+        "detected_all": 0,
+        "detected_successful": 0,
+        "fp_count": 12,
+        "mean_score": 0.8296951055526733,
+        "auroc_percent": 37.8005
+      }
+    }
+  ],
+  "exact_vector_overlaps": {
+    "D1__X_test_benign": 0,
+    "D1__X_test_malware": 0,
+    "X_test_benign__X_test_malware": 0
+  },
+  "missing_reproduction_inputs": [
+    "X_SENTINEL_Baseline_Handover_Package\\data\\pilot_dataset_cache.npz",
+    "X_SENTINEL_Baseline_Handover_Package\\scripts\\baseline_detectors.py",
+    "X_SENTINEL_Baseline_Handover_Package\\scripts\\run_pilot_experiment.py"
+  ],
+  "file_inventory": [
+    {
+      "path": "BASELINE_REPORT.md",
+      "bytes": 19861,
+      "sha256": "282eacbc46f51dd87e4bbfb155aa4637393dfee927c36a31a1d658b37919afe5"
+    },
+    {
+      "path": "config\\feasible_features.json",
+      "bytes": 4473,
+      "sha256": "81ceb87e3f9ea6ba586819921aab43179896b0459eeaeaede41c8b08a41ef9da"
+    },
+    {
+      "path": "config\\view_mapping.json",
+      "bytes": 2463,
+      "sha256": "4a4b172ec09a28029963cdf88f41b869e505074ef37535e7d43b570cc30ba1f2"
+    },
+    {
+      "path": "data\\experiment_reproducibility_manifest.json",
+      "bytes": 8206,
+      "sha256": "097b18786e9f568257ad934b9aa09c88b01baf949fa4ee896d558a5c839f579d"
+    },
+    {
+      "path": "data\\reproducibility_artifacts\\sample_scores_concentrated.npz",
+      "bytes": 19705,
+      "sha256": "7762609ee194736d6a7803f277cea95a8a9afc635207b5ff9e8873d287b00e95"
+    },
+    {
+      "path": "data\\reproducibility_artifacts\\sample_scores_cross.npz",
+      "bytes": 19752,
+      "sha256": "045dd82a52cb812164c90e656a9a48d2e18113218d779b73c79c511752eb2014"
+    },
+    {
+      "path": "data\\reproducibility_artifacts\\sample_scores_spread.npz",
+      "bytes": 19726,
+      "sha256": "de7d8e36458d8e6afd4990f24277f3ee0f580141ba7ea75aa421dcbea17ccbf6"
+    },
+    {
+      "path": "data\\reproducibility_artifacts\\sample_scores_stress_metadata_24.npz",
+      "bytes": 20049,
+      "sha256": "f5bf9018a3dea55dfa83b40094775b3b88b0bd2c276420e086696d019de7906b"
+    },
+    {
+      "path": "data\\rigorous_baseline_benchmark_results.json",
+      "bytes": 4486,
+      "sha256": "169b133cd98186a77130ef0ec555c0109a3c4490164c2df551d67e15f487881d"
+    },
+    {
+      "path": "data\\rigorous_eval_dataset_1000.npz",
+      "bytes": 6029769,
+      "sha256": "767cd912f74a9be1c7781ab2adb42072da4f027e3f611c158eb1dd88e7d4555f"
+    },
+    {
+      "path": "docs\\01_paper_reading_notes.md",
+      "bytes": 9369,
+      "sha256": "9b04ee513115c4e697534183b27246aa46f44eece6e5a635e9c04626f32c13d4"
+    },
+    {
+      "path": "docs\\02_threat_model.md",
+      "bytes": 7722,
+      "sha256": "609a0d89d974ff1612a99dc3b38d0e3192b7746ae5b5b44e2691b0571e1b27df"
+    },
+    {
+      "path": "docs\\05_baseline_detectors_specification.md",
+      "bytes": 25848,
+      "sha256": "11fc8981d54c74d17c36a12a6c8456dcb59d4097cc106f6c187d171e58a64181"
+    },
+    {
+      "path": "models\\model_backdoor_concentrated.txt",
+      "bytes": 4256913,
+      "sha256": "2e5dfe50ab3825de82408fb79e1ada032a2e4ddccfc6c44ebe68a933cf5ec7a8"
+    },
+    {
+      "path": "models\\model_backdoor_cross.txt",
+      "bytes": 4275116,
+      "sha256": "860d7c33a9582c3156d69f49bdcab014f00c973f3f36772d70a8279770561942"
+    },
+    {
+      "path": "models\\model_backdoor_spread.txt",
+      "bytes": 4278693,
+      "sha256": "09e0df174c1a3ffe86cddd9bd92068344a6edbc60719d14300609eae1b4e6c74"
+    },
+    {
+      "path": "models\\model_backdoor_stress_metadata_24.txt",
+      "bytes": 4272506,
+      "sha256": "f4c3eebd0d3a250337ef55d37bc91bbe74f82ab01f3c66366b9bcb9dccd4b408"
+    },
+    {
+      "path": "models\\model_clean.txt",
+      "bytes": 4281323,
+      "sha256": "dc3b599d43273e185fe2544d2ea58e93c298a46a5615f741733497a2898b1fb2"
+    },
+    {
+      "path": "README_HUONG_DAN_SU_DUNG.md",
+      "bytes": 1707,
+      "sha256": "a20406c322fa7f2f677ac78034fb65ab7c4a2d0addf2c3af6a7fef89a3acd5af"
+    },
+    {
+      "path": "scripts\\export_reproducibility_artifacts.py",
+      "bytes": 10148,
+      "sha256": "3584bdd216f68e91ac634beb698c5f8e54d27b0a4e7eb0c47826a9acb14d8148"
+    },
+    {
+      "path": "scripts\\run_baseline_rigorous_validation.py",
+      "bytes": 19220,
+      "sha256": "c387a3d4678c13daa7ceaa4923b3c4aa09c08e2d45e5cdd36d7bc6674849f637"
+    },
+    {
+      "path": "scripts\\run_full_comparison_benchmark.py",
+      "bytes": 9308,
+      "sha256": "517602269c0e302bb64ecf4773a330d68493f07be23ad06d022c245d25c18090"
+    },
+    {
+      "path": "scripts\\x_sentinel_detectors.py",
+      "bytes": 15381,
+      "sha256": "d5743a6840bbba06259bb7ba4aae825d6ca60faee044779523bd89531611e0c4"
+    }
+  ]
+}

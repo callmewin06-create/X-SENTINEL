@@ -1,0 +1,7 @@
+{
+  "purpose": "approved 40000-row fit-only resource pilot; reuse existing research model parameters; not principal results",
+  "fit_rows": 40000,
+  "rounds": 500,
+  "view_rounds": 150,
+  "params": {"objective": "binary", "num_leaves": 64, "learning_rate": 0.05, "max_bin": 255, "feature_fraction": 0.9, "bagging_fraction": 0.9, "bagging_freq": 1, "num_threads": 4, "verbosity": -1, "deterministic": true, "force_col_wise": true}
+}

@@ -8,6 +8,7 @@ from xsentinel.schema import DIM,VIEWS
 from xsentinel.baselines.scores import contributions,tadr,strip
 from xsentinel.detection.calibration import threshold,d0_budget
 from xsentinel.detection.detector import Detector
+from xsentinel.detection.components import LEGACY_PROTOCOL
 from xsentinel.attacks.trigger import Trigger,poison,select_trigger
 from xsentinel.data.vectorizer import Vectorizer
 from xsentinel.evaluation.metrics import auc,paired_bootstrap,wilson
@@ -42,7 +43,7 @@ def test_additivity_strip_reproducible(fixture_model):
     assert np.all((a>=0)&(a<=1))
 
 def test_blind_api_and_m5_direction(fixture_model):
-    model,X,_=fixture_model; detector=Detector(model,X[:40])
+    model,X,_=fixture_model; detector=Detector(model,X[:40],protocol=LEGACY_PROTOCOL)
     assert not set(inspect.signature(Detector).parameters)&{'labels','manifest','clean_model'}
     ss,details=detector.components(X[:5],include_strip=False)
     assert details['m5_sensitive_branch']=='unsupported_group_only'
@@ -70,7 +71,7 @@ def test_feasible_cross_fails(fixture_model):
 
 def test_vectorizer_real_against_upstream():
     root=Path(__file__).resolve().parents[1]
-    raw=root/'ember2018/test_features.jsonl'
+    raw=root/'data/ember2018/test_features.jsonl'
     if not raw.exists(): pytest.skip('Local real EMBER absent; CI uses synthetic core fixtures')
     with raw.open(encoding='utf8') as f: rows=[json.loads(next(f)) for _ in range(32)]
     v=Vectorizer(); expected=np.stack([v.transform(r) for r in rows]); actual=v.transform_batch(rows)

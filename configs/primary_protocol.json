@@ -1,0 +1,33 @@
+{
+  "protocol": "xsentinel-primary-v2",
+  "datasets": {
+    "EMBER2018": "ember-v2-2381-views-v2",
+    "EMBER2024": "ember-v3-2568-views-v1"
+  },
+  "variants": ["reduced", "full"],
+  "M3": "view_mass",
+  "M4_reduced": "shap_behavioral_conflict",
+  "M4_full": "prob_gap",
+  "fusion": "equal_right_reference_ecdf_ranks",
+  "strip": {"n": 50, "alpha": 0.5, "rng": "sample_content_and_seed"},
+  "target_calibration_fpr": 0.01,
+  "malware_threshold": 0.5,
+  "cross_three_view_space": "vector_stress",
+  "m5": "supplementary_only_not_scheduled",
+  "sample_sizes": {"fit": 200000, "selection": 10000, "development": 10000, "confirmation": 10000, "reference": 500, "calibration": 2000, "final": 20000},
+  "pilot_budget": {"fit": 40000, "purpose": "resource measurement; not main research results"},
+  "family_geometry": {
+    "concentrated_structural": {"profile": "feature_restricted", "structural": 2},
+    "spread_structural": {"profile": "feature_restricted", "structural": 10},
+    "cross_3view_stress": {"profile": "vector_stress", "structural": 8, "behavioral": 8, "metadata": 8}
+  },
+  "poison_rate_denominator": "all_fit",
+  "rates": [0.005, 0.01, 0.02],
+  "seeds": [17, 29, 43],
+  "split_seed": 17,
+  "attack_screen": {"min_eligible": 1000, "min_asr": 0.5, "min_paired_gain": 0.2, "strict_max_accuracy_drop": 0.005, "max_protocol_rounds_per_dataset": 2},
+  "selector_protocol": {"candidates": ["legacy_rare", "signed_shap_conditioned"], "selection_pool": "selection", "comparison_pool": "development", "lock_before": "confirmation"},
+  "selector_lock_rule": {"scope": "one selector shared by both datasets", "priority_1": "number of strong_and_stealth_runs", "priority_2": "mean_paired_gain", "final_tie": "signed_shap_conditioned", "failed_runs": "preserve and count as not passing"},
+  "pending": {},
+  "execution_status": "research scope approved; implementation and source/data validation in progress"
+}

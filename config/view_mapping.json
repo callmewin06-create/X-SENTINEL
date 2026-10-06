@@ -1,0 +1,125 @@
+{
+  "Structural": {
+    "description": "Cấu trúc, bố cục và định dạng tệp PE (Header, Sections, General Info, Data Directories)",
+    "groups": [
+      {
+        "name": "GeneralFileInfo",
+        "key": "general",
+        "dim": 10,
+        "start_idx": 616,
+        "end_idx": 626
+      },
+      {
+        "name": "HeaderFileInfo",
+        "key": "header",
+        "dim": 62,
+        "start_idx": 626,
+        "end_idx": 688
+      },
+      {
+        "name": "SectionInfo",
+        "key": "section",
+        "dim": 255,
+        "start_idx": 688,
+        "end_idx": 943
+      },
+      {
+        "name": "DataDirectories",
+        "key": "datadirectories",
+        "dim": 30,
+        "start_idx": 2351,
+        "end_idx": 2381
+      }
+    ],
+    "total_dim": 357,
+    "slices": [
+      [
+        616,
+        626
+      ],
+      [
+        626,
+        688
+      ],
+      [
+        688,
+        943
+      ],
+      [
+        2351,
+        2381
+      ]
+    ]
+  },
+  "Behavioral/API": {
+    "description": "Hành vi dự kiến thông qua giao tiếp API và thư viện (Imports, Exports)",
+    "groups": [
+      {
+        "name": "ImportsInfo",
+        "key": "imports",
+        "dim": 1280,
+        "start_idx": 943,
+        "end_idx": 2223
+      },
+      {
+        "name": "ExportsInfo",
+        "key": "exports",
+        "dim": 128,
+        "start_idx": 2223,
+        "end_idx": 2351
+      }
+    ],
+    "total_dim": 1408,
+    "slices": [
+      [
+        943,
+        2223
+      ],
+      [
+        2223,
+        2351
+      ]
+    ]
+  },
+  "Metadata/String": {
+    "description": "Nội dung byte thô, thống kê entropy và chuỗi trích xuất (Byte Hist, Entropy Hist, Strings)",
+    "groups": [
+      {
+        "name": "ByteHistogram",
+        "key": "histogram",
+        "dim": 256,
+        "start_idx": 0,
+        "end_idx": 256
+      },
+      {
+        "name": "ByteEntropyHistogram",
+        "key": "byteentropy",
+        "dim": 256,
+        "start_idx": 256,
+        "end_idx": 512
+      },
+      {
+        "name": "StringExtractor",
+        "key": "strings",
+        "dim": 104,
+        "start_idx": 512,
+        "end_idx": 616
+      }
+    ],
+    "total_dim": 616,
+    "slices": [
+      [
+        0,
+        256
+      ],
+      [
+        256,
+        512
+      ],
+      [
+        512,
+        616
+      ]
+    ]
+  }
+}

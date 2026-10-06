@@ -1,0 +1,149 @@
+{
+  "review_date": "2026-10-05",
+  "submitted_sha256": "abfe94a4d26591b9d53d755a10763b2084f483d474caa236301175a8dab3a007",
+  "source_sha256": {
+    "docs\\upstream\\severi_ember_feature_utils.py": "c64d1bb447097272bbcee54d483b25f2b1513473881ff26b688371f09ea9b9c7",
+    "docs\\upstream\\severi_constants.py": "5205c673b145f7e21bc35c409ea4d28fa6a0416b5dd9ea3eb67e10fe53f488a5",
+    "docs\\upstream\\severi_data_utils.py": "7343aaec0696a53af22018dc9388b1f0186dccfc384da70a66446673c07e3d7b"
+  },
+  "feasible_rule": "vendored non_hashed minus infeasible_features; native feature IDs remap unchanged for these selected fields",
+  "derived_count": 17,
+  "derived_features": [
+    {
+      "index": 612,
+      "name": "paths_count"
+    },
+    {
+      "index": 613,
+      "name": "urls_count"
+    },
+    {
+      "index": 614,
+      "name": "registry_count"
+    },
+    {
+      "index": 615,
+      "name": "MZ_count"
+    },
+    {
+      "index": 616,
+      "name": "size"
+    },
+    {
+      "index": 626,
+      "name": "timestamp"
+    },
+    {
+      "index": 677,
+      "name": "major_image_version"
+    },
+    {
+      "index": 678,
+      "name": "minor_image_version"
+    },
+    {
+      "index": 679,
+      "name": "major_linker_version"
+    },
+    {
+      "index": 680,
+      "name": "minor_linker_version"
+    },
+    {
+      "index": 681,
+      "name": "major_operating_system_version"
+    },
+    {
+      "index": 682,
+      "name": "minor_operating_system_version"
+    },
+    {
+      "index": 684,
+      "name": "minor_subsystem_version"
+    },
+    {
+      "index": 689,
+      "name": "num_zero_size_sections"
+    },
+    {
+      "index": 690,
+      "name": "num_unnamed_sections"
+    },
+    {
+      "index": 691,
+      "name": "num_read_and_execute_sections"
+    },
+    {
+      "index": 692,
+      "name": "num_write_sections"
+    }
+  ],
+  "derived_view_counts": {
+    "structural": 13,
+    "behavioral": 0,
+    "metadata": 4
+  },
+  "submitted_indices_not_in_derived_set": [
+    512,
+    513,
+    514,
+    611,
+    617,
+    622,
+    623,
+    688
+  ],
+  "implementation_count": 16,
+  "derived_but_missing_in_implementation": [
+    684
+  ],
+  "implementation_outside_derived_set": [],
+  "interpolated_p99_checks": [
+    {
+      "n": 100,
+      "interpolated_p99": 98.01,
+      "strict_alerts": 1,
+      "empirical_fpr": 0.01
+    },
+    {
+      "n": 150,
+      "interpolated_p99": 147.51,
+      "strict_alerts": 2,
+      "empirical_fpr": 0.013333333333333334
+    },
+    {
+      "n": 200,
+      "interpolated_p99": 197.01,
+      "strict_alerts": 2,
+      "empirical_fpr": 0.01
+    },
+    {
+      "n": 250,
+      "interpolated_p99": 246.51,
+      "strict_alerts": 3,
+      "empirical_fpr": 0.012
+    },
+    {
+      "n": 300,
+      "interpolated_p99": 296.01,
+      "strict_alerts": 3,
+      "empirical_fpr": 0.01
+    }
+  ],
+  "submitted_strip_same_vector_same_process_scores": [
+    0.5325838327407837,
+    0.45796912908554077,
+    0.4980372190475464,
+    0.4318968653678894,
+    0.4785330295562744
+  ],
+  "entropy_counterexample": {
+    "probabilities": [
+      0.01,
+      0.99
+    ],
+    "mean_binary_entropy": 0.08079313589591121,
+    "entropy_of_mean_probability": 1.0
+  },
+  "scope": "review checks only; no target model training or detector code changes; only the inspected STRIP method AST was executed with a synthetic probability model"
+}

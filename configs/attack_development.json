@@ -1,0 +1,30 @@
+{
+  "name": "train_only_attack_screen_v1",
+  "seed": 17,
+  "split_seed": 731,
+  "fit_rows": 40000,
+  "selection_rows": 5000,
+  "development_rows": 10000,
+  "attack_profile": "feasible",
+  "trigger": "concentrated",
+  "selectors": ["legacy_rare", "joint_benign_rare"],
+  "selection_samples": 5000,
+  "rare_tuple_quantile": 0.2,
+  "rates": [0.005, 0.01, 0.02],
+  "rounds": 100,
+  "view_rounds": 100,
+  "params": {
+    "objective": "binary", "num_leaves": 31, "learning_rate": 0.08,
+    "max_bin": 127, "num_threads": 4, "verbosity": -1,
+    "deterministic": true, "force_col_wise": true, "min_data_in_leaf": 10
+  },
+  "screen": {
+    "malware_threshold": 0.5,
+    "min_eligible": 1000,
+    "min_asr": 0.5,
+    "min_paired_gain": 0.2,
+    "max_accuracy_drop": 0.02,
+    "max_tpr_drop": 0.02,
+    "max_fpr_increase": 0.02
+  }
+}

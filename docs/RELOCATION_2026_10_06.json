@@ -1,0 +1,37 @@
+{
+  "action": "Collect root reports/plans/source documents into docs",
+  "moved_at": "2026-10-06T23:05:46.7093104+07:00",
+  "content_verification": "SHA256 unchanged for all six files",
+  "files": [
+    {
+      "source": "D:\\.f tư bản ko cho t ngủ\\IAM302t\\Project\\Ban_Dac_Ta_Baseline_TADR_STRIP_X_SENTINEL.md",
+      "destination": "D:\\.f tư bản ko cho t ngủ\\IAM302t\\Project\\docs\\Ban_Dac_Ta_Baseline_TADR_STRIP_X_SENTINEL.md",
+      "sha256": "b0f6a6f5d13b321ccfbb1de29e3c052de7914e80403c1fd5d0237d50bd6fe9d6"
+    },
+    {
+      "source": "D:\\.f tư bản ko cho t ngủ\\IAM302t\\Project\\BASELINE_REPORT.md",
+      "destination": "D:\\.f tư bản ko cho t ngủ\\IAM302t\\Project\\docs\\BASELINE_REPORT.md",
+      "sha256": "282eacbc46f51dd87e4bbfb155aa4637393dfee927c36a31a1d658b37919afe5"
+    },
+    {
+      "source": "D:\\.f tư bản ko cho t ngủ\\IAM302t\\Project\\X_SENTINEL_HANDOFF_2026_10_06.md",
+      "destination": "D:\\.f tư bản ko cho t ngủ\\IAM302t\\Project\\docs\\X_SENTINEL_HANDOFF_2026_10_06.md",
+      "sha256": "d4f5e31f5e7769d18b377db2f844992cc34117ceaba4f2ec95fa02c8e0923bea"
+    },
+    {
+      "source": "D:\\.f tư bản ko cho t ngủ\\IAM302t\\Project\\X_SENTINEL_PLAN_HANDOFF.md",
+      "destination": "D:\\.f tư bản ko cho t ngủ\\IAM302t\\Project\\docs\\X_SENTINEL_PLAN_HANDOFF.md",
+      "sha256": "2f6d956809a0a6f5c9cb4fa4df96beaf50e8ae7e6557c1fcfba2de6b21377bc7"
+    },
+    {
+      "source": "D:\\.f tư bản ko cho t ngủ\\IAM302t\\Project\\báo cáo kế hoạch IAM.docx",
+      "destination": "D:\\.f tư bản ko cho t ngủ\\IAM302t\\Project\\docs\\báo cáo kế hoạch IAM.docx",
+      "sha256": "3796475e41575fea182c5f4b4bbd28fec41c1615ebfc4ddd3f84a28d8926cb5a"
+    },
+    {
+      "source": "D:\\.f tư bản ko cho t ngủ\\IAM302t\\Project\\Hướng dẫn hướng đi - X-SENTINEL Cross-View Backdoor Detection (Nhóm 4, IA2007).pdf",
+      "destination": "D:\\.f tư bản ko cho t ngủ\\IAM302t\\Project\\docs\\Hướng dẫn hướng đi - X-SENTINEL Cross-View Backdoor Detection (Nhóm 4, IA2007).pdf",
+      "sha256": "00c67298f3fc09a7c5efdce69ccd1eb88f4710912c8665a11e204e290d95c649"
+    }
+  ]
+}

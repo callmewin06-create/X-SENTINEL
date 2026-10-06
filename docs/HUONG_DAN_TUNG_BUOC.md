@@ -24,6 +24,20 @@ Train LightGBM sạch, sau đó chọn feature/value trigger từ train. Random 
 
 Mã Severi gốc dùng v1 2.351 cột và danh sách feasible không có Behavioral hash. Vì vậy T-cross ba view và T-spread 24 Metadata cần profile `vector_stress`, khác profile `feasible`. Không thể gọi stress-test là đã chứng minh chỉnh được PE. Nếu ASR thấp, cần sửa/đánh giá attack bằng development từ train, không tối ưu bằng final test.
 
+### 5.1. Kiểm chứng attack bằng development từ train
+
+Lệnh `develop-attack` chỉ mở các file `*_train.npy`, không mở test, reference hoặc calibration. Nó lấy mẫu ngẫu nhiên phân tầng từ toàn bộ train thành ba phần cân bằng, không giao nhau:
+
+1. **Fit: 40.000 mẫu.** Train model sạch và các model đầu độc; 0,5%/1%/2% nghĩa là đầu độc 200/400/800 mẫu benign, tính trên 40.000 mẫu fit.
+2. **Selection: 5.000 mẫu.** Chọn hai cột Metadata feasible và giá trị trigger. So cách cũ chọn từng giá trị hiếm với cách thử nghiệm chọn cả cặp giá trị đã xuất hiện trên benign, hiếm và có tổng SHAP âm. Hai cách dùng cùng cặp cột để so việc chọn giá trị. Đây là adaptation, chưa phải tái lập đúng thuật toán Severi.
+3. **Development: 10.000 mẫu.** Sau khi khóa các trigger và cấu hình, đo ASR trên malware được model sạch phát hiện đúng; đồng thời đo accuracy/TPR/FPR trên dữ liệu chưa gắn trigger.
+
+Gắn cùng trigger vào malware rồi cho **model sạch** dự đoán là đối chứng quan trọng. Nếu model sạch cũng bị lừa nhiều, ASR cao của model đầu độc có thể chỉ phản ánh trigger gây né phân loại trực tiếp. Vì vậy báo cả ASR của hai model, số mẫu mới bị lừa, số mẫu hết bị lừa và chênh lệch trên cùng các malware eligible.
+
+Quy tắc screening được định trước: ít nhất 1.000 malware eligible, ASR >=50%, mức tăng so đối chứng >=20 điểm phần trăm, accuracy/TPR giảm và FPR tăng không quá 2 điểm phần trăm. Đây là tiêu chí development do nhóm thử nghiệm, không phải tiêu chuẩn bắt buộc của bài Severi hoặc chứng minh backdoor. Không hạ tiêu chí sau khi thấy kết quả để biến run thất bại thành thành công.
+
+Mỗi run có source snapshot, split/ID, config và model hash, danh sách poisoning, dự đoán từng mẫu và báo cáo tiếng Anh. Giữ nguyên run cũ; nếu sửa selector hoặc tăng cỡ mẫu/rounds, dùng config và thư mục mới, ghi rõ đó là vòng phát triển tiếp theo. Các kết quả development đã xem không còn là holdout độc lập để xác nhận lựa chọn cuối. Không dùng final test để chọn trigger hoặc chỉnh selector.
+
 ## 6. TADR và STRIP của baseline
 
 SHAP là mức đóng góp vào raw margin lớp malware. `pred_contrib=True` trả thêm bias cuối; code bỏ bias và kiểm tra tổng khớp raw output. TADR lấy feature tuyệt đối lớn nhất chia tổng tuyệt đối. Tín hiệu chia đều trên nhiều feature có thể làm tỷ lệ này giảm; đó là giả thuyết.
@@ -58,4 +72,4 @@ Bundle mang main model, view models, reference/ranks, threshold/config và check
 
 ## 12. Đọc code theo thứ tự
 
-`schema.py` → `data/vectorizer.py` → `data/prepare.py` → `attacks/trigger.py` → `baselines/scores.py` → `detection/detector.py` → `evaluation/metrics.py` → `experiment.py` → `dashboard/app.py`. Xem tests để biết quy tắc nào đã được kiểm tra. README chứa lệnh chạy và trạng thái thực tế nằm trong IMPLEMENTATION_STATUS.
+`schema.py` → `data/vectorizer.py` → `data/prepare.py` → `attacks/trigger.py` → `attacks/development.py` → `baselines/scores.py` → `detection/detector.py` → `evaluation/metrics.py` → `experiment.py` → `dashboard/app.py`. Xem tests để biết quy tắc nào đã được kiểm tra. README chứa lệnh chạy và trạng thái thực tế nằm trong IMPLEMENTATION_STATUS.

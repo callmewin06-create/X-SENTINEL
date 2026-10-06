@@ -12,7 +12,7 @@ def test_pe_verification_rejects_invalid():
 def test_streaming_duplicate_and_split_rules(tmp_path):
     # Upstream-valid raw records can be drawn from local data without using their
     # research labels inside a detector. This validates actual streaming wiring.
-    raw=Path(__file__).resolve().parents[1]/'ember2018/test_features.jsonl'
+    raw=Path(__file__).resolve().parents[1]/'data/ember2018/test_features.jsonl'
     if not raw.exists(): pytest.skip('Real raw dataset unavailable')
     with raw.open(encoding='utf8') as f: rows=[json.loads(next(f)) for _ in range(30)]
     source=tmp_path/'source'; source.mkdir()

@@ -1,0 +1,8 @@
+# Preserve exact bytes of models and calibrated bundles on every platform.
+models/*.txt -text
+outputs/**/bundle/* -text
+
+# Pinned upstream sources are recorded with SHA256 checksums.
+docs/upstream/* -text
+src/xsentinel/*_upstream.py -text
+src/xsentinel/pefile_warnings.txt -text

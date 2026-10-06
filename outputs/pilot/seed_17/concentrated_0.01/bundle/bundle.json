@@ -1,0 +1,44 @@
+{
+  "schema": "ember-v2-2381-views-v1",
+  "config": {
+    "strip_n": 50,
+    "strip_alpha": 0.5,
+    "seed": 17,
+    "malware_threshold": 0.5,
+    "fpr": 0.01
+  },
+  "thresholds": {
+    "TADR": 0.254451608481572,
+    "M3": 0.6488472940543188,
+    "M4_reduced": 0.052083637115096046,
+    "M5_limited": 0.0,
+    "M4_full": 0.5766036919801578,
+    "STRIP": 0.7471917746935837,
+    "X_reduced": 0.915,
+    "X_reduced_M5_limited": 0.9433333333333334,
+    "X_full": 0.94,
+    "X_full_M5_limited": 0.96
+  },
+  "hashes": {
+    "main.txt": "2c2ebaf33529bc797917ac1cf239885df5f192ab54604268b2c82b9cb812c019",
+    "view_structural.txt": "c92372095105f7f98d439326c406350330eea4caf2d51b1caaf80cac51fb4ef4",
+    "view_behavioral.txt": "531e934cd496f5aa18704f6bf26db5328d4feaf074e7a362157ecbf20235c610",
+    "view_metadata.txt": "ca9268d0c115a194a0355097a5e5e579cf40dd04495038dd3b44eb9ba0e78acd",
+    "reference.npz": "b0e7f78ada7d49c1783ccbdfd61fca59d94b2f4af572783487eeca647e6759a1"
+  },
+  "calibration_fpr": {
+    "TADR": 0.01,
+    "M3": 0.01,
+    "M4_reduced": 0.01,
+    "M5_limited": 0.0,
+    "M4_full": 0.01,
+    "STRIP": 0.01,
+    "X_reduced": 0.01,
+    "X_reduced_M5_limited": 0.01,
+    "X_full": 0.0075,
+    "X_full_M5_limited": 0.0075
+  },
+  "calibration_size": 400,
+  "m5_scope": "limited; sensitive API/string branch unsupported",
+  "pe_extraction": "experimental_lief_0.16.6"
+}

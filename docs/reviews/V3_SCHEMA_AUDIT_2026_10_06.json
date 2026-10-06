@@ -1,0 +1,211 @@
+{
+  "scope": "schema probes only; official train; no predictions/attack selection",
+  "dataset": "EMBER2024",
+  "schema": "ember-v3-2568-views-v1",
+  "schema_sha256": "5332d4b429eb10e2ba736324f38f17f29211c68226f6e98e6deada29c0686ccc",
+  "dimension": 2568,
+  "extractor_commit": "0ef753e81d98bf209f71b03cd331dfc190b5b54d",
+  "extractor_sha256": "58a085e9ad307aa2c52e165985ff80db8fd5b763891c0cba2d1758a4825f7273",
+  "archive": "D:\\.f tư bản ko cho t ngủ\\IAM302t\\Project\\data\\ember2024_archives\\Dot_Net_train.zip",
+  "archive_sha256": "b9f6e90ab75293a7ceb9339700586dd033a03d19766282755ee31dfa0836e625",
+  "dataset_revision": "3d23efef7c0f0b702c5024400cfff4c3744a3832",
+  "archive_bytes": 937108923,
+  "uncompressed_bytes": 4487176033,
+  "shards": 52,
+  "sample_count": 104,
+  "per_shard_first_records": 2,
+  "file_types": [
+    "Dot_Net"
+  ],
+  "labels_for_audit_only": {
+    "0": 49,
+    "1": 55
+  },
+  "finite_float32": true,
+  "vector_sha256": "761af65037765e4ec6823c85f6353b7bfe55ddc91caa0f85536c829079b0e120",
+  "seen_source_ids": [
+    "002bafa236ab2488ca15a6ba7691ffafc88e9c6f3394626eab305672e13ba88a",
+    "002bf626f714748ddf955251143c772a6a8aabe2b1038e55cae3cbaef6cbc9ff",
+    "000629b02aee2bd2f5412ee98b227bcbb1118f6bb3423c81c3dc2072bcdaa747",
+    "00146e631ee289f555773fbed51cbd62f7f96cc309decffee23acad08ac93fc4",
+    "0039e2cf8e2d4d5e698209e52b4bb260510000c17001bdd4b0fe8baf71dae67a",
+    "003a1eeb57083f85954102ee1a825de2d18bf872a7ed5dc04307e7c171029e94",
+    "000199f68ea163f70bc89458146f4f59c1431af6290634d0864b418094e7582b",
+    "001995c59d836783cb38d261b34e025e1394b9a7827dfc277628970397990598",
+    "002e8349034be2093f7b3c13cbca082444ccaa058439fe6e45f08bbe749f4938",
+    "004bfebd32983ad24ec44d532088fe3a36d061074227ca94fe69742a27f1558c",
+    "00062aad8dbd7fffcf737917ba3890d6c76a3cd16cd5e9be0a2657f5d8f62d84",
+    "0020f8bf807a38df90766b0f87bfc555440b06d8efabc4decf53c99865264e28",
+    "000c8c617aba3c2c6a4bf21b692b6fb6c63add022bf7131be994d1aa3b0d5497",
+    "00109002691cc9f3109f6acc63d459079db035e5f0497b58c493b51246fd267b",
+    "000ac33c4c5e7209c3f1b48c8a697edfcd0dc4edf6989406a073e67baae95a01",
+    "001f1b7047de07b19a2e3ed8da75801dd0a8ff3ba4fcb0b4728aa1d2ace49b00",
+    "000feaec81a7ee1ddfbc1fb7d0449e9278b21e2e685bc7077d4a5eab0351150b",
+    "00183ad8c1a7b170207c62a2a89982967d17dbdcb013d70c57c574441410a5e8",
+    "000853a930852a50d3402aa9c1432a743230e0644461eec7a3fcb6aca6545f07",
+    "001c81dc243883a4c64e4ecf4acf70860616bcd32e60deee036d1f0b51d7d903",
+    "0011f4aa3a526cdcab16aa9e74a7b4c34f013686b76d6e088c4249ab7a0f5beb",
+    "0017c3c631f8065ca7044a76333322253d1931699ab2c84f609ca52e7be4b77f",
+    "0016e63047f784c76a9ed8411cc3ed3a2a45bf682a3aa75cb32fd018959960eb",
+    "00329a5e2397d7b2905d94536169c74d46465a464db6f4289c133f42ca73a157",
+    "0006a7c211492375af6fb8e11e15b604b7e5c74a13cffe3ee13ad6d7fd8b64f6",
+    "001f093eac3f6216fc8875ebdc5893006eb90d2768a5f45aabdff94a0c35283c",
+    "0004ecf01acb4579e70ec626eb3d9f39f2a754008aeaf376350b672ed7a3cdbe",
+    "000d3ce268bbe4ca59f5658a30e35f9e95a98eeca75e9336e9deeea2ea09a868",
+    "000ebfc4fb8a0625dff1a64d7532535ab9411161b403fbae3e03556f3141f102",
+    "001184ab29aa8bbbc8fa4d4ba8c57d19f410e7fa03f69b2118d75a4aa6b2aee1",
+    "0001a9c499c0f57df160f01ef57c6191608234221f5ae904bcd838e6cbffb014",
+    "0007321144728058bbf09996e0785a82e6c222ab5685e0ecd58575bf49fb3b23",
+    "000727d7bcd5dc0d24a2d8837d41c88a702da2145ec270d691cad9d6900577f8",
+    "000adca846fef3073eb6166d117d494288ab3ed5955264ce14617a51f994507b",
+    "000c1d044aab23fbed028acf2d745cf7d7f27fddd814dfe4b16546e314948387",
+    "001b888a5a4bbd96d99471377bd4b1b31258b29b45bf9affaa93a80c9f546e23",
+    "000378022c1d6e6dd72a66923ebca59222a0038fc149549bcd5ecac39ea37380",
+    "000c6e16cf81645ee2e0702c103f4fdc0690172e343d01f0f8bf2caf63080437",
+    "0021c0f4e0a6550c01b83eb868ad73c3720620178ff249d18380d0c67830aed9",
+    "002bd86d51d5375eb5c8b5591027d38ef4c6ca13a41561c369eec77a669f7c97",
+    "00155a1cdcdfa0bd5887d113de065919fc1366b0edfde315b6320d3d396cd71f",
+    "0017017d437d8e1bc8340e025906e7a658d56a80522b2ee89f153c7b3d718700",
+    "00098964991e1b8d3c5082bf2324f89d42d2532bfa979c5c93623b0001575e6b",
+    "001e27044cb20e909560a0270ae977d5215d4ddf0a72222276d469f6f7b8a9c8",
+    "0005878d6b09afc47f4876c681f04fd908d1d3699f012666d957825af799a43f",
+    "00125ef1f758119538ffde693f9cf86cbd45c008b44b15582425e78c398e4243",
+    "000baddd30e9d384df061abd713de3e804bf44d44e0f9cd981c1c993ccfcfefd",
+    "001c6b2ca5bc0830f77b51804ccf38d7585d15728a13524998d8426697e37a61",
+    "00056e4efec1a52f5369da8e664e9f65c745a7e9bcdb19f14900fb57420d6f4c",
+    "0006d98afa85602c043fba2b4a7aa092853ca89b5ee037b08c7c6ae3144985c5",
+    "00021d8f405b1c0c24abe87f97adbe09f379e66dbf20d20ad924f44ee364f116",
+    "0008298c91fe7ba17da88497f4a49967cf6dee9d685c0f2294da435910363bd8",
+    "00396c97d2f4ad52e2b827afa2c54d563e14fa795223f4de4fb5e8f620749771",
+    "00410315546f0e592febbf03ee8f0819f0a3cee77d7cb7156a1ae1d1bae8a945",
+    "000f399f4133a68894ce501d282c7b0c23489449b1b15dc79f788ef2b924d75b",
+    "00171ad4ca5457c15333ac5e67f9ad69b83bd381cadd0bcb8d70eed27f7a983f",
+    "00287ef080170269c183362038194d58818eb9bb2ca3f271881d5cbedd0e2924",
+    "002e3ee40257cb5c1fe2cb5e70613e033ae4c47ec816d59685f8bd753f087612",
+    "00043a9f06636fa862f11c21e45856d8fbd046351bbd062e232ad6785fb4a79e",
+    "0017fc383350b96bf72eaaee461760be2867c7a087baed4e9e6ebb762ea285ea",
+    "001244fe77fe637a530a1827ff9757b0768e6bd4772decb8a2bd47ace594b64e",
+    "0017d4163870907d2c1ff9d59533baa6f8aef0271c7b936ab4c9ec93db430f1b",
+    "00005a79690c9bb7cff98f575099271ba0ed2a06b712d132cb9f2030f866dde9",
+    "0006086c681171a9d896d1fec87b14fc91e130ead6d7a44b933ba3a4961cc18a",
+    "000833ee945998eb494c90abd5581457762d5f3f574bfba52dbccdfb64ca2619",
+    "000bbf99d7694be5bd23cb29aed06d5efdbdf266480db2a0f38ca963eed7b030",
+    "0008cd46802338dcc9b40f42c30cbe5dfa48b360c7ca60900286d5e1bfbf904c",
+    "000abd702f9f50825b4aa03bdfe60c6afa3acfbbaebf5ba6908d1f1cbfdde43b",
+    "00043e343bc4379e31277773cc664127c57b17f1e49f106b047fb30781280fd5",
+    "0005d528296a4183d51da2986507dd8e42b75d6ef3ea527e85ee97b94d06beda",
+    "000054edea8ead33da86263c3bcd0535a118c2ffe123e9703415e55de6ae2303",
+    "0011bc6305534e8cae316a0c242730a63e0cbe5d848e7113410406cd9ecc5449",
+    "0039c1236691932b47aea3a0120fdd5da74df758ece5b133c3aab7951b84b45e",
+    "003ffc818577ecec15db76e97e1bc3acafce6a8ee5e0887b091366ba50b6133b",
+    "0012b1b4926c1ddb29e10e7d5997eaf0426fafd4340bf526a2ad5b55183dd9dc",
+    "00367187ddb850536982e5460b218fefd5cadf5cd126a4401bdb4bd527ca8ae3",
+    "0002e821341e784857ce8fb2313e311ed8a3d741f7f72c2292c0dd3b9822934f",
+    "001295afb89bf7c94425786b0d35cb083167955b5df7e293da7aa0aa60a2f833",
+    "000f587e37a693eedb2685a6fbaa4c0ae6a7afd97dd1653728a8fdb21cd3b08e",
+    "001b435fa95ec2a1acd402f01ce768f841da649e7645480e6d8d007364564b4e",
+    "0002f8353b54855f362b1de3ba009e422185c35966fc0f25bb74944696b3e3f1",
+    "001d7ecbe58c36673500de22dbd300038d86ead6e99f88736a87a6c785a67b1a",
+    "0021b5f73d5a97afa5c23d47cf77680ca948d6ed0ceb7bcf2bd6b21495427422",
+    "002247544e1bb5b6fe47daebefe9dd15ed52829b03209cebfb1b97db1a489784",
+    "00035a89937a7f8c54f28645358304409a1ff07ba07713df469ffb5fd20e5998",
+    "00286d10b313fcaaf04d88f0a0cd6caef9b220ea8607892bf7397c8ac3a58a7b",
+    "001bdb5eac62d5df6cf4427d18b4214113872a3e2f14007d26919becf7f4e6be",
+    "002b6cc508fbee796ca99120138177a62ef76e5786e23bf6e5cb47adff7aa25f",
+    "000840dcd147544b07920fc1c2d6f4dc6c1d77079e94332585a4446829d56f9b",
+    "000d931f8f76a4fc9ba255cbc972e03f58d3e49bcdd6008094ac0dc2e4fe25a6",
+    "0006874297cd66f75efa52b7dbe744f1e6f0d55b10148baa077d8114a498f521",
+    "0008cef98036cab1f07971c4ba982f687afcd33bbc9c4ac378e95b06c23f9058",
+    "00289e0f98afcb9a709f39fed63730dd0d6e43e409f17a12deef9b1256d69822",
+    "0047bcdfa34c768b4fd4b194a14d2a1d545a783770403876d5df1b405da40ffb",
+    "00087a1a80f416fce7dd11597e15466617f42c30a837dc539223f963074e7d2e",
+    "001051985b8006686f5d7b82554fb9c5c056f20b1c542ff4168186254e7f6186",
+    "000439ab3accbdb196225e5e1cb387471c1469e379a5082de56696aa762c59dc",
+    "000d7db645b69db54921146fc2e54c5fac3cd9ac6186a7dff03c40274dadf3f3",
+    "000ba1d7065ba2dc73e5cf7afca16695405d03cd235d52946042c715478f71bd",
+    "001ac78b59057d8ccc45bb145776a0d9135ce3804c5dcb4cf1278d3908159365",
+    "0003cf72e0eda9f0e4b36d4fdb7017c9d56260f37b8f0e114a9cadb0a57b9ce4",
+    "0004fd49c084ed6fade3ed92a9aa959fba61ce344caf943982924fbe6313bfe2",
+    "000338e356bdd412c53daa943fe31e5361aab139e27873fb061e9ab59a0018da",
+    "0007ae532560363924ce4497eb169f83a8abc1c9796ac7ceba114c96eeac5806"
+  ],
+  "view_sizes": {
+    "structural": 467,
+    "behavioral": 1411,
+    "metadata": 690
+  },
+  "restricted_probe_variation": [
+    {
+      "index": 0,
+      "name": "general.size",
+      "varying_on_probes": true
+    },
+    {
+      "index": 696,
+      "name": "header.coff.timestamp",
+      "varying_on_probes": true
+    },
+    {
+      "index": 703,
+      "name": "header.optional.major_image_version",
+      "varying_on_probes": false
+    },
+    {
+      "index": 704,
+      "name": "header.optional.minor_image_version",
+      "varying_on_probes": false
+    },
+    {
+      "index": 705,
+      "name": "header.optional.major_linker_version",
+      "varying_on_probes": true
+    },
+    {
+      "index": 706,
+      "name": "header.optional.minor_linker_version",
+      "varying_on_probes": false
+    },
+    {
+      "index": 707,
+      "name": "header.optional.major_operating_system_version",
+      "varying_on_probes": true
+    },
+    {
+      "index": 708,
+      "name": "header.optional.minor_operating_system_version",
+      "varying_on_probes": true
+    },
+    {
+      "index": 710,
+      "name": "header.optional.minor_subsystem_version",
+      "varying_on_probes": true
+    },
+    {
+      "index": 771,
+      "name": "section.num_zero_size_sections",
+      "varying_on_probes": false
+    },
+    {
+      "index": 772,
+      "name": "section.num_unnamed_sections",
+      "varying_on_probes": true
+    },
+    {
+      "index": 773,
+      "name": "section.num_read_and_execute_sections",
+      "varying_on_probes": true
+    },
+    {
+      "index": 774,
+      "name": "section.num_write_sections",
+      "varying_on_probes": true
+    }
+  ],
+  "limits": "Only this training archive and probes checked; no main fit/selection audit or 2024 model results.",
+  "upstream_behavior_preserved": [
+    "exports first field is hash-vector length, not actual export count",
+    "DataDirectories.process_raw_features iterates range(1,len(raw_obj)-1); preserve last-entry behavior"
+  ],
+  "test_accessed": false,
+  "binary_executed": false
+}

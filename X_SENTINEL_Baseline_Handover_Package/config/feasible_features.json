@@ -1,0 +1,157 @@
+{
+  "total_feasible_count": 16,
+  "structural_count": 12,
+  "metadata_count": 4,
+  "structural_indices": [
+    616,
+    617,
+    622,
+    623,
+    626,
+    677,
+    678,
+    679,
+    680,
+    688,
+    689,
+    690
+  ],
+  "metadata_indices": [
+    512,
+    513,
+    514,
+    611
+  ],
+  "all_indices": [
+    512,
+    513,
+    514,
+    611,
+    616,
+    617,
+    622,
+    623,
+    626,
+    677,
+    678,
+    679,
+    680,
+    688,
+    689,
+    690
+  ],
+  "features": [
+    {
+      "index": 512,
+      "name": "numstrings",
+      "group": "StringExtractor",
+      "view": "Metadata/String",
+      "description": "Tổng số lượng chuỗi in được (Printable strings count). Attacker chèn thêm chuỗi văn bản benign."
+    },
+    {
+      "index": 513,
+      "name": "avlength",
+      "group": "StringExtractor",
+      "view": "Metadata/String",
+      "description": "Độ dài trung bình của các chuỗi in được. Attacker điều chỉnh độ dài chuỗi chèn."
+    },
+    {
+      "index": 514,
+      "name": "printables",
+      "group": "StringExtractor",
+      "view": "Metadata/String",
+      "description": "Tổng số ký tự in được trong toàn bộ file. Tăng tương ứng khi chèn chuỗi."
+    },
+    {
+      "index": 611,
+      "name": "string_entropy",
+      "group": "StringExtractor",
+      "view": "Metadata/String",
+      "description": "Entropy phân bố ký tự in được. Có thể kiểm soát bằng việc chọn từ điển chuỗi tiếng Anh chuẩn."
+    },
+    {
+      "index": 616,
+      "name": "file_size",
+      "group": "GeneralFileInfo",
+      "view": "Structural",
+      "description": "Kích thước tệp tin PE (bytes). Dễ dàng tăng thông qua chèn Overlay padding hoặc Slack space."
+    },
+    {
+      "index": 617,
+      "name": "vsize",
+      "group": "GeneralFileInfo",
+      "view": "Structural",
+      "description": "Kích thước ảo toàn bộ hình ảnh PE trong bộ nhớ (VirtualSize)."
+    },
+    {
+      "index": 622,
+      "name": "has_resources",
+      "group": "GeneralFileInfo",
+      "view": "Structural",
+      "description": "Cờ có tài nguyên (.rsrc). Attacker có thể chèn mục tài nguyên vô hại."
+    },
+    {
+      "index": 623,
+      "name": "has_signature",
+      "group": "GeneralFileInfo",
+      "view": "Structural",
+      "description": "Cờ chữ ký số Authenticode. Attacker có thể gỡ bỏ hoặc gắn chứng chỉ tự ký."
+    },
+    {
+      "index": 626,
+      "name": "coff_timestamp",
+      "group": "HeaderFileInfo",
+      "view": "Structural",
+      "description": "Thời gian biên dịch COFF Header (TimeDateStamp). Sửa đổi tùy ý không ảnh hưởng nạp file."
+    },
+    {
+      "index": 677,
+      "name": "major_image_version",
+      "group": "HeaderFileInfo",
+      "view": "Structural",
+      "description": "Số phiên bản chính của Image trong Optional Header."
+    },
+    {
+      "index": 678,
+      "name": "minor_image_version",
+      "group": "HeaderFileInfo",
+      "view": "Structural",
+      "description": "Số phiên bản phụ của Image trong Optional Header."
+    },
+    {
+      "index": 679,
+      "name": "major_linker_version",
+      "group": "HeaderFileInfo",
+      "view": "Structural",
+      "description": "Số phiên bản chính của Linker trong Optional Header."
+    },
+    {
+      "index": 680,
+      "name": "minor_linker_version",
+      "group": "HeaderFileInfo",
+      "view": "Structural",
+      "description": "Số phiên bản phụ của Linker trong Optional Header."
+    },
+    {
+      "index": 688,
+      "name": "num_sections",
+      "group": "SectionInfo",
+      "view": "Structural",
+      "description": "Tổng số lượng section PE. Attacker chèn thêm section rỗng hoặc section chứa payload vô hại."
+    },
+    {
+      "index": 689,
+      "name": "zero_size_sections",
+      "group": "SectionInfo",
+      "view": "Structural",
+      "description": "Số lượng section có kích thước RawData bằng 0. Khả thi bằng việc tạo Section header rỗng."
+    },
+    {
+      "index": 690,
+      "name": "empty_name_sections",
+      "group": "SectionInfo",
+      "view": "Structural",
+      "description": "Số lượng section có tên rỗng trong Section table."
+    }
+  ]
+}

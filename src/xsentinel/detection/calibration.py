@@ -10,8 +10,9 @@ def threshold(scores,fpr=0.01):
     return float(s[len(s)-allowed-1])
 
 def rank(reference,scores):
-    reference=np.sort(np.asarray(reference))
-    if not len(reference): raise ValueError('Empty rank reference')
+    reference=np.sort(np.asarray(reference,dtype=float)); scores=np.asarray(scores,dtype=float)
+    if reference.ndim!=1 or not len(reference) or not np.isfinite(reference).all() or not np.isfinite(scores).all():
+        raise ValueError('Invalid rank reference/scores')
     return np.searchsorted(reference,scores,side='right')/len(reference)
 
 def d0_budget(scores,q=0.01):

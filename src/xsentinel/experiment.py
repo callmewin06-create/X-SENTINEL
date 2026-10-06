@@ -9,23 +9,31 @@ import numpy as np
 from xsentinel.data.prepare import load_data
 from xsentinel.attacks.trigger import select_trigger,poison,FEASIBLE
 from xsentinel.detection.detector import Detector
-from xsentinel.schema import VIEWS
+from xsentinel.schema import VIEWS,SCHEMA_VERSION,get_schema
+from xsentinel.detection.components import LEGACY_PROTOCOL
 from xsentinel.utils import read_json,write_json,sha256
 from xsentinel.evaluation.metrics import rate,auc,paired_bootstrap,latency_summary
 
-def train(X,y,path,config,seed,view=None):
+def train(X,y,path,config,seed,view=None,schema=SCHEMA_VERSION):
+    schema=get_schema(schema)
     if len(np.unique(y))!=2: raise ValueError('Training requires both benign and malware labels')
     params=dict(config['params']); params.update(seed=seed,data_random_seed=seed,feature_fraction_seed=seed,bagging_seed=seed)
     lock=Path(path).with_suffix('.training.json')
     expected={'params':params,'seed':seed,'view':view,'rounds':config['view_rounds'] if view else config['rounds'],'rows':len(y)}
+    if schema.version!=SCHEMA_VERSION:
+        expected.update(schema=schema.version,schema_sha256=schema.fingerprint)
     if Path(path).exists():
         state=read_json(lock)
         if state['training']!=expected or state['model_sha256']!=sha256(path):
             raise ValueError('Training checkpoint mismatch')
-        return lgb.Booster(model_file=str(path))
+        loaded=lgb.Booster(model_file=str(path)); schema.check_model(loaded,view)
+        return loaded
     started=time.perf_counter()
-    data=np.asarray(X[:,VIEWS[view]]) if view else X
-    ds=lgb.Dataset(data,label=y,free_raw_data=True)
+    if X.ndim!=2 or X.shape!=(len(y),schema.dim): raise ValueError('Training matrix/schema mismatch')
+    indices=schema.views[view] if view else np.arange(schema.dim)
+    data=np.asarray(X[:,indices]) if view else X
+    cats=[i for i,j in enumerate(indices) if j in schema.categorical]
+    ds=lgb.Dataset(data,label=y,free_raw_data=True,categorical_feature=cats)
     model=lgb.train(params,ds,num_boost_round=config['view_rounds'] if view else config['rounds'])
     model.save_model(str(path)); del ds,data; gc.collect()
     write_json(lock,{'training':expected,'model_sha256':sha256(path),'elapsed_seconds':time.perf_counter()-started})
@@ -89,7 +97,7 @@ def evaluate(detector,clean,d,splits,trigger,out,config):
             'TADR_only':ids[m1&~m4].tolist(),method+'_only':ids[~m1&m4].tolist()}
     write_json(out/'paired_cases.json',catch)
     # E0 controls: same vectors through the clean model; no use inside poisoned detector.
-    control=Detector(clean,detector.reference,config=config['detector'])
+    control=Detector(clean,detector.reference,config=config['detector'],protocol=LEGACY_PROTOCOL)
     e0={}
     for name,X in pools.items():
         collected={}
@@ -145,6 +153,8 @@ def evaluate(detector,clean,d,splits,trigger,out,config):
 
 def run(directory,output,config_path,allow_vector_stress=False,resume=False):
     config=read_json(config_path); d=load_data(directory); meta=read_json(Path(directory)/'dataset.json')
+    if meta['schema']!=SCHEMA_VERSION:
+        raise ValueError('Legacy run command requires archived V2 data; use the versioned primary workflow')
     if config['attack_profile']=='vector_stress' and not allow_vector_stress:
         raise ValueError('Vector stress requires explicit --allow-vector-stress; no PE realizability claim')
     root=Path(output); root.mkdir(parents=True,exist_ok=True)
@@ -195,7 +205,7 @@ def run(directory,output,config_path,allow_vector_stress=False,resume=False):
                     'seed':seed,'clean_model_sha256':sha256(base/'clean.txt')})
                 model=train(Xp,d['y_train'],dest/'poisoned.txt',config,seed); del Xp; gc.collect()
                 detector_config=dict(config['detector']); detector_config['seed']=seed
-                detector=Detector(model,ref,views,detector_config).fit(cal)
+                detector=Detector(model,ref,views,detector_config,protocol=LEGACY_PROTOCOL).fit(cal)
                 detector.save(dest/'bundle',dest/'poisoned.txt',view_paths)
                 write_json(dest/'threshold_lock.json',{'bundle_sha256':sha256(dest/'bundle/bundle.json'),'config_sha256':sha256(config_path),
                     'split_sha256':sha256(Path(directory)/'splits.npz'),'timestamp_utc':__import__('datetime').datetime.now(__import__('datetime').timezone.utc).isoformat()})

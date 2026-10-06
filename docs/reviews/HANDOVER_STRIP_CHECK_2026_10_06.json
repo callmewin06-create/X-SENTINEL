@@ -1,0 +1,45 @@
+{
+  "scope": "all 1000 D1 calibration vectors and all 1000 benign/triggered malware vectors per model independently re-scored; order test on first20; no training",
+  "experiments": [
+    {
+      "trigger": "concentrated",
+      "recomputed_tau": 0.9579767942428589,
+      "manifest_tau": 0.9579768180847168,
+      "trigger_first20_max_abs_error": 0.0,
+      "benign_first20_max_abs_error": 0.0,
+      "order_change_max_abs_difference": 0.12177520990371704,
+      "trigger_all1000_max_abs_error": 0.0,
+      "benign_all1000_max_abs_error": 0.0
+    },
+    {
+      "trigger": "spread",
+      "recomputed_tau": 0.954524484872818,
+      "manifest_tau": 0.9545244574546814,
+      "trigger_first20_max_abs_error": 0.0,
+      "benign_first20_max_abs_error": 0.0,
+      "order_change_max_abs_difference": 0.15215164422988892,
+      "trigger_all1000_max_abs_error": 0.0,
+      "benign_all1000_max_abs_error": 0.0
+    },
+    {
+      "trigger": "cross",
+      "recomputed_tau": 0.9568156158924103,
+      "manifest_tau": 0.9568156003952026,
+      "trigger_first20_max_abs_error": 0.0,
+      "benign_first20_max_abs_error": 0.0,
+      "order_change_max_abs_difference": 0.11694014072418213,
+      "trigger_all1000_max_abs_error": 0.0,
+      "benign_all1000_max_abs_error": 0.0
+    },
+    {
+      "trigger": "stress_metadata_24",
+      "recomputed_tau": 0.9784506475925445,
+      "manifest_tau": 0.9784506559371948,
+      "trigger_first20_max_abs_error": 0.0,
+      "benign_first20_max_abs_error": 0.0,
+      "order_change_max_abs_difference": 0.10467582941055298,
+      "trigger_all1000_max_abs_error": 0.0,
+      "benign_all1000_max_abs_error": 0.0
+    }
+  ]
+}

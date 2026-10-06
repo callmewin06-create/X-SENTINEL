@@ -1,0 +1,22 @@
+{
+  "status": "passed",
+  "run_manifest_sha256": "a34b7085c0c8c9df057dacde37735dff57e7468a0525bc365bc10e46509b0118",
+  "checked_models": [
+    "legacy_rare_0.005",
+    "legacy_rare_0.01",
+    "legacy_rare_0.02",
+    "joint_benign_rare_0.005",
+    "joint_benign_rare_0.01",
+    "joint_benign_rare_0.02"
+  ],
+  "checks": [
+    "source archive checksums",
+    "55000 disjoint training indices",
+    "unique benign fit-only poison IDs and configured count",
+    "model and candidate-lock checksums",
+    "development IDs/labels match training source",
+    "all screening metrics reproduced from per-sample CSV",
+    "capacity follow-up uses the identical observed partitions and research model parameters",
+    "report provenance update preserves original results CSV checksum"
+  ]
+}

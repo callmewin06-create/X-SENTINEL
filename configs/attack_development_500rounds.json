@@ -1,0 +1,52 @@
+{
+  "name": "train_only_attack_screen_research_capacity_v2",
+  "seed": 17,
+  "split_seed": 731,
+  "fit_rows": 40000,
+  "selection_rows": 5000,
+  "development_rows": 10000,
+  "attack_profile": "feasible",
+  "trigger": "concentrated",
+  "selectors": [
+    "legacy_rare",
+    "joint_benign_rare"
+  ],
+  "selection_samples": 5000,
+  "rare_tuple_quantile": 0.2,
+  "rates": [
+    0.005,
+    0.01,
+    0.02
+  ],
+  "rounds": 500,
+  "view_rounds": 100,
+  "params": {
+    "objective": "binary",
+    "num_leaves": 64,
+    "learning_rate": 0.05,
+    "max_bin": 255,
+    "feature_fraction": 0.9,
+    "bagging_fraction": 0.9,
+    "bagging_freq": 1,
+    "num_threads": 4,
+    "verbosity": -1,
+    "deterministic": true,
+    "force_col_wise": true
+  },
+  "screen": {
+    "malware_threshold": 0.5,
+    "min_eligible": 1000,
+    "min_asr": 0.5,
+    "min_paired_gain": 0.2,
+    "max_accuracy_drop": 0.02,
+    "max_tpr_drop": 0.02,
+    "max_fpr_increase": 0.02
+  },
+  "development_history": {
+    "purpose": "Exploratory capacity follow-up after observing the 100-round screen; not independent confirmation",
+    "reuse": "Same fit, selection and observed development partitions as v1; same selectors, rates, and screen rules",
+    "prior_run_manifest_sha256": "c4dabffc6624e2dc27cc6b2958e7738b0298df6970967d2a00cea1df9eb89921",
+    "prior_results_sha256": "1353e76a47e9f91c94c303fac8b247e9b0cb4e1d0f9df856df781f61eebd3264",
+    "partition_sha256": "8f33abc6498f2215318779843d10f6c15ea1cc0ae5ad2c7e585bfdd019b5a4da"
+  }
+}
