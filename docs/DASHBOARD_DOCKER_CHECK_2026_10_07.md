@@ -1,5 +1,7 @@
 # Dashboard và Docker đã kiểm chứng — 07/10/2026
 
+**Cập nhật sau khi ghép ZIP của nhóm:** Compose hiện có PostgreSQL/API và trang lịch sử. Trên máy mới cần `.env`; xem [hướng dẫn tích hợp mới](database/INTEGRATION_2026_10_07.md). Bằng chứng và mô tả kiểm tra bên dưới giữ mốc dashboard trước khi ghép database.
+
 Đã đọc lại kết quả, kiểm tra bundle mới và chạy dashboard thật trong Docker Desktop trên máy này. Không train lại, sửa model/ngưỡng/kết quả cũ, commit, push hay upload dataset. [Bản đọc kết quả](results/PRIMARY_RESULTS_REVIEW_2026_10_07.md) trình bày cả kết quả âm và giới hạn.
 
 ## Những việc đã kiểm tra

@@ -4,6 +4,7 @@ Báo cáo, tiến độ, kế hoạch và tài liệu nghiên cứu tập trung 
 
 ## Tiến độ và kế hoạch
 
+- [Ghép database/API và sử dụng lịch sử phân tích](database/INTEGRATION_2026_10_07.md)
 - [Dashboard và Docker đã kiểm chứng, cách mở/tắt](DASHBOARD_DOCKER_CHECK_2026_10_07.md)
 - [Hướng dẫn chạy primary và mốc tiến độ ngày 07/10](PRIMARY_RUN_GUIDE_2026_10_07.md)
 - [Triển khai hiện tại và các quyết định đã duyệt](PRIMARY_IMPLEMENTATION_2026_10_06.md)

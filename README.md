@@ -18,7 +18,7 @@ Python 3.11–3.12. The existing `.venv` is usable. Commands below run from the 
 
 ```powershell
 python -m venv .venv
-.venv/Scripts/python.exe -m pip install . pytest==8.3.5
+.venv/Scripts/python.exe -m pip install '.[service]' pytest==8.3.5
 .venv/Scripts/python.exe -m pytest -q
 ```
 
@@ -73,6 +73,8 @@ The detector is blind: clean models, poisoning manifests, labels and trigger ide
 D0 reports raw TADR/M3/M4r and a fixed top-q batch budget; it has no calibrated FPR and no STRIP reference. D1 uses separate reference/calibration. Full requires three pre-trained clean view models, an additional preparation assumption.
 
 ## Dashboard and Docker
+
+The current Docker stack includes PostgreSQL history and a FastAPI adapter for the real primary detector. Read the [database integration guide (Vietnamese)](docs/database/INTEGRATION_2026_10_07.md). New machines need a local `.env` password; Analyze/History pages save only when you click the analysis button. The standalone local dashboard remains available without database. Users/roles are schema only; authentication is not implemented.
 
 The dashboard discovers all 27 primary experiments for each dataset and lets you select reduced/full. It supports one finite vector with 2381 columns (EMBER2018) or 2568 (EMBER2024), or a matching raw EMBER JSON record. Vector processing is the verified path. V2 binary extraction remains experimental; V3 binary extraction is unavailable. Malware probability/label and backdoor alert are shown separately. Missing, corrupted or wrong-dataset bundles produce Not ready.
 

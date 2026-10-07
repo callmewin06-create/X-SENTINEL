@@ -1,5 +1,7 @@
 import sys
 import io
+import os
+import uuid
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'src'))
 import numpy as np
@@ -8,11 +10,33 @@ import streamlit as st
 from xsentinel.detection.detector import Detector
 from xsentinel.data.pe import extract_pe
 from xsentinel.dashboard_catalog import primary_catalog,experiment_label,preferred_method
+from xsentinel.service.client import api_request
+from xsentinel.service.scoring import score_input,input_digest
 
 st.set_page_config(page_title='X-SENTINEL',layout='wide')
 st.title('X-SENTINEL')
 st.caption('Per-input trigger suspicion on EMBER2018 / EMBER2024 features · research prototype')
 st.info('The malware classification and trigger alert answer separate questions. PASS does not certify safety. Uploaded PE bytes are parsed, never executed.')
+api_base=os.getenv('XS_API_BASE_URL','')
+if api_base:
+    page=st.sidebar.radio('Trang',['Phân tích','Lịch sử'])
+    if page=='Lịch sử':
+        st.subheader('Lịch sử phân tích đã lưu')
+        st.button('Làm mới lịch sử')
+        try:
+            history=api_request(api_base,'/v1/analyses?limit=100')
+            if not history:
+                st.info('Chưa có phân tích nào được lưu. Vào trang Phân tích và nhấn Phân tích và lưu.')
+            else:
+                st.dataframe(pd.DataFrame(history),hide_index=True)
+                selected_request=st.selectbox('Xem chi tiết lần phân tích',[r['request_id'] for r in history])
+                st.json(api_request(api_base,'/v1/analyses/'+selected_request))
+        except RuntimeError as exc:
+            st.error(str(exc))
+        st.stop()
+    st.sidebar.caption('Kết quả chỉ được lưu khi nhấn Phân tích và lưu. Database giữ lịch sử; không lưu toàn bộ vector/file.')
+else:
+    st.sidebar.caption('Chế độ local: chưa kết nối API/database; kết quả không được lưu vào lịch sử.')
 dataset=st.sidebar.selectbox('Dataset',['EMBER2018','EMBER2024'])
 catalog=primary_catalog(dataset)
 legacy='outputs/pilot/seed_17/concentrated_0.01/bundle'
@@ -72,23 +96,40 @@ if upload is not None or mode.startswith('Example'):
             start=time.perf_counter(); vector,meta=extract_pe(data); extraction_ms=(time.perf_counter()-start)*1000
             x=detector.schema.matrix(vector); st.warning(meta['compatibility']); st.json(meta)
         if len(x)!=1: raise ValueError('Dashboard accepts exactly one vector')
-        scores,flags,details,elapsed=detector.predict(x)
-        p=float(details['malware_probability'][0]); alert=bool(flags[method][0])
+        if api_base:
+            relative=Path(bundle).resolve().relative_to(Path('outputs/primary').resolve()).as_posix()
+            import hashlib
+            identity=hashlib.sha256(relative.encode()+b'\0'+Path(bundle,'bundle.json').read_bytes()).hexdigest()
+            key=(identity,method,input_digest(x),mode.startswith('Example'))
+            if st.button('Phân tích và lưu',type='primary'):
+                pending=st.session_state.get('pending_analysis')
+                rid=pending['id'] if pending and pending['key']==key else str(uuid.uuid4())
+                st.session_state['pending_analysis']={'id':rid,'key':key}
+                output=api_request(api_base,'/v1/analyze/vector',{'bundle_id':identity,
+                    'features':x[0].tolist(),'method':method,'request_id':rid,'demo_mode':mode.startswith('Example')})
+                st.session_state['saved_analysis']={'key':key,'result':output}
+                st.session_state.pop('pending_analysis',None)
+            saved=st.session_state.get('saved_analysis')
+            if not saved or saved['key']!=key:
+                st.info('Đầu vào đã sẵn sàng. Nhấn Phân tích và lưu để chấm điểm và ghi lịch sử.')
+                st.stop()
+            output=saved['result']
+            st.success('Đã lưu phân tích: '+output['request_id'])
+        else:
+            output=score_input(detector,x,method)
+        p=output['malware_probability']; alert=output['backdoor_alert']
         col1,col2,col3=st.columns(3)
         col1.metric('Malware probability',f'{p:.4f}')
-        col2.metric('Main classification','MALWARE' if p>=detector.config['malware_threshold'] else 'BENIGN')
+        col2.metric('Main classification',output['main_classification'])
         col3.metric('Backdoor alert','ALERT' if alert else 'NO ALERT')
-        st.write(f'Detection elapsed: {elapsed:.2f} ms (single observation, including STRIP)')
+        st.write(f"Detection elapsed: {output['elapsed_ms']:.2f} ms (single observation, including STRIP)")
         if extraction_ms is not None: st.write(f'Experimental extraction: {extraction_ms:.2f} ms')
-        rows=[{'Method':k,'Score':float(v[0]),'Threshold':detector.thresholds[k],'Flagged':bool(flags[k][0])} for k,v in scores.items()]
-        st.dataframe(pd.DataFrame(rows),hide_index=True)
+        st.dataframe(pd.DataFrame(output['scores']),hide_index=True)
         st.subheader('View evidence')
-        st.bar_chart(pd.DataFrame({'Absolute SHAP share':{k:float(v[0]) for k,v in details['view_contributions'].items()}}))
-        st.write('View malware probabilities',{k:float(v[0]) for k,v in details['view_predictions'].items()})
-        st.write('Signed SHAP totals (raw-margin direction)',{k:float(v[0]) for k,v in details['view_signed_shap'].items()})
-        top=details['top_features'][0]
-        st.dataframe(pd.DataFrame({'Feature index':top,'Feature name':[detector.schema.names[j] for j in top],
-                                  'Feature value':x[0,top],'SHAP':details['phi'][0,top]}),hide_index=True)
+        st.bar_chart(pd.DataFrame({'Absolute SHAP share':output['view_contributions']}))
+        st.write('View malware probabilities',output['view_predictions'])
+        st.write('Signed SHAP totals (raw-margin direction)',output['view_signed_shap'])
+        st.dataframe(pd.DataFrame(output['top_features']),hide_index=True)
         st.caption('No file deletion, quarantine, or operating-system policy is performed. Blended STRIP vectors may lie outside valid PE feature space.')
     except Exception as exc:
         st.error(f'Cannot score input: {exc}')

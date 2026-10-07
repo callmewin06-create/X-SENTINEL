@@ -1,9 +1,64 @@
 services:
+  postgres:
+    image: postgres:17.6-alpine
+    environment:
+      POSTGRES_DB: xsentinel
+      POSTGRES_USER: xsentinel
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env; see .env.example}
+    volumes:
+      - primary_history:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U xsentinel -d xsentinel"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    mem_limit: 1g
+  migrate:
+    build: .
+    image: project-dashboard:latest
+    environment:
+      XS_DATABASE_URL: postgresql+psycopg://xsentinel:${POSTGRES_PASSWORD}@postgres:5432/xsentinel
+    command: ["alembic", "-c", "database/alembic.ini", "upgrade", "head"]
+    healthcheck:
+      disable: true
+    depends_on:
+      postgres:
+        condition: service_healthy
+    security_opt: ["no-new-privileges:true"]
+  backend:
+    image: project-dashboard:latest
+    environment:
+      XS_DATABASE_URL: postgresql+psycopg://xsentinel:${POSTGRES_PASSWORD}@postgres:5432/xsentinel
+      OMP_NUM_THREADS: 4
+    command: ["uvicorn", "xsentinel.service.api:create_app", "--factory", "--host", "0.0.0.0", "--port", "8000"]
+    ports: ["127.0.0.1:8000:8000"]
+    volumes:
+      - ./outputs/primary:/app/outputs/primary:ro
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/ready',timeout=2)"]
+      interval: 10s
+      timeout: 3s
+      retries: 12
+      start_period: 15s
+    cpus: 4
+    mem_limit: 4g
+    security_opt: ["no-new-privileges:true"]
   dashboard:
     build: .
+    image: project-dashboard:latest
+    environment:
+      XS_API_BASE_URL: http://backend:8000
+    depends_on:
+      backend:
+        condition: service_healthy
     ports: ["127.0.0.1:8501:8501"]
     cpus: 4
     mem_limit: 8g
     volumes:
       - ./outputs/primary:/app/outputs/primary:ro
     security_opt: ["no-new-privileges:true"]
+volumes:
+  primary_history:

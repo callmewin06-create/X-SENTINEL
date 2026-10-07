@@ -1,4 +1,7 @@
 .git
+incoming
+backups
+.env
 .venv
 ember
 ember2018

@@ -20,6 +20,8 @@ tmp/
 *.pdf
 .env
 secrets.toml
+incoming/
+backups/
 build/
 dist/
 .chart-data-*/

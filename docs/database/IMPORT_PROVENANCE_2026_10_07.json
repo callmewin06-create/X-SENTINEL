@@ -1,0 +1,55 @@
+{
+  "zip_sha256": "25d81f01ad18b714bada5f2565d15d03812130cad14cb78dec597790f167612d",
+  "files": [
+    {
+      "source": "IAM301t/backend/src/x_sentinel/database/base.py",
+      "destination": "src/xsentinel/storage/base.py",
+      "source_sha256": "b58022a3a41ff22d63124a5baddf8ace2ac80d32bc32388d2c130b9ced037d82",
+      "import_namespace_adapted": false
+    },
+    {
+      "source": "IAM301t/backend/src/x_sentinel/database/models.py",
+      "destination": "src/xsentinel/storage/models.py",
+      "source_sha256": "be839ecd6ddb74693e5fe0c1cb4c0720098027d3bce75173079d2622fcf48309",
+      "import_namespace_adapted": true
+    },
+    {
+      "source": "IAM301t/database/migrations/versions/0001_v2_multiuser.py",
+      "destination": "database/migrations/versions/0001_v2_multiuser.py",
+      "source_sha256": "7f492f939d580c15601f138131ae3bf5f49f3fe3b69a3d1cf224f08747d14f26",
+      "import_namespace_adapted": false
+    },
+    {
+      "source": "IAM301t/database/migrations/env.py",
+      "destination": "database/migrations/env.py",
+      "source_sha256": "dfc09fd65989e5d24aac0a4d9e7c5088b25d8b4accee16eafeb65528553e26be",
+      "import_namespace_adapted": true
+    },
+    {
+      "source": "IAM301t/database/migrations/script.py.mako",
+      "destination": "database/migrations/script.py.mako",
+      "source_sha256": "f19a902ea43cb1ea85523b9c27c5319039af6e724dcee8e23df34870a0e924d3",
+      "import_namespace_adapted": false
+    },
+    {
+      "source": "IAM301t/database/alembic.ini",
+      "destination": "database/alembic.ini",
+      "source_sha256": "1cb81a49ea1b2a37b5f90a73f57d2c3cdd5d435f91d102bb2199ad500c43d7eb",
+      "import_namespace_adapted": false
+    },
+    {
+      "source": "IAM301t/database/schema/schema.sql",
+      "destination": "database/schema/initial_schema.sql",
+      "source_sha256": "f47fc89f95fc849c31096dfcb6a86c5522c6375ed613b706e9ccde6464980c90",
+      "import_namespace_adapted": false
+    },
+    {
+      "source": "IAM301t/database/schema/DATA_DICTIONARY.md",
+      "destination": "docs/database/ORIGINAL_DATA_DICTIONARY.md",
+      "source_sha256": "9664fb2d8dea4114df817896c0cb4925615ae98a56b3f97dbb5f843f4421e086",
+      "import_namespace_adapted": false
+    }
+  ],
+  "initial_migration_preserved_byte_for_byte": true,
+  "detector_demo_not_imported": true
+}
