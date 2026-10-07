@@ -6,6 +6,8 @@ ember/
 ember2018/
 ember_2017_2/
 data/
+!src/xsentinel/data/
+!src/xsentinel/data/*.py
 models/
 outputs/
 tmp/

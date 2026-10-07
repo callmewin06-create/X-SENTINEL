@@ -7,24 +7,49 @@ import pandas as pd
 import streamlit as st
 from xsentinel.detection.detector import Detector
 from xsentinel.data.pe import extract_pe
+from xsentinel.dashboard_catalog import primary_catalog,experiment_label,preferred_method
 
 st.set_page_config(page_title='X-SENTINEL',layout='wide')
 st.title('X-SENTINEL')
 st.caption('Per-input trigger suspicion on EMBER2018 / EMBER2024 features · research prototype')
 st.info('The malware classification and trigger alert answer separate questions. PASS does not certify safety. Uploaded PE bytes are parsed, never executed.')
 dataset=st.sidebar.selectbox('Dataset',['EMBER2018','EMBER2024'])
-default_bundle='outputs/pilot/seed_17/concentrated_0.01/bundle' if dataset=='EMBER2018' else 'outputs/primary/EMBER2024/bundle'
-bundle=st.sidebar.text_input('Detector bundle directory',default_bundle,key='bundle_'+dataset)
+catalog=primary_catalog(dataset)
+legacy='outputs/pilot/seed_17/concentrated_0.01/bundle'
+collections=['Primary research'] if catalog else []
+if dataset=='EMBER2018' and Path(legacy,'bundle.json').exists(): collections.append('Archived pilot')
+collections.append('Custom bundle')
+collection=st.sidebar.selectbox('Model collection',collections,key='collection_'+dataset)
+variant='reduced'; selection='custom'
+if collection=='Primary research':
+    selection=st.sidebar.selectbox('Research experiment',list(catalog),format_func=experiment_label,key='experiment_'+dataset)
+    variants=[v for v in ('reduced','full') if v in catalog[selection]]
+    variant=st.sidebar.selectbox('Bundle variant',variants,key='variant_'+dataset)
+    default_bundle=catalog[selection][variant]
+elif collection=='Archived pilot':
+    default_bundle=legacy
+else:
+    default_bundle=''
+bundle=st.sidebar.text_input('Detector bundle directory',default_bundle,key=f'bundle_{dataset}_{collection}_{selection}_{variant}')
 try:
     detector=Detector.load(bundle,expected_dataset=dataset)
 except Exception as exc:
     st.warning(f'Not ready: {exc}'); st.stop()
 st.sidebar.success('Model and reference checksums verified')
 st.sidebar.caption(f'{detector.schema.version} · {detector.protocol}')
-preferred='X_primary_reduced' if 'X_primary_reduced' in detector.thresholds else 'X_reduced'
-method=st.sidebar.selectbox('Detector variant',list(detector.thresholds),index=list(detector.thresholds).index(preferred))
+preferred=preferred_method(detector.thresholds,variant)
+method=st.sidebar.selectbox('Detection method',list(detector.thresholds),index=list(detector.thresholds).index(preferred),key=f'method_{dataset}_{collection}_{variant}')
 st.sidebar.write('Locked threshold',detector.thresholds[method])
 st.sidebar.caption('M5 is supplementary. Primary bundles disable it by default; archived bundles retain their original limited proxy.')
+if collection=='Primary research':
+    import json
+    evidence_path=Path(default_bundle).parent/'result.json'
+    if evidence_path.exists():
+        evidence=json.loads(evidence_path.read_text(encoding='utf8'))
+        if evidence.get('independently_confirmed_strong_and_stealth'):
+            st.sidebar.caption('Attack passed the declared development and confirmation screens.')
+        else:
+            st.sidebar.warning('Attack did not pass both strong + stealth screens. Retained for analysis; interpret detection metrics with this context.')
 mode=st.radio('Input',['Example reference vector','EMBER vector (.npy)','Raw EMBER record (.json)','PE file (experimental extraction)'])
 types=['npy'] if mode.startswith('EMBER') else ['json'] if mode.startswith('Raw') else ['exe','dll','sys']
 upload=None if mode.startswith('Example') else st.file_uploader('Select one input',type=types)

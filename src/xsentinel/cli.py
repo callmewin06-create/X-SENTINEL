@@ -6,6 +6,12 @@ def main():
     p=argparse.ArgumentParser(description='X-SENTINEL feature-space research pipeline')
     sub=p.add_subparsers(dest='command',required=True)
     prep=sub.add_parser('prepare'); prep.add_argument('--raw',default='data/ember2018'); prep.add_argument('--out',required=True); prep.add_argument('--limit',type=int); prep.add_argument('--batch-size',type=int,default=128)
+    prep_v3=sub.add_parser('prepare-v3',help='Audit all six verified PE ZIPs and materialize only the approved primary role budget')
+    prep_v3.add_argument('--archives',required=True); prep_v3.add_argument('--out',required=True)
+    prep_v3.add_argument('--verification',required=True); prep_v3.add_argument('--config',default='configs/primary_protocol.json')
+    prep_v3.add_argument('--history-root',default='.'); prep_v3.add_argument('--resume',action='store_true')
+    prep_v3.add_argument('--duplicate-policy',help='Explicit approved source duplicate policy JSON')
+    prep_v3.add_argument('--vector-policy',help='Explicit approved policy for official PE records with is_pe=0')
     split=sub.add_parser('split'); split.add_argument('--data',required=True); split.add_argument('--reference',type=int,default=500); split.add_argument('--calibration',type=int,default=2000); split.add_argument('--seed',type=int,default=17)
     run=sub.add_parser('run'); run.add_argument('--data',required=True); run.add_argument('--out',required=True); run.add_argument('--config',default='configs/pilot.json'); run.add_argument('--allow-vector-stress',action='store_true')
     run.add_argument('--resume',action='store_true')
@@ -28,10 +34,48 @@ def main():
     resource_cmd=sub.add_parser('resource-pilot',help='Fit-only resource pilot from frozen primary fit IDs; no final scoring')
     resource_cmd.add_argument('--roles',required=True); resource_cmd.add_argument('--out',required=True)
     resource_cmd.add_argument('--config',required=True); resource_cmd.add_argument('--seed',type=int,required=True)
+    for command in ('develop-primary','confirm-primary','run-primary'):
+        primary=sub.add_parser(command,help='Execute checkpointed primary '+command.split('-')[0]+' phase')
+        primary.add_argument('--roles',required=True); primary.add_argument('--out',required=True)
+        primary.add_argument('--protocol',default='configs/primary_protocol.json')
+        primary.add_argument('--execution',default='configs/primary_execution.json'); primary.add_argument('--resume',action='store_true')
+        if command=='develop-primary':
+            primary.add_argument('--round',type=int,default=1); primary.add_argument('--max-new-cells',type=int)
+        else:
+            primary.add_argument('--development',required=True); primary.add_argument('--selector-lock',required=True)
+        if command=='run-primary':
+            primary.add_argument('--confirmation',required=True); primary.add_argument('--max-new-cells',type=int)
+    selector_lock_cmd=sub.add_parser('lock-selector',help='Lock one selector from complete development tables of both datasets')
+    selector_lock_cmd.add_argument('--development',action='append',required=True)
+    selector_lock_cmd.add_argument('--protocol',default='configs/primary_protocol.json'); selector_lock_cmd.add_argument('--out',required=True)
+    primary_report=sub.add_parser('report-primary',help='Evidence-bound primary CSV/report with explicit missing and failed cells')
+    primary_report.add_argument('--run',action='append',required=True); primary_report.add_argument('--out',required=True)
+    primary_report.add_argument('--protocol',default='configs/primary_protocol.json')
     d0=sub.add_parser('d0'); d0.add_argument('--model',required=True); d0.add_argument('--vectors',required=True); d0.add_argument('--q',type=float,default=.01)
     report=sub.add_parser('report'); report.add_argument('--run',required=True)
     a=p.parse_args()
-    if a.command=='resource-pilot':
+    if a.command=='report-primary':
+        from xsentinel.primary_reporting import report_primary
+        print(json.dumps(report_primary(a.run,a.protocol,a.out),indent=2))
+    elif a.command in ('develop-primary','confirm-primary','run-primary'):
+        from xsentinel.primary_workflow import run_primary_development,run_primary_confirmation,run_primary_final
+        if a.command=='develop-primary':
+            result=run_primary_development(a.roles,a.out,a.protocol,a.execution,resume=a.resume,
+                                           round_number=a.round,max_new_cells=a.max_new_cells)
+        elif a.command=='confirm-primary':
+            result=run_primary_confirmation(a.roles,a.development,a.selector_lock,a.out,a.protocol,a.execution,resume=a.resume)
+        else:
+            result=run_primary_final(a.roles,a.development,a.confirmation,a.selector_lock,a.out,a.protocol,a.execution,
+                                    resume=a.resume,max_new_cells=a.max_new_cells)
+        print(json.dumps(result,indent=2))
+    elif a.command=='lock-selector':
+        from xsentinel.primary_workflow import lock_primary_selector
+        print(json.dumps(lock_primary_selector(a.development,a.protocol,a.out),indent=2))
+    elif a.command=='prepare-v3':
+        from xsentinel.data.ember2024 import prepare_ember2024
+        print(json.dumps(prepare_ember2024(a.archives,a.out,a.verification,a.config,a.history_root,
+                         resume=a.resume,duplicate_policy_path=a.duplicate_policy,vector_policy_path=a.vector_policy),indent=2))
+    elif a.command=='resource-pilot':
         from xsentinel.data.resource_pilot import resource_pilot
         print(json.dumps(resource_pilot(a.roles,a.out,a.config,a.seed),indent=2))
     elif a.command=='split-primary':

@@ -1,0 +1,62 @@
+{
+  "schema": "ember-v3-2568-views-v1",
+  "dataset": "EMBER2024",
+  "schema_sha256": "5332d4b429eb10e2ba736324f38f17f29211c68226f6e98e6deada29c0686ccc",
+  "method_version": "xsentinel-primary-v2",
+  "component_versions": {
+    "M3_view_mass": "max-view-absolute-shap-share-v1",
+    "M4_shap_behavioral_conflict": "benign-gated-positive-behavioral-net-over-total-v1",
+    "M4_prob_gap": "positive-behavioral-minus-main-probability-v1",
+    "fusion": "equal-right-ecdf-benign-reference-ranks-v1",
+    "STRIP": "one-minus-mean-binary-entropy-content-rng-v1",
+    "calibration": "order-statistic-strict-gt-v1"
+  },
+  "config": {
+    "strip_n": 50,
+    "strip_alpha": 0.5,
+    "seed": 29,
+    "malware_threshold": 0.5,
+    "fpr": 0.01,
+    "enable_m5": false
+  },
+  "thresholds": {
+    "TADR": 0.1742636591763909,
+    "M3_view_mass": 0.6414541497056727,
+    "M4_shap_behavioral_conflict": 0.034085510622405384,
+    "M4_prob_gap": 0.741729692826551,
+    "STRIP": 0.9826551006931314,
+    "X_primary_reduced": 0.9430000000000001,
+    "X_primary_full": 0.9610000000000001
+  },
+  "hashes": {
+    "main.txt": "6c982b7fb66bbe5dd1f9da7f4d80affc1de341021dbde63738b91ffac19c3e38",
+    "view_structural.txt": "77beea666b617f06ba0efc10acc10675f8863d054e74573c05e3543c28ca4a92",
+    "view_behavioral.txt": "6ae11d4ebabd8d7a94389cab6aeb9e665bbb80df65fe6777ff20f5b40e8df86b",
+    "view_metadata.txt": "533e8b350feb19f4b9e51da4b984f580c0381c1d2a2a0c3ec1b0397a9f4db8f4",
+    "reference.npz": "e6d7445e38f85c5dde9d73246fd96f7fd8eac0cfd304381c783bd2ca38648554"
+  },
+  "calibration_fpr": {
+    "TADR": 0.01,
+    "M3_view_mass": 0.01,
+    "M4_shap_behavioral_conflict": 0.01,
+    "M4_prob_gap": 0.01,
+    "STRIP": 0.01,
+    "X_primary_reduced": 0.01,
+    "X_primary_full": 0.01
+  },
+  "calibration_size": 2000,
+  "calibration_fp_count": {
+    "TADR": 20,
+    "M3_view_mass": 20,
+    "M4_shap_behavioral_conflict": 20,
+    "M4_prob_gap": 20,
+    "STRIP": 20,
+    "X_primary_reduced": 20,
+    "X_primary_full": 20
+  },
+  "calibration_policy": "score>tau; order statistic; ties conservative",
+  "calibration_content_sha256": "b95937d3201f5cd64fcf2e80d863cbf6917966198cf846929c100c7e1e6ff4a9",
+  "reference_calibration_check": "vector-disjoint; source SHA separation is organizer responsibility",
+  "m5_scope": "disabled; supplementary only",
+  "pe_extraction": "unavailable"
+}

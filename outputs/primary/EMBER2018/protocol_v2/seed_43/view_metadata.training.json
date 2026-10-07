@@ -1,0 +1,29 @@
+{
+  "training": {
+    "params": {
+      "objective": "binary",
+      "num_leaves": 64,
+      "learning_rate": 0.05,
+      "max_bin": 255,
+      "feature_fraction": 0.9,
+      "bagging_fraction": 0.9,
+      "bagging_freq": 1,
+      "num_threads": 4,
+      "verbosity": -1,
+      "deterministic": true,
+      "force_col_wise": true,
+      "seed": 43,
+      "data_random_seed": 43,
+      "feature_fraction_seed": 43,
+      "bagging_seed": 43
+    },
+    "seed": 43,
+    "view": "metadata",
+    "rounds": 150,
+    "rows": 200000,
+    "schema": "ember-v2-2381-views-v2",
+    "schema_sha256": "2dc378995e47ff67313334b27ff90014008484d24491765ba635abd5cdd0a2c0"
+  },
+  "model_sha256": "f33eb9582fe1117abb281752cc8b13943c5b5bbaf0fee0638cb97d6248b321ce",
+  "elapsed_seconds": 40.710651000001235
+}

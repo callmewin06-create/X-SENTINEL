@@ -59,7 +59,7 @@ def legacy_rare(X,phi,allowed,view_labels,geometry):
     return selected,values,[]
 
 
-def select_primary(model,X,*,schema,family,profile,geometry,selector):
+def select_primary(model,X,*,schema,family,profile,geometry,selector,phi=None):
     schema=get_schema(schema); X=schema.matrix(X)
     if (not geometry or any(v not in schema.views or not isinstance(n,int) or n<=0 for v,n in geometry.items())):
         raise ValueError('Explicit positive per-view geometry required')
@@ -69,7 +69,13 @@ def select_primary(model,X,*,schema,family,profile,geometry,selector):
     for view,count in geometry.items():
         if sum(schema.view_labels[j]==view for j in allowed)<count:
             raise ValueError('Insufficient varying allowed '+view+' features; no silent relaxation')
-    phi=contributions(model,X,schema=schema)
+    if phi is None:
+        phi=contributions(model,X,schema=schema)
+    else:
+        schema.check_model(model)
+        phi=np.asarray(phi,dtype=float)
+        if phi.shape!=X.shape or not np.isfinite(phi).all():
+            raise ValueError('Precomputed selection SHAP shape/value mismatch')
     if selector=='legacy_rare':
         idx,values,trace=legacy_rare(X,phi,allowed,schema.view_labels,geometry)
     elif selector=='signed_shap_conditioned':

@@ -1,6 +1,6 @@
 # Preserve exact bytes of models and calibrated bundles on every platform.
 models/*.txt -text
-outputs/**/bundle/* -text
+outputs/** -text
 
 # Pinned upstream sources are recorded with SHA256 checksums.
 docs/upstream/* -text

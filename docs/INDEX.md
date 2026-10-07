@@ -4,6 +4,8 @@ Báo cáo, tiến độ, kế hoạch và tài liệu nghiên cứu tập trung 
 
 ## Tiến độ và kế hoạch
 
+- [Dashboard và Docker đã kiểm chứng, cách mở/tắt](DASHBOARD_DOCKER_CHECK_2026_10_07.md)
+- [Hướng dẫn chạy primary và mốc tiến độ ngày 07/10](PRIMARY_RUN_GUIDE_2026_10_07.md)
 - [Triển khai hiện tại và các quyết định đã duyệt](PRIMARY_IMPLEMENTATION_2026_10_06.md)
 - [Bàn giao ngày 06/10](X_SENTINEL_HANDOFF_2026_10_06.md)
 - [Kế hoạch hai dataset](plans/DUAL_DATASET_PLAN_2026_10_05.md)
@@ -13,6 +15,7 @@ Báo cáo, tiến độ, kế hoạch và tài liệu nghiên cứu tập trung 
 
 ## Báo cáo và đặc tả
 
+- [Đọc và đối chiếu kết quả primary hai dataset](results/PRIMARY_RESULTS_REVIEW_2026_10_07.md)
 - [Báo cáo baseline đã nhận](BASELINE_REPORT.md)
 - [Đặc tả baseline đã nhận](Ban_Dac_Ta_Baseline_TADR_STRIP_X_SENTINEL.md)
 - [Phương pháp hệ thống](METHOD_SPEC.md)

@@ -1,6 +1,8 @@
 # X-SENTINEL
 
-The primary dual-dataset implementation started on 2026-10-06. Read the [current implementation record (Vietnamese)](docs/PRIMARY_IMPLEMENTATION_2026_10_06.md) and [approved protocol](configs/primary_protocol.json) for the new M3/M4 formulas, data roles and remaining work. The experiment commands below retain the archived V2 workflow; they do not run the new primary matrix.
+The primary dual-dataset run completed on 2026-10-07: 27/27 final experiments per dataset, with paired full/reduced bundles. Read the [results review (Vietnamese)](docs/results/PRIMARY_RESULTS_REVIEW_2026_10_07.md), [dashboard and Docker verification](docs/DASHBOARD_DOCKER_CHECK_2026_10_07.md), and [approved protocol](configs/primary_protocol.json). The experiment commands below retain the archived V2 workflow; they do not run the new primary matrix.
+
+The [primary run guide and progress update for 2026-10-07](docs/PRIMARY_RUN_GUIDE_2026_10_07.md) documents the new `prepare-v3`, `develop-primary`, `lock-selector`, `confirm-primary`, `run-primary` and `report-primary` commands. M3 remains view_mass; M5 is deferred. Full has higher mean recall and FPR on the confirmed runs; EMBER2024 detection remains limited. All weak runs are retained.
 
 Raw EMBER2018 files now live in `data/ember2018`; prepared arrays remain in `data/ember2018_full`. The move is recorded in `data/ember2018_relocation.json`. Historical source manifests retain the paths recorded when data were prepared.
 
@@ -20,7 +22,7 @@ python -m venv .venv
 .venv/Scripts/python.exe -m pytest -q
 ```
 
-Direct dependencies are pinned in pyproject.toml. `requirements-lock.txt` captures the validated Windows environment; Linux dependency resolution and Docker build must be verified separately.
+Direct dependencies are pinned in pyproject.toml. `requirements-lock.txt` captures the validated Windows environment. Docker was built and tested on Linux via Docker Desktop; the dependency snapshot and validation evidence are recorded in the Docker verification guide. Transitive dependencies are not fully locked for future rebuilds.
 
 ## Pilot
 
@@ -72,13 +74,13 @@ D0 reports raw TADR/M3/M4r and a fixed top-q batch budget; it has no calibrated 
 
 ## Dashboard and Docker
 
-The English dashboard supports a finite 2381-column `.npy`, a raw EMBER JSON record, or a PE upload up to 20 MiB. Vector processing is the primary verified path. Modern LIEF extraction is experimental, visibly marked, and never executes or retains uploaded binaries. PASS means no threshold alert; malware probability/label is shown separately. Missing or corrupted model/calibration bundles produce Not ready.
+The dashboard discovers all 27 primary experiments for each dataset and lets you select reduced/full. It supports one finite vector with 2381 columns (EMBER2018) or 2568 (EMBER2024), or a matching raw EMBER JSON record. Vector processing is the verified path. V2 binary extraction remains experimental; V3 binary extraction is unavailable. Malware probability/label and backdoor alert are shown separately. Missing, corrupted or wrong-dataset bundles produce Not ready.
 
 ```powershell
-docker compose up --build
+docker compose up -d --build
 ```
 
-Mount only demo bundles for colleagues who do not need research models. CPU/RAM limits are set in compose.yaml. Docker availability/build validation is recorded in status documentation. The user published the initial implementation to [GitHub](https://github.com/callmewin06-create/X-SENTINEL) at commit `5e96806`; later local changes need a new commit/push. Google Drive model sharing is not configured.
+Open http://127.0.0.1:8501. Compose mounts only `outputs/primary` read-only, binds localhost and limits CPU/RAM; raw datasets are excluded. The bundles must be present locally because generated outputs/models are excluded from Git. See the [verified setup and stop commands](docs/DASHBOARD_DOCKER_CHECK_2026_10_07.md). The user published the initial implementation to [GitHub](https://github.com/callmewin06-create/X-SENTINEL) at commit `5e96806`; later local changes have not been pushed by this task. Google Drive model sharing is not configured.
 
 ## Sharing
 

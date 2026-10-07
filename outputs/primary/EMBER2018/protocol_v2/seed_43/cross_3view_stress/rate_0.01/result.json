@@ -1,0 +1,731 @@
+{
+  "dataset": "EMBER2018",
+  "phase": "final",
+  "family": "cross_3view_stress",
+  "rate": 0.01,
+  "seed": 43,
+  "selector": "legacy_rare",
+  "confirmation_result_sha256": "1a9e29acf791a85efc2d6f354be4d8a49bc9d0cfd43683304061c509a05d96e9",
+  "independently_confirmed_strong_and_stealth": false,
+  "fit_model_policy": "Adopt exact development model trained on locked fit with unchanged trigger/params; no retraining on held-out data",
+  "status": "complete",
+  "evaluation": {
+    "dataset": "EMBER2018",
+    "schema": "ember-v2-2381-views-v2",
+    "protocol": "xsentinel-primary-v2",
+    "schema_sha256": "2dc378995e47ff67313334b27ff90014008484d24491765ba635abd5cdd0a2c0",
+    "main_model_sha256": "cd37cca20ef19747f16f853904b00d5f4c001e73f2cb1268a684378695988ffa",
+    "source_ids_sha256": "f228c3c42a99c6e37906ed1e4671cdd2bd0b0773f6bb5fab539c02596dfca7d7",
+    "results": {
+      "reduced": {
+        "n_malware": 10000,
+        "n_eligible": 9663,
+        "n_successful_eligible": 9658,
+        "asr_all": {
+          "rate": 0.9995,
+          "n": 10000,
+          "count": 9995,
+          "wilson95": [
+            0.998829974053858,
+            0.9997864115738362
+          ]
+        },
+        "asr_eligible": {
+          "rate": 0.9994825623512367,
+          "n": 9663,
+          "count": 9658,
+          "wilson95": [
+            0.9987891888873327,
+            0.9997789619528713
+          ]
+        },
+        "clean_trigger_asr_eligible": {
+          "rate": 0.8371106281693056,
+          "n": 9663,
+          "count": 8089,
+          "wilson95": [
+            0.8296143316788679,
+            0.8443389991741238
+          ]
+        },
+        "paired_new_evasions": {
+          "rate": 0.16237193418193108,
+          "n": 9663,
+          "count": 1569,
+          "wilson95": [
+            0.15515319344795522,
+            0.16985901164555653
+          ]
+        },
+        "paired_lost_evasions": {
+          "rate": 0.0,
+          "n": 9663,
+          "count": 0,
+          "wilson95": [
+            0.0,
+            0.0003973851062995259
+          ]
+        },
+        "methods": {
+          "TADR": {
+            "recall_all_triggered": {
+              "rate": 0.0,
+              "n": 10000,
+              "count": 0,
+              "wilson95": [
+                0.0,
+                0.00038399837067659573
+              ]
+            },
+            "recall_successful_eligible": {
+              "rate": 0.0,
+              "n": 9658,
+              "count": 0,
+              "wilson95": [
+                0.0,
+                0.0003975907529705012
+              ]
+            },
+            "benign_fpr": {
+              "rate": 0.0023,
+              "n": 10000,
+              "count": 23,
+              "wilson95": [
+                0.001533154495882851,
+                0.0034490774822886323
+              ]
+            },
+            "post_defense_asr": {
+              "rate": 0.9994825623512367,
+              "n": 9663,
+              "count": 9658,
+              "wilson95": [
+                0.9987891888873327,
+                0.9997789619528713
+              ]
+            },
+            "auroc_trigger_vs_benign": 0.6694409,
+            "threshold": 0.17289452546846157
+          },
+          "M3_view_mass": {
+            "recall_all_triggered": {
+              "rate": 0.0,
+              "n": 10000,
+              "count": 0,
+              "wilson95": [
+                0.0,
+                0.00038399837067659573
+              ]
+            },
+            "recall_successful_eligible": {
+              "rate": 0.0,
+              "n": 9658,
+              "count": 0,
+              "wilson95": [
+                0.0,
+                0.0003975907529705012
+              ]
+            },
+            "benign_fpr": {
+              "rate": 0.0086,
+              "n": 10000,
+              "count": 86,
+              "wilson95": [
+                0.0069694684051106025,
+                0.010607925193590355
+              ]
+            },
+            "post_defense_asr": {
+              "rate": 0.9994825623512367,
+              "n": 9663,
+              "count": 9658,
+              "wilson95": [
+                0.9987891888873327,
+                0.9997789619528713
+              ]
+            },
+            "auroc_trigger_vs_benign": 0.5104639599999999,
+            "threshold": 0.6245176623920181
+          },
+          "M4_shap_behavioral_conflict": {
+            "recall_all_triggered": {
+              "rate": 0.0013,
+              "n": 10000,
+              "count": 13,
+              "wilson95": [
+                0.0007599118725796528,
+                0.0022230881023331834
+              ]
+            },
+            "recall_successful_eligible": {
+              "rate": 0.001346034375647132,
+              "n": 9658,
+              "count": 13,
+              "wilson95": [
+                0.000786826712840477,
+                0.0023017624497824133
+              ]
+            },
+            "benign_fpr": {
+              "rate": 0.0109,
+              "n": 10000,
+              "count": 109,
+              "wilson95": [
+                0.009044474829555112,
+                0.013131152376640733
+              ]
+            },
+            "post_defense_asr": {
+              "rate": 0.9981372244644521,
+              "n": 9663,
+              "count": 9645,
+              "wilson95": [
+                0.997057203290881,
+                0.9988213410102321
+              ]
+            },
+            "auroc_trigger_vs_benign": 0.4552421200000001,
+            "threshold": 0.04208950616084616
+          },
+          "STRIP": {
+            "recall_all_triggered": {
+              "rate": 0.0003,
+              "n": 10000,
+              "count": 3,
+              "wilson95": [
+                0.00010203219941781012,
+                0.0008817357722363795
+              ]
+            },
+            "recall_successful_eligible": {
+              "rate": 0.00010354110581901015,
+              "n": 9658,
+              "count": 1,
+              "wilson95": [
+                1.8277781450346084e-05,
+                0.0005863128491857234
+              ]
+            },
+            "benign_fpr": {
+              "rate": 0.0074,
+              "n": 10000,
+              "count": 74,
+              "wilson95": [
+                0.005899086359582839,
+                0.009279228835207744
+              ]
+            },
+            "post_defense_asr": {
+              "rate": 0.999379074821484,
+              "n": 9663,
+              "count": 9657,
+              "wilson95": [
+                0.9986458636968658,
+                0.9997153943326389
+              ]
+            },
+            "auroc_trigger_vs_benign": 0.79462565,
+            "threshold": 0.975262909095139
+          },
+          "X_primary_reduced": {
+            "recall_all_triggered": {
+              "rate": 0.0,
+              "n": 10000,
+              "count": 0,
+              "wilson95": [
+                0.0,
+                0.00038399837067659573
+              ]
+            },
+            "recall_successful_eligible": {
+              "rate": 0.0,
+              "n": 9658,
+              "count": 0,
+              "wilson95": [
+                0.0,
+                0.0003975907529705012
+              ]
+            },
+            "benign_fpr": {
+              "rate": 0.008,
+              "n": 10000,
+              "count": 80,
+              "wilson95": [
+                0.006433050051197009,
+                0.00994480434554876
+              ]
+            },
+            "post_defense_asr": {
+              "rate": 0.9994825623512367,
+              "n": 9663,
+              "count": 9658,
+              "wilson95": [
+                0.9987891888873327,
+                0.9997789619528713
+              ]
+            },
+            "auroc_trigger_vs_benign": 0.507020985,
+            "threshold": 0.9550000000000001
+          }
+        }
+      },
+      "full": {
+        "n_malware": 10000,
+        "n_eligible": 9663,
+        "n_successful_eligible": 9658,
+        "asr_all": {
+          "rate": 0.9995,
+          "n": 10000,
+          "count": 9995,
+          "wilson95": [
+            0.998829974053858,
+            0.9997864115738362
+          ]
+        },
+        "asr_eligible": {
+          "rate": 0.9994825623512367,
+          "n": 9663,
+          "count": 9658,
+          "wilson95": [
+            0.9987891888873327,
+            0.9997789619528713
+          ]
+        },
+        "clean_trigger_asr_eligible": {
+          "rate": 0.8371106281693056,
+          "n": 9663,
+          "count": 8089,
+          "wilson95": [
+            0.8296143316788679,
+            0.8443389991741238
+          ]
+        },
+        "paired_new_evasions": {
+          "rate": 0.16237193418193108,
+          "n": 9663,
+          "count": 1569,
+          "wilson95": [
+            0.15515319344795522,
+            0.16985901164555653
+          ]
+        },
+        "paired_lost_evasions": {
+          "rate": 0.0,
+          "n": 9663,
+          "count": 0,
+          "wilson95": [
+            0.0,
+            0.0003973851062995259
+          ]
+        },
+        "methods": {
+          "TADR": {
+            "recall_all_triggered": {
+              "rate": 0.0,
+              "n": 10000,
+              "count": 0,
+              "wilson95": [
+                0.0,
+                0.00038399837067659573
+              ]
+            },
+            "recall_successful_eligible": {
+              "rate": 0.0,
+              "n": 9658,
+              "count": 0,
+              "wilson95": [
+                0.0,
+                0.0003975907529705012
+              ]
+            },
+            "benign_fpr": {
+              "rate": 0.0023,
+              "n": 10000,
+              "count": 23,
+              "wilson95": [
+                0.001533154495882851,
+                0.0034490774822886323
+              ]
+            },
+            "post_defense_asr": {
+              "rate": 0.9994825623512367,
+              "n": 9663,
+              "count": 9658,
+              "wilson95": [
+                0.9987891888873327,
+                0.9997789619528713
+              ]
+            },
+            "auroc_trigger_vs_benign": 0.6694409,
+            "threshold": 0.17289452546846157
+          },
+          "M3_view_mass": {
+            "recall_all_triggered": {
+              "rate": 0.0,
+              "n": 10000,
+              "count": 0,
+              "wilson95": [
+                0.0,
+                0.00038399837067659573
+              ]
+            },
+            "recall_successful_eligible": {
+              "rate": 0.0,
+              "n": 9658,
+              "count": 0,
+              "wilson95": [
+                0.0,
+                0.0003975907529705012
+              ]
+            },
+            "benign_fpr": {
+              "rate": 0.0086,
+              "n": 10000,
+              "count": 86,
+              "wilson95": [
+                0.0069694684051106025,
+                0.010607925193590355
+              ]
+            },
+            "post_defense_asr": {
+              "rate": 0.9994825623512367,
+              "n": 9663,
+              "count": 9658,
+              "wilson95": [
+                0.9987891888873327,
+                0.9997789619528713
+              ]
+            },
+            "auroc_trigger_vs_benign": 0.5104639599999999,
+            "threshold": 0.6245176623920181
+          },
+          "M4_shap_behavioral_conflict": {
+            "recall_all_triggered": {
+              "rate": 0.0013,
+              "n": 10000,
+              "count": 13,
+              "wilson95": [
+                0.0007599118725796528,
+                0.0022230881023331834
+              ]
+            },
+            "recall_successful_eligible": {
+              "rate": 0.001346034375647132,
+              "n": 9658,
+              "count": 13,
+              "wilson95": [
+                0.000786826712840477,
+                0.0023017624497824133
+              ]
+            },
+            "benign_fpr": {
+              "rate": 0.0109,
+              "n": 10000,
+              "count": 109,
+              "wilson95": [
+                0.009044474829555112,
+                0.013131152376640733
+              ]
+            },
+            "post_defense_asr": {
+              "rate": 0.9981372244644521,
+              "n": 9663,
+              "count": 9645,
+              "wilson95": [
+                0.997057203290881,
+                0.9988213410102321
+              ]
+            },
+            "auroc_trigger_vs_benign": 0.4552421200000001,
+            "threshold": 0.04208950616084616
+          },
+          "M4_prob_gap": {
+            "recall_all_triggered": {
+              "rate": 0.0,
+              "n": 10000,
+              "count": 0,
+              "wilson95": [
+                0.0,
+                0.00038399837067659573
+              ]
+            },
+            "recall_successful_eligible": {
+              "rate": 0.0,
+              "n": 9658,
+              "count": 0,
+              "wilson95": [
+                0.0,
+                0.0003975907529705012
+              ]
+            },
+            "benign_fpr": {
+              "rate": 0.0111,
+              "n": 10000,
+              "count": 111,
+              "wilson95": [
+                0.00922610769453467,
+                0.013349365912312904
+              ]
+            },
+            "post_defense_asr": {
+              "rate": 0.9994825623512367,
+              "n": 9663,
+              "count": 9658,
+              "wilson95": [
+                0.9987891888873327,
+                0.9997789619528713
+              ]
+            },
+            "auroc_trigger_vs_benign": 0.5555944850000001,
+            "threshold": 0.6953793689098294
+          },
+          "STRIP": {
+            "recall_all_triggered": {
+              "rate": 0.0003,
+              "n": 10000,
+              "count": 3,
+              "wilson95": [
+                0.00010203219941781012,
+                0.0008817357722363795
+              ]
+            },
+            "recall_successful_eligible": {
+              "rate": 0.00010354110581901015,
+              "n": 9658,
+              "count": 1,
+              "wilson95": [
+                1.8277781450346084e-05,
+                0.0005863128491857234
+              ]
+            },
+            "benign_fpr": {
+              "rate": 0.0074,
+              "n": 10000,
+              "count": 74,
+              "wilson95": [
+                0.005899086359582839,
+                0.009279228835207744
+              ]
+            },
+            "post_defense_asr": {
+              "rate": 0.999379074821484,
+              "n": 9663,
+              "count": 9657,
+              "wilson95": [
+                0.9986458636968658,
+                0.9997153943326389
+              ]
+            },
+            "auroc_trigger_vs_benign": 0.79462565,
+            "threshold": 0.975262909095139
+          },
+          "X_primary_reduced": {
+            "recall_all_triggered": {
+              "rate": 0.0,
+              "n": 10000,
+              "count": 0,
+              "wilson95": [
+                0.0,
+                0.00038399837067659573
+              ]
+            },
+            "recall_successful_eligible": {
+              "rate": 0.0,
+              "n": 9658,
+              "count": 0,
+              "wilson95": [
+                0.0,
+                0.0003975907529705012
+              ]
+            },
+            "benign_fpr": {
+              "rate": 0.008,
+              "n": 10000,
+              "count": 80,
+              "wilson95": [
+                0.006433050051197009,
+                0.00994480434554876
+              ]
+            },
+            "post_defense_asr": {
+              "rate": 0.9994825623512367,
+              "n": 9663,
+              "count": 9658,
+              "wilson95": [
+                0.9987891888873327,
+                0.9997789619528713
+              ]
+            },
+            "auroc_trigger_vs_benign": 0.507020985,
+            "threshold": 0.9550000000000001
+          },
+          "X_primary_full": {
+            "recall_all_triggered": {
+              "rate": 0.0,
+              "n": 10000,
+              "count": 0,
+              "wilson95": [
+                0.0,
+                0.00038399837067659573
+              ]
+            },
+            "recall_successful_eligible": {
+              "rate": 0.0,
+              "n": 9658,
+              "count": 0,
+              "wilson95": [
+                0.0,
+                0.0003975907529705012
+              ]
+            },
+            "benign_fpr": {
+              "rate": 0.0071,
+              "n": 10000,
+              "count": 71,
+              "wilson95": [
+                0.005633116021239761,
+                0.008945429572573226
+              ]
+            },
+            "post_defense_asr": {
+              "rate": 0.9994825623512367,
+              "n": 9663,
+              "count": 9658,
+              "wilson95": [
+                0.9987891888873327,
+                0.9997789619528713
+              ]
+            },
+            "auroc_trigger_vs_benign": 0.562627165,
+            "threshold": 0.9470000000000001
+          }
+        }
+      }
+    },
+    "paired_comparison": {
+      "auroc_full_minus_reduced": {
+        "ci95": [
+          0.04909870599999999,
+          0.06174397212499998
+        ],
+        "repeats": 1000,
+        "two_sided_sign_tail": 0.0,
+        "difference": 0.05560617999999995
+      },
+      "recall_successful_full_minus_reduced": {
+        "difference": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "n": 9658
+      },
+      "benign_fpr_full_minus_reduced": {
+        "difference": -0.0009,
+        "ci95": [
+          -0.003,
+          0.0012
+        ],
+        "n": 10000
+      },
+      "post_defense_asr_full_minus_reduced": {
+        "difference": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "n": 9663
+      },
+      "successful_full_only_ids": [],
+      "successful_reduced_only_ids": []
+    },
+    "interpretation": "Within-dataset paired estimates; extra clean view models only for full; FPR target is not a test guarantee."
+  },
+  "resources": {
+    "calibration_seconds": {
+      "reduced": 18.13123800000176,
+      "full": 18.29991910001263
+    },
+    "process_peak_memory": {
+      "peak_working_set_mib": 6523.09765625,
+      "peak_pagefile_mib": 7650.2109375,
+      "method": "Windows GetProcessMemoryInfo; whole process, including native allocations"
+    },
+    "peak_memory_scope": "whole shared process; not attributable to a detector variant",
+    "model_bytes": {
+      "reduced": 3718281,
+      "full": 7084353
+    },
+    "latency": {
+      "reduced": {
+        "n": 100,
+        "mean_ms": 25.80969299931894,
+        "median_ms": 26.162649992329534,
+        "p95_ms": 26.997545001358958
+      },
+      "full": {
+        "n": 100,
+        "mean_ms": 25.863040000404,
+        "median_ms": 26.618150004651397,
+        "p95_ms": 27.519629991729744
+      },
+      "scope": "warm single-input detector latency; alternating order, same samples; not isolated RAM comparison",
+      "n": 100,
+      "sample_content_sha256": "84579e91d60c7e5ee4eb9c7346320051bea99195d57d4d4de0338bb4291d7c50"
+    }
+  },
+  "clean_performance": {
+    "accuracy": 0.9628,
+    "tpr": {
+      "rate": 0.9663,
+      "n": 10000,
+      "count": 9663,
+      "wilson95": [
+        0.9625802207422883,
+        0.9696616623772186
+      ]
+    },
+    "fpr": {
+      "rate": 0.0407,
+      "n": 10000,
+      "count": 407,
+      "wilson95": [
+        0.03700032210807924,
+        0.044752418795224264
+      ]
+    },
+    "auroc": 0.9929677099999998
+  },
+  "poisoned_clean_performance": {
+    "accuracy": 0.96115,
+    "tpr": {
+      "rate": 0.9654,
+      "n": 10000,
+      "count": 9654,
+      "wilson95": [
+        0.961635401714528,
+        0.9688071726020463
+      ]
+    },
+    "fpr": {
+      "rate": 0.0431,
+      "n": 10000,
+      "count": 431,
+      "wilson95": [
+        0.039292009027508144,
+        0.047258888683616114
+      ]
+    },
+    "auroc": 0.99287437
+  },
+  "artifact_sha256": {
+    "poisoned.txt": "d9272443efc5fba6b691ae802bd64361635be8ab9227905b11757a60b8638c1d",
+    "attack.json": "17f5c24581f5b9d47374eecf20c5c960f9a8533dc24179342d01231d759463ad",
+    "paired_predictions.npz": "a3b8c74124779d585f90484d1bdbb818ae1bebe6e3239463f15c8ec509dfc2ec"
+  },
+  "bundle_manifest_sha256": {
+    "reduced": "47504880ce4db8ab81a65446c6acff9671e706d8ba670bd8f833ec5069a47632",
+    "full": "3e17bf4390b811b651578955fcc152a91d95c34ebf980951d9a5cb3539e24390"
+  },
+  "interpretation": "Weak/unconfirmed attack cells retained and labeled; detector efficacy claims require independently viable attacks"
+}

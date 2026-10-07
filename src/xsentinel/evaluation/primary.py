@@ -57,7 +57,7 @@ def _paired_rate(a,b,repeats,seed):
 
 
 def evaluate_pair(reduced,full,clean_model,benign,malware,triggered,benign_ids,malware_ids,
-                  *,batch_size=128,bootstrap_repeats=1000,seed=17):
+                  *,batch_size=128,bootstrap_repeats=1000,seed=17,artifacts=None):
     """Does not tune or train. Caller must lock protocol/tau before supplying final pools."""
     if reduced.protocol!=PRIMARY_PROTOCOL or full.protocol!=PRIMARY_PROTOCOL or reduced.views or not full.views:
         raise ValueError('Expected primary reduced/full pair with distinct resource access')
@@ -100,6 +100,17 @@ def evaluate_pair(reduced,full,clean_model,benign,malware,triggered,benign_ids,m
         'successful_reduced_only_ids':mi[success&rf&~ff].tolist(),
     }
     comparison['auroc_full_minus_reduced']['difference']=auc(tf['X_primary_full'],bf['X_primary_full'])-auc(tr['X_primary_reduced'],br['X_primary_reduced'])
+    if artifacts is not None:
+        from pathlib import Path
+        dest=Path(artifacts)
+        if dest.exists(): raise FileExistsError('Existing paired predictions preserved')
+        dest.parent.mkdir(parents=True,exist_ok=True)
+        arrays={'benign_ids':bi.astype('S64'),'malware_ids':mi.astype('S64'),
+                'clean_malware_p':clean_p,'clean_trigger_p':clean_trigger_p,'triggered_main_p':pr}
+        for variant,(ts,bs,tp) in raw.items():
+            arrays.update({variant+'_trigger_'+k:v for k,v in ts.items()})
+            arrays.update({variant+'_benign_'+k:v for k,v in bs.items()})
+        np.savez_compressed(dest,**arrays)
     return {'dataset':s.dataset,'schema':s.version,'protocol':PRIMARY_PROTOCOL,'schema_sha256':s.fingerprint,
         'main_model_sha256':hashlib.sha256(reduced.model.model_to_string().encode()).hexdigest(),
         'source_ids_sha256':hashlib.sha256(('\n'.join(bi)+'\n'+'\n'.join(mi)).encode()).hexdigest(),

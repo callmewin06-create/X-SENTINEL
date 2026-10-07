@@ -1,5 +1,7 @@
 # Triển khai X-SENTINEL bản chính ngày 06/10/2026
 
+**Cập nhật sau bản ghi này:** xem [tiến độ và workflow ngày 07/10](PRIMARY_RUN_GUIDE_2026_10_07.md), [review kết quả đã hoàn tất](results/PRIMARY_RESULTS_REVIEW_2026_10_07.md) và [dashboard/Docker đã kiểm chứng](DASHBOARD_DOCKER_CHECK_2026_10_07.md). Các phần “chưa có CLI orchestration”, “mới có một ZIP” và 41 tests dưới đây ghi lại mốc cũ. Kết quả lịch sử không bị sửa.
+
 Đã bắt đầu triển khai bản mới theo bàn giao và các câu trả lời trực tiếp trong chat này. Nền tảng hai schema, detector và so sánh paired đã có code và kiểm tra; chưa có kết quả detector của ma trận chính. Các kết quả, model, split và tài liệu lịch sử được giữ nguyên. Chưa commit, push hoặc upload.
 
 ## 1. Những lựa chọn đã chốt trong chat này

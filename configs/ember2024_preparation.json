@@ -1,0 +1,8 @@
+{
+  "duplicate_policy": "merge_equal_features_exclude_conflicts_v1",
+  "authorization": "User approved in chat on 2026-10-06",
+  "merge_when": "same official split, label, PE type and all raw PE feature fields",
+  "exclude_when": "cross train/test, conflicting label/type or conflicting raw PE features",
+  "representative": "first occurrence in pinned archive/member order",
+  "audit": "retain original location and every duplicate location; record all exclusions"
+}

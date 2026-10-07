@@ -1,0 +1,53 @@
+{
+  "schema": "ember-v2-2381-views-v2",
+  "dataset": "EMBER2018",
+  "schema_sha256": "2dc378995e47ff67313334b27ff90014008484d24491765ba635abd5cdd0a2c0",
+  "method_version": "xsentinel-primary-v2",
+  "component_versions": {
+    "M3_view_mass": "max-view-absolute-shap-share-v1",
+    "M4_shap_behavioral_conflict": "benign-gated-positive-behavioral-net-over-total-v1",
+    "M4_prob_gap": "positive-behavioral-minus-main-probability-v1",
+    "fusion": "equal-right-ecdf-benign-reference-ranks-v1",
+    "STRIP": "one-minus-mean-binary-entropy-content-rng-v1",
+    "calibration": "order-statistic-strict-gt-v1"
+  },
+  "config": {
+    "strip_n": 50,
+    "strip_alpha": 0.5,
+    "seed": 17,
+    "malware_threshold": 0.5,
+    "fpr": 0.01,
+    "enable_m5": false
+  },
+  "thresholds": {
+    "TADR": 0.1646526935056241,
+    "M3_view_mass": 0.625978153210522,
+    "M4_shap_behavioral_conflict": 0.04594739711015399,
+    "STRIP": 0.9775755942736303,
+    "X_primary_reduced": 0.952
+  },
+  "hashes": {
+    "main.txt": "e15c0446eaf5a70ea5e48cf4d9bb5170307bcc704ee33f43f273a64a8c04037d",
+    "reference.npz": "5508e92d1fe9efe0db19b4726c50135c1108d57ff1a7d04351259d70611e02d9"
+  },
+  "calibration_fpr": {
+    "TADR": 0.01,
+    "M3_view_mass": 0.01,
+    "M4_shap_behavioral_conflict": 0.01,
+    "STRIP": 0.01,
+    "X_primary_reduced": 0.0085
+  },
+  "calibration_size": 2000,
+  "calibration_fp_count": {
+    "TADR": 20,
+    "M3_view_mass": 20,
+    "M4_shap_behavioral_conflict": 20,
+    "STRIP": 20,
+    "X_primary_reduced": 17
+  },
+  "calibration_policy": "score>tau; order statistic; ties conservative",
+  "calibration_content_sha256": "3145204ef50c0f5a84bb8cb8234629d857dc16d430ab9faf8a7189eaabbe049a",
+  "reference_calibration_check": "vector-disjoint; source SHA separation is organizer responsibility",
+  "m5_scope": "disabled; supplementary only",
+  "pe_extraction": "experimental_lief_0.16.6"
+}

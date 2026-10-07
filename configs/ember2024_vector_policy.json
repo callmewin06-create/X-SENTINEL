@@ -1,0 +1,8 @@
+{
+  "policy": "official_pe_scope_keep_original_is_pe_v1",
+  "authorization": "User approved in chat on 2026-10-07",
+  "scope": "Official Win32, Win64 and Dot_Net PE archives",
+  "is_pe_zero": "Retain when upstream vector has 2568 finite values",
+  "feature_mutation": "None; preserve upstream features and original is_pe flag",
+  "audit": "Counts by partition, file type, label and is_pe for raw occurrences, unique representatives and materialized samples"
+}
