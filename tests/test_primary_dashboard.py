@@ -14,21 +14,37 @@ def test_catalog_experiment_keeps_full_reduced_together(tmp_path):
     assert preferred_method({'TADR':.1,'X_primary_full':.9},'full')=='X_primary_full'
 
 
-def test_dashboard_real_primary_bundles_and_wrong_dataset():
+def test_dashboard_real_primary_bundles_and_details_do_not_rescore(monkeypatch):
     if not all(primary_catalog(d) for d in ('EMBER2018','EMBER2024')):
         pytest.skip('Completed research bundles not present in this checkout')
+    monkeypatch.delenv('XS_API_BASE_URL', raising=False)
     from streamlit.testing.v1 import AppTest
+    from xsentinel.detection.detector import Detector
+    original = Detector.predict
+    calls = []
+    def counted(self, x):
+        calls.append(self.schema.dataset)
+        return original(self, x)
+    monkeypatch.setattr(Detector, 'predict', counted)
     app=AppTest.from_file('dashboard/app.py').run(timeout=45)
-    for dataset in ('EMBER2018','EMBER2024'):
-        app.sidebar.selectbox[0].set_value(dataset).run(timeout=45)
-        assert app.sidebar.selectbox[1].value=='Primary research'
-        for variant in ('reduced','full'):
-            app.sidebar.selectbox[3].set_value(variant).run(timeout=45)
-            assert not app.exception and not app.error and len(app.metric)==3
-            assert app.sidebar.selectbox[4].value=='X_primary_'+variant
-            assert 'Model and reference checksums verified' in app.sidebar.success[0].value
-            assert app.metric[1].label=='Main classification' and app.metric[2].label=='Backdoor alert'
-    wrong=next(iter(primary_catalog('EMBER2018').values()))['full']
-    app.sidebar.text_input[0].set_value(wrong).run(timeout=45)
     assert not app.exception and not app.metric
-    assert any('Bundle dataset mismatch' in x.value for x in app.warning)
+    for dataset in ('EMBER2018','EMBER2024'):
+        app.selectbox(key='dataset').set_value(dataset).run(timeout=45)
+        app.sidebar.radio(key='page').set_value('Nghiên cứu').run(timeout=45)
+        for variant in ('reduced','full'):
+            app.selectbox(key='variant_'+dataset).set_value(variant).run(timeout=45)
+            assert app.selectbox(key='method_'+dataset).value=='X_primary_'+variant
+            app.radio(key='mode_Nghiên cứu').set_value('Dùng mẫu demo').run(timeout=45)
+            app.button(key='analyze').click().run(timeout=45)
+            assert not app.exception and not app.error and len(app.metric)==2
+            assert app.metric[0].label=='Mô hình phân loại file' and app.metric[1].label=='Dấu hiệu trigger'
+            before=len(calls)
+            app.toggle[0].set_value(True).run(timeout=45)
+            app.toggle[1].set_value(True).run(timeout=45)
+            assert not app.exception and len(calls)==before
+            assert len(app.dataframe)>=2
+    wrong=next(iter(primary_catalog('EMBER2018').values()))['full']
+    app.checkbox(key='custom_enabled').set_value(True).run(timeout=45)
+    app.text_input(key='custom_path').set_value(wrong).run(timeout=45)
+    assert not app.exception and not app.metric
+    assert any('không khớp' in x.value for x in app.error)

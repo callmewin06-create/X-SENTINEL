@@ -1,5 +1,7 @@
 # Implementation and validation status
 
+**Current-status pointer, 2026-10-14:** this file below is the preserved October 4–5 pilot record. Use [the latest research revision](REVISION_2026_10_13.md) and [the deployment handoff](DELIVERY_2026_10_14.md) for the current primary models, Vietnamese UI, 50 MiB upload, V2/V3 fixture checks, 66-test run and isolated backup restore. A second physical machine test is pending for October 15. Historical statements below are not the current system status.
+
 Recorded 2026-10-04, Asia/Bangkok. This file distinguishes implementation from completed research evidence.
 
 Review update, 2026-10-05: the newly submitted baseline is reviewed in docs/reviews/BASELINE_REVIEW_2026_10_05.md. Its proposed feasible membership conflicts with the vendored source. Recomputing the source filter also identified our own omission: derived set has 17 columns (13 Structural + 4 Metadata), while current code/runs use a valid 16-column subset lacking 684. The earlier assertion that 16 was the complete author whitelist was incorrect. No detector/attack source, whitelist, locked run or trigger profile was changed as part of this review; no new model run was launched. Review checks and the submitted document snapshot are preserved alongside the review.

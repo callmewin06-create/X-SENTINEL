@@ -1,12 +1,14 @@
 """Experimental modern-LIEF adapter. Reads only; never invokes a binary."""
 import hashlib
+import io
 import struct
 import numpy as np
 import lief
 from .vectorizer import Vectorizer,upstream_module
+from .limits import MAX_UPLOAD_BYTES
 
-def verify_pe(data,max_bytes=20*1024*1024):
-    if len(data)>max_bytes: raise ValueError('Upload exceeds 20 MiB')
+def verify_pe(data,max_bytes=MAX_UPLOAD_BYTES):
+    if len(data)>max_bytes: raise ValueError(f'Upload exceeds {max_bytes//(1024*1024)} MiB')
     if len(data)<64 or data[:2]!=b'MZ': raise ValueError('Missing DOS MZ header')
     offset=struct.unpack_from('<I',data,0x3c)[0]
     if offset<64 or offset+24>len(data) or data[offset:offset+4]!=b'PE\0\0':
@@ -14,7 +16,7 @@ def verify_pe(data,max_bytes=20*1024*1024):
 
 def extract_pe(data):
     verify_pe(data)
-    binary=lief.PE.parse(list(data))
+    binary=lief.PE.parse(io.BytesIO(data))
     if binary is None: raise ValueError('LIEF could not parse PE')
     u=upstream_module(); raw={'sha256':hashlib.sha256(data).hexdigest()}
     for cls in (u.ByteHistogram,u.ByteEntropyHistogram,u.StringExtractor,u.ImportsInfo,u.ExportsInfo,u.GeneralFileInfo,u.HeaderFileInfo,u.DataDirectories):

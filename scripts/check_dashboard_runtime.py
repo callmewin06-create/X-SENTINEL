@@ -1,53 +1,77 @@
-"""Smoke test the deployed dashboard with real bundles, including Linux Docker."""
+"""Portable AppTest smoke checks for the revised UI and real scoring/history."""
 import argparse
 import json
 import os
 from pathlib import Path
 import platform
 import sys
-
-sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'src'))
+import time
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
 from streamlit.testing.v1 import AppTest
 from xsentinel.dashboard_catalog import primary_catalog
+from xsentinel.service.scoring import score_input
+from xsentinel.detection.detector import Detector
 from xsentinel.utils import write_json
 
 
 def main():
-    parser=argparse.ArgumentParser(); parser.add_argument('--out')
-    args=parser.parse_args()
-    results=[]
-    app=AppTest.from_file('dashboard/app.py').run(timeout=60)
-    connected=bool(os.getenv('XS_API_BASE_URL'))
-    for dataset in ('EMBER2018','EMBER2024'):
-        if len(primary_catalog(dataset))!=27: raise ValueError('Expected all 27 completed primary experiments')
-        app.sidebar.selectbox[0].set_value(dataset).run(timeout=60)
-        for variant in ('reduced','full'):
-            app.sidebar.selectbox[3].set_value(variant).run(timeout=60)
-            if connected:
-                app.button[0].click().run(timeout=90)
-            if app.exception or app.error or len(app.metric)!=3:
-                raise AssertionError('Dashboard failed for '+dataset+'/'+variant)
-            if app.sidebar.selectbox[4].value!='X_primary_'+variant:
-                raise AssertionError('Wrong preferred primary method')
-            results.append({'dataset':dataset,'variant':variant,'metrics':{m.label:m.value for m in app.metric},
-                'method':app.sidebar.selectbox[4].value,'scores':app.dataframe[0].value.to_dict(orient='records')})
-    wrong=next(iter(primary_catalog('EMBER2018').values()))['full']
-    app.sidebar.text_input[0].set_value(wrong).run(timeout=60)
-    rejected=not app.exception and not app.metric and any('Bundle dataset mismatch' in w.value for w in app.warning)
-    if not rejected: raise AssertionError('Wrong dataset was not rejected')
-    history_ok=None
+    parser = argparse.ArgumentParser(); parser.add_argument('--out')
+    args = parser.parse_args()
+    app = AppTest.from_file('dashboard/app.py').run(timeout=60)
+    if app.exception:
+        raise AssertionError('Initial dashboard failed')
+    connected = bool(os.getenv('XS_API_BASE_URL'))
+    app.sidebar.radio(key='page').set_value('Nghiên cứu').run(timeout=60)
+    cases = []
+    for dataset in ('EMBER2018', 'EMBER2024'):
+        if len(primary_catalog(dataset)) != 27:
+            raise ValueError('Expected all 27 experiments')
+        app.selectbox(key='dataset').set_value(dataset).run(timeout=60)
+        for variant in ('reduced', 'full'):
+            app.selectbox(key='variant_' + dataset).set_value(variant).run(timeout=60)
+            assert app.selectbox(key='method_' + dataset).value == 'X_primary_' + variant
+            app.radio(key='mode_Nghiên cứu').set_value('Dùng mẫu demo').run(timeout=60)
+            start = time.perf_counter()
+            app.button(key='analyze').click().run(timeout=90)
+            app_run_ms = (time.perf_counter() - start) * 1000
+            if app.exception or app.error or len(app.metric) != 2:
+                raise AssertionError('Dashboard failed for ' + dataset + '/' + variant)
+            record = app.session_state['analysis']
+            result = record['result']
+            result_before_details = json.loads(json.dumps(result))
+            app.toggle[0].set_value(True).run(timeout=60)
+            assert not app.exception, [error.message for error in app.exception]
+            app.toggle[1].set_value(True).run(timeout=60)
+            assert not app.exception
+            assert app.session_state['analysis']['result'] == result_before_details
+            assert app.session_state['analysis']['timings'] == record['timings']
+            cases.append({'dataset': dataset, 'variant': variant, 'method': result['method'],
+                          'metrics': {m.label: m.value for m in app.metric},
+                          'predict_ms': result['elapsed_ms'], 'ui_script_run_ms': app_run_ms,
+                          'application_timings': record['timings'],
+                          'details_reuse_existing_result': True,
+                          'input_metadata_present': result['input_metadata']['kind'] == 'demo',
+                          'request_id': result.get('request_id'), 'saved': result.get('saved', False)})
+        # Dataset change must not show the previous result.
+        other = 'EMBER2024' if dataset == 'EMBER2018' else 'EMBER2018'
+        app.selectbox(key='dataset').set_value(other).run(timeout=60)
+        assert not app.metric
+    history_ok = None
     if connected:
-        app.sidebar.radio[0].set_value('Lịch sử').run(timeout=60)
-        history_ok=not app.error and not app.exception and len(app.dataframe[0].value)>=4
-        if not history_ok: raise AssertionError('Saved history page failed')
-    result={'platform':platform.platform(),'python':platform.python_version(),'uid':os.getuid() if hasattr(os,'getuid') else None,
-        'cases':results,'wrong_dataset_rejected':True,'raw_dataset_mounted':Path('data/ember2024_archives').exists(),
-        'api_connected':connected,'history_page_ok':history_ok}
+        app.sidebar.radio(key='page').set_value('Lịch sử').run(timeout=60)
+        history_ok = not app.exception and not app.error and len(app.dataframe[0].value) >= 4
+        assert history_ok
+        assert app.dataframe[0].value['Bộ mô hình'].isin(['EMBER2018', 'EMBER2024']).all()
+    result = {'platform': platform.platform(), 'python': platform.python_version(),
+              'uid': os.getuid() if hasattr(os, 'getuid') else None, 'cases': cases,
+              'api_connected': connected, 'history_page_ok': history_ok,
+              'source_data_mounted': Path('data/ember2024_archives').exists(),
+              'scope': 'Real model + AppTest script roundtrip; ui_script_run_ms includes AppTest overhead, excludes actual browser rendering/upload. Not a second physical machine.'}
     if args.out:
-        dest=Path(args.out)
-        if dest.exists(): raise FileExistsError('Existing validation preserved')
-        write_json(dest,result)
-    print(json.dumps(result,ensure_ascii=True),flush=True)
+        destination = Path(args.out)
+        if destination.exists(): raise FileExistsError('Existing validation preserved')
+        write_json(destination, result)
+    print(json.dumps(result, ensure_ascii=True, indent=2))
 
 
-if __name__=='__main__': main()
+if __name__ == '__main__': main()

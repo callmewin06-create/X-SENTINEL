@@ -6,11 +6,12 @@ COPY pyproject.toml ./
 COPY src ./src
 COPY docs/upstream ./docs/upstream
 COPY dashboard ./dashboard
+COPY .streamlit ./.streamlit
 COPY configs ./configs
 COPY scripts ./scripts
 COPY database ./database
-RUN pip install --no-cache-dir '.[service]' && useradd -m appuser && mkdir -p /app/outputs /app/data && chown appuser /app/outputs /app/data
+RUN pip install --no-cache-dir '.[service,binary-v3]' && useradd -m appuser && mkdir -p /app/outputs /app/data && chown appuser /app/outputs /app/data
 USER appuser
 EXPOSE 8501
 HEALTHCHECK --interval=10s --timeout=3s --start-period=10s --retries=5 CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8501/_stcore/health',timeout=2)"
-CMD ["streamlit", "run", "dashboard/app.py", "--server.address=0.0.0.0", "--server.port=8501", "--server.maxUploadSize=20"]
+CMD ["streamlit", "run", "dashboard/app.py", "--server.address=0.0.0.0", "--server.port=8501", "--server.maxUploadSize=50"]

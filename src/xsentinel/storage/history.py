@@ -8,13 +8,14 @@ from sqlalchemy.orm import Session
 from xsentinel.storage.models import (ModelVersion, AnalysisJob, AnalysisResultRecord,
                                       DetectorScore, Alert, AuditEvent)
 from xsentinel.service.scoring import input_digest,score_input
+from xsentinel.service.input_metadata import stable_metadata
 
 
 class RequestConflict(ValueError):
     pass
 
 
-def analyze_and_store(engine, registry, identity, features, method, request_id, demo_mode=False):
+def analyze_and_store(engine, registry, identity, features, method, request_id, demo_mode=False, input_metadata=None):
     entry = registry.entry(identity)
     detector,lock = registry.loaded(identity)
     x = detector.schema.matrix(features)
@@ -28,10 +29,12 @@ def analyze_and_store(engine, registry, identity, features, method, request_id, 
         session.execute(text('SELECT pg_advisory_xact_lock(:key)'),{'key':advisory})
         old = session.scalar(select(AnalysisJob).where(AnalysisJob.request_id==request_id))
         if old:
+            old_result = session.get(AnalysisResultRecord,old.id).result_json
             if (old.input_sha256!=digest or old.model_version_id!=model_id or
-                    old.config_version!=method or old.demo_mode!=demo_mode):
+                    old.config_version!=method or old.demo_mode!=demo_mode or
+                    stable_metadata(old_result.get('input_metadata')) != stable_metadata(input_metadata)):
                 raise RequestConflict('Request ID was already used for a different analysis')
-            return session.get(AnalysisResultRecord,old.id).result_json
+            return old_result
         started = datetime.now(timezone.utc)
         with lock:
             result = score_input(detector,x,method)
@@ -40,6 +43,8 @@ def analyze_and_store(engine, registry, identity, features, method, request_id, 
                        'input_sha256':digest,'demo_mode':demo_mode,'saved':True,
                        'experiment':{k:entry[k] for k in ('dataset','family','seed','rate','variant')},
                        'created_at':started.isoformat()})
+        if input_metadata is not None:
+            result['input_metadata'] = input_metadata
         state = entry['state']
         config_hash = hashlib.sha256((entry['path']/'bundle.json').read_bytes()).hexdigest()
         session.execute(insert(ModelVersion).values(id=model_id,name=entry['dataset']+'_'+entry['variant'],
@@ -49,7 +54,7 @@ def analyze_and_store(engine, registry, identity, features, method, request_id, 
                            'bundle_path':entry['relative_path'],'hashes':state['hashes']}
             ).on_conflict_do_nothing(index_elements=['name','version']))
         job = AnalysisJob(id=job_id,request_id=request_id,model_version_id=model_id,
-            status='completed',input_mode='vector',input_sha256=digest,config_version=method,
+            status='completed',input_mode='raw_pe' if input_metadata and input_metadata['kind']=='pe' else 'vector',input_sha256=digest,config_version=method,
             demo_mode=demo_mode,started_at=started,completed_at=datetime.now(timezone.utc))
         session.add(job); session.flush()
         selected = next(s for s in result['scores'] if s['Method']==method)
@@ -74,10 +79,12 @@ def recent_analyses(engine, limit=50):
             .join(ModelVersion,ModelVersion.id==AnalysisJob.model_version_id)
             .order_by(AnalysisJob.created_at.desc(),AnalysisJob.id.desc()).limit(limit)).all()
         return [{'request_id':j.request_id,'created_at':j.created_at.isoformat(),'model':m.name,
-                 **{k:m.metadata_json.get(k) for k in ('dataset','family','seed','rate','variant')},
+                 **{k:(m.metadata_json.get(k) or r.result_json.get('experiment', {}).get(k)
+                       or r.result_json.get(k)) for k in ('dataset','family','seed','rate','variant')},
                  'bundle_id':m.version,'method':j.config_version,'demo_mode':j.demo_mode,
                  'malware_probability':r.malware_score,'main_classification':r.result_json['main_classification'],
-                 'backdoor_alert':r.result_json['backdoor_alert'],'elapsed_ms':r.latency_ms}
+                 'backdoor_alert':r.result_json['backdoor_alert'],'elapsed_ms':r.latency_ms,
+                 'input_metadata':r.result_json.get('input_metadata')}
                 for j,r,m in rows]
 
 

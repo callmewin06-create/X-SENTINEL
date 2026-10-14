@@ -28,11 +28,18 @@ def test_streaming_duplicate_and_split_rules(tmp_path):
     (source/'test_features.jsonl').write_text(json.dumps(rows[0])+'\n',encoding='utf8')
     with pytest.raises(ValueError,match='Duplicate SHA256'): prepare(source,tmp_path/'duplicate')
 
-def test_dashboard_real_bundle():
+def test_dashboard_real_bundle(monkeypatch):
     bundle=Path('outputs/pilot/seed_17/concentrated_0.01/bundle')
     if not bundle.exists(): pytest.skip('Pilot bundle not present in CI')
+    monkeypatch.delenv('XS_API_BASE_URL', raising=False)
     from streamlit.testing.v1 import AppTest
     a=AppTest.from_file('dashboard/app.py').run(timeout=30)
-    assert not a.exception and len(a.metric)==3
-    a.sidebar.text_input[0].set_value('missing_bundle_for_test').run(timeout=30)
-    assert not a.exception and 'Not ready' in a.warning[0].value
+    assert not a.exception and not a.metric
+    a.sidebar.radio(key='page').set_value('Nghiên cứu').run(timeout=30)
+    a.checkbox(key='custom_enabled').set_value(True).run(timeout=30)
+    a.text_input(key='custom_path').set_value(str(bundle)).run(timeout=30)
+    a.radio(key='mode_Nghiên cứu').set_value('Dùng mẫu demo').run(timeout=30)
+    a.button(key='analyze').click().run(timeout=30)
+    assert not a.exception and not a.error and len(a.metric)==2
+    a.text_input(key='custom_path').set_value('missing_bundle_for_test').run(timeout=30)
+    assert not a.exception and not a.metric and a.error

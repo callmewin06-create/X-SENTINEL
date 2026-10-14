@@ -9,11 +9,13 @@ ember_2017_2
 data
 models
 outputs
+output
 tmp
 __pycache__
 *.exe
 *.dll
 *.docx
+*.pptx
 *.pdf
 build
 dist

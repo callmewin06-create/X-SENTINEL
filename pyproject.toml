@@ -5,9 +5,9 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "xsentinel"
 version = "0.1.0"
-description = "Reproducible per-input cross-view backdoor detection on EMBER2018"
+description = "Per-input cross-view backdoor suspicion on EMBER2018 and EMBER2024"
 requires-python = ">=3.11,<3.13"
-dependencies = ["numpy==1.26.4", "lightgbm==4.6.0", "scikit-learn==1.6.1", "scipy==1.17.1", "pandas==2.3.3", "streamlit==1.45.1", "lief==0.16.6"]
+dependencies = ["numpy==1.26.4", "lightgbm==4.6.0", "scikit-learn==1.6.1", "scipy==1.17.1", "pandas==2.3.3", "streamlit==1.45.1", "pyarrow==25.0.1", "lief==0.16.6"]
 
 [project.scripts]
 xsentinel = "xsentinel.cli:main"
@@ -15,6 +15,9 @@ xsentinel = "xsentinel.cli:main"
 [project.optional-dependencies]
 service = ["fastapi==0.115.12", "uvicorn==0.34.0", "SQLAlchemy==2.0.40", "alembic==1.15.2", "psycopg[binary]==3.2.6", "pydantic==2.11.1", "httpx==0.28.1"]
 plots = ["matplotlib==3.10.1", "contourpy==1.3.2"]
+# oscrypto PyPI 1.3.0 cannot detect current OpenSSL version strings on Linux.
+# Upstream fix: https://github.com/wbond/oscrypto/commit/d5f3437ed24257895ae1edd9e503cfb352e635a8
+binary-v3 = ["pefile==2024.8.26", "signify==0.7.1", "oscrypto @ https://github.com/wbond/oscrypto/archive/d5f3437ed24257895ae1edd9e503cfb352e635a8.zip#sha256=6f54c4261ab6d56c9fe96b01c92abf99b06feb8836208c7e3fed894702d34b59 ; sys_platform == 'linux'"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -8,6 +8,7 @@ from xsentinel.dashboard_catalog import preferred_method
 from xsentinel.storage.connection import database_engine,readiness
 from xsentinel.storage.history import analyze_and_store,recent_analyses,analysis_detail,RequestConflict
 from xsentinel.service.registry import BundleRegistry
+from xsentinel.service.input_metadata import InputMetadata
 
 
 class VectorRequest(BaseModel):
@@ -18,6 +19,7 @@ class VectorRequest(BaseModel):
     request_id: str = Field(default_factory=lambda:str(uuid.uuid4()),min_length=1,max_length=128,
                             pattern=r'^[A-Za-z0-9_.-]+$')
     demo_mode: bool = False
+    input_metadata: InputMetadata | None = None
 
 
 def create_app(engine=None, registry=None):
@@ -52,8 +54,13 @@ def create_app(engine=None, registry=None):
         require_ready()
         try:
             entry = registry.entry(req.bundle_id)
+            if req.input_metadata and req.input_metadata.schema_version != entry['state']['schema']:
+                raise ValueError('Input metadata schema does not match bundle')
+            if req.input_metadata and (req.input_metadata.kind == 'demo') != req.demo_mode:
+                raise ValueError('Demo input metadata and demo_mode disagree')
             method = req.method or preferred_method(entry['state']['thresholds'],entry['variant'])
-            return analyze_and_store(engine,registry,req.bundle_id,req.features,method,req.request_id,req.demo_mode)
+            metadata = req.input_metadata.model_dump(by_alias=True) if req.input_metadata else None
+            return analyze_and_store(engine,registry,req.bundle_id,req.features,method,req.request_id,req.demo_mode,metadata)
         except KeyError:
             raise HTTPException(404,'Unknown primary bundle')
         except RequestConflict as exc:

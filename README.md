@@ -1,5 +1,7 @@
 # X-SENTINEL
 
+The teacher-feedback revision is in [the revision guide](docs/REVISION_2026_10_13.md). It preserves the primary models, triggers and thresholds, aligns the manuscript with the implemented M3/M4 formulas, separates restricted edits from cross-view stress, and adds source audits, component analysis, fresh source-ID validation, clean shadow comparisons, a bounded Structural vector optimizer and benign binary extraction checks. The revised manuscript is a Word document under `output/revision_2026_10_13/`; raw datasets are excluded from its local reproduction package. M5 remains unassessed. New baselines have additional access and do not replace primary results.
+
 The primary dual-dataset run completed on 2026-10-07: 27/27 final experiments per dataset, with paired full/reduced bundles. Read the [results review (Vietnamese)](docs/results/PRIMARY_RESULTS_REVIEW_2026_10_07.md), [dashboard and Docker verification](docs/DASHBOARD_DOCKER_CHECK_2026_10_07.md), and [approved protocol](configs/primary_protocol.json). The experiment commands below retain the archived V2 workflow; they do not run the new primary matrix.
 
 The [primary run guide and progress update for 2026-10-07](docs/PRIMARY_RUN_GUIDE_2026_10_07.md) documents the new `prepare-v3`, `develop-primary`, `lock-selector`, `confirm-primary`, `run-primary` and `report-primary` commands. M3 remains view_mass; M5 is deferred. Full has higher mean recall and FPR on the confirmed runs; EMBER2024 detection remains limited. All weak runs are retained.
@@ -76,7 +78,9 @@ D0 reports raw TADR/M3/M4r and a fixed top-q batch budget; it has no calibrated 
 
 The current Docker stack includes PostgreSQL history and a FastAPI adapter for the real primary detector. Read the [database integration guide (Vietnamese)](docs/database/INTEGRATION_2026_10_07.md). New machines need a local `.env` password; Analyze/History pages save only when you click the analysis button. The standalone local dashboard remains available without database. Users/roles are schema only; authentication is not implemented.
 
-The dashboard discovers all 27 primary experiments for each dataset and lets you select reduced/full. It supports one finite vector with 2381 columns (EMBER2018) or 2568 (EMBER2024), or a matching raw EMBER JSON record. Vector processing is the verified path. V2 binary extraction remains experimental; V3 binary extraction is unavailable. Malware probability/label and backdoor alert are shown separately. Missing, corrupted or wrong-dataset bundles produce Not ready.
+The Vietnamese dashboard separates Analysis, History and Research. Analysis accepts PE uploads up to 50 MiB or labelled reference-vector demos. Research exposes all 27 primary experiments per dataset, reduced/full, finite vectors with 2381 columns (EMBER2018) or 2568 (EMBER2024), and matching raw EMBER JSON. V2/V3 PE extraction is connected and fixture-tested; V2 compatibility caveats and the lack of original-dataset binary parity remain explicit. Classification and the selected method's trigger alert are separate. Result explanations and SHAP views reuse existing output. History retains optional client-declared input metadata and supports older records.
+
+Read the [14 October deployment handoff and second-machine checklist](docs/DELIVERY_2026_10_14.md). The updated Word report and demo slides are in `output/delivery_2026_10_14`; runtime evidence is under `outputs/delivery_2026_10_14/stack_v10`. A real isolated backup restore, four PE/service cases and Windows/Linux Docker UI checks passed on the current physical machine. The teammate's physical-machine check is pending for 15 October. The 10 ms research target remains unmet.
 
 ```powershell
 docker compose up -d --build
