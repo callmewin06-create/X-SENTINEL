@@ -76,6 +76,8 @@ D0 reports raw TADR/M3/M4r and a fixed top-q batch budget; it has no calibrated 
 
 ## Dashboard and Docker
 
+The [16 October UI revision handoff](docs/UI_REVISION_2026_10_16.md) records the readable light/dark results, direct Reduced/Full selector, Vietnamese explanations and controls, source-verified demo label comparison, and downloadable Vietnamese result PDF. The revision passed 80 tests and API/history/Linux Docker checks on this physical machine. Second-machine acceptance and actual screen recording remain unverified. Existing primary models, thresholds and research artifacts are unchanged.
+
 The current Docker stack includes PostgreSQL history and a FastAPI adapter for the real primary detector. Read the [database integration guide (Vietnamese)](docs/database/INTEGRATION_2026_10_07.md). New machines need a local `.env` password; Analyze/History pages save only when you click the analysis button. The standalone local dashboard remains available without database. Users/roles are schema only; authentication is not implemented.
 
 The Vietnamese dashboard separates Analysis, History and Research. Analysis accepts PE uploads up to 50 MiB or labelled reference-vector demos. Research exposes all 27 primary experiments per dataset, reduced/full, finite vectors with 2381 columns (EMBER2018) or 2568 (EMBER2024), and matching raw EMBER JSON. V2/V3 PE extraction is connected and fixture-tested; V2 compatibility caveats and the lack of original-dataset binary parity remain explicit. Classification and the selected method's trigger alert are separate. Result explanations and SHAP views reuse existing output. History retains optional client-declared input metadata and supports older records.

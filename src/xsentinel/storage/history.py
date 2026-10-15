@@ -9,6 +9,7 @@ from xsentinel.storage.models import (ModelVersion, AnalysisJob, AnalysisResultR
                                       DetectorScore, Alert, AuditEvent)
 from xsentinel.service.scoring import input_digest,score_input
 from xsentinel.service.input_metadata import stable_metadata
+from xsentinel.demo_provenance import demo_ground_truth
 
 
 class RequestConflict(ValueError):
@@ -38,6 +39,7 @@ def analyze_and_store(engine, registry, identity, features, method, request_id, 
         started = datetime.now(timezone.utc)
         with lock:
             result = score_input(detector,x,method)
+        result['ground_truth'] = demo_ground_truth(entry['state'], x, demo_mode)
         job_id = uuid.uuid4()
         result.update({'request_id':request_id,'analysis_id':str(job_id),'bundle_id':identity,
                        'input_sha256':digest,'demo_mode':demo_mode,'saved':True,

@@ -8,39 +8,26 @@ import sys
 import threading
 import time
 import uuid
+from datetime import datetime, timezone
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
 import pandas as pd
 import streamlit as st
 from xsentinel.detection.detector import Detector
 from xsentinel.dashboard_catalog import primary_catalog, experiment_label, preferred_method
 from xsentinel.dashboard_input import context_key, prepare_input, reader_signature
-from xsentinel.dashboard_presentation import explain_result, friendly_error, method_name, format_size, VIEW_NAMES, VIEW_HELP
+from xsentinel.dashboard_presentation import explain_result, feature_rows, friendly_error, method_name, format_size, VIEW_NAMES, VIEW_HELP
+from xsentinel.dashboard_chrome import controls, contribution_chart
+from xsentinel.demo_provenance import demo_ground_truth, demo_comparison
 from xsentinel.service.client import api_request
 from xsentinel.service.scoring import score_input
 from xsentinel.data.limits import MAX_UPLOAD_BYTES
 
 st.set_page_config(page_title='X-SENTINEL · Phân tích PE', layout='wide', initial_sidebar_state='expanded')
-st.markdown("""
-<style>
-.block-container {max-width: 1180px; padding-top: 2rem; padding-bottom: 3rem;}
-h1 {letter-spacing: -0.035em;}
-[data-testid="stMetric"] {background: white; border: 1px solid #dce4ef; border-radius: 12px; padding: 18px;}
-[data-testid="stMetricValue"] {font-size: 1.65rem;}
-[data-testid="stSidebar"] {border-right: 1px solid #dce4ef;}
-[data-testid="stStatusWidget"] {font-size: 0.9rem;}
-.stAppDeployButton, .stDeployButton {display: none;}
-[data-testid="stFileUploaderDropzone"] button {font-size: 0;}
-[data-testid="stFileUploaderDropzone"] button::after {content: "Chọn file"; font-size: 14px;}
-[data-testid="stFileUploaderDropzoneInstructions"] > div > span {font-size: 0;}
-[data-testid="stFileUploaderDropzoneInstructions"] > div > span::after {content: "Kéo và thả file vào đây"; font-size: 14px;}
-[data-testid="stFileUploaderDropzoneInstructions"] small {font-size: 0;}
-[data-testid="stFileUploaderDropzoneInstructions"] small::after {content: "Tối đa 50 MB mỗi file"; font-size: 12px;}
-</style>
-""", unsafe_allow_html=True)
 api_base = os.getenv('XS_API_BASE_URL', '')
 st.sidebar.title('X-SENTINEL')
 st.sidebar.caption('Phân tích PE và dấu hiệu trigger')
 page = st.sidebar.radio('Điều hướng', ['Phân tích', 'Lịch sử', 'Nghiên cứu'], key='page')
+controls()
 st.sidebar.caption('API + lịch sử dùng chung' if api_base else 'Local · kết quả chưa lưu database')
 st.sidebar.caption('File được đọc, không được thực thi. Chưa có cảnh báo không chứng nhận an toàn.')
 
@@ -74,6 +61,13 @@ def render_result(result, timings=None, key_prefix='result'):
         size = metadata.get('size_bytes')
         suffix = ' · ' + format_size(size) if size is not None else ' · Mẫu demo'
         st.markdown(f'<strong>{name}</strong>{suffix}', unsafe_allow_html=True)
+    comparison = demo_comparison(result)
+    if comparison['known']:
+        st.markdown('**Nhãn gốc theo bộ dữ liệu: ' + comparison['expected'] + '**')
+        (st.success if comparison['matched'] else st.warning)('Đối chiếu: ' + comparison['text'])
+        st.caption(comparison['source'] + ' · Đối chiếu này chỉ chấm phân loại file, không chấm trigger.')
+    else:
+        st.caption(comparison['text'])
     left, right = st.columns(2)
     left.metric('Mô hình phân loại file', explanation['classification'])
     right.metric('Dấu hiệu trigger', explanation['alert'])
@@ -82,6 +76,20 @@ def render_result(result, timings=None, key_prefix='result'):
     (st.warning if result['backdoor_alert'] else st.info)(explanation['interpretation'])
     with st.expander('Vì sao có kết quả này?', expanded=True):
         selected = explanation['selected']
+        st.markdown('**1. Vì sao có nhãn phân loại này?**')
+        st.write(explanation['classification_explanation'])
+        st.caption('Điểm sát ngưỡng có thể đổi nhãn khi điểm thay đổi ít. Điểm mô hình không phải mức chắc chắn thực tế đã được kiểm chứng.')
+        st.markdown('**2. Đặc điểm nào đẩy dự đoán về mỗi phía?**')
+        features = feature_rows(result)
+        for column, positive, label in zip(st.columns(2), (True, False), ('Đẩy về mã độc', 'Đẩy về lành')):
+            column.markdown('**' + label + '**')
+            items = [row for row in features if (row['shap'] > 0 if positive else row['shap'] < 0)][:3]
+            for row in items:
+                column.markdown(f"- **{row['title']}**: giá trị {row['value']:.6g}; ảnh hưởng SHAP {row['shap']:+.4f}.")
+            if not items:
+                column.caption('Không có trong 10 đặc trưng ảnh hưởng mạnh nhất đang hiển thị.')
+        st.caption('Các đặc điểm có thể kéo về hai phía. Mô hình gộp tất cả đóng góp cùng mốc ban đầu để ra điểm cuối; các số SHAP không cộng trực tiếp vào xác suất.')
+        st.markdown('**3. Vì sao có hoặc chưa có cảnh báo trigger?**')
         st.markdown(f"**{explanation['method_label']}** · Điểm **{selected['Score']:.6f}** · Ngưỡng **{selected['Threshold']:.6f}**")
         st.write(explanation['threshold_explanation'])
         st.write(explanation['method_explanation'])
@@ -90,15 +98,18 @@ def render_result(result, timings=None, key_prefix='result'):
         st.caption('Điểm cảnh báo không phải xác suất file chứa backdoor. Ngưỡng đã cố định từ calibration; mục tiêu tại calibration không bảo đảm tỷ lệ cảnh báo nhầm tương lai.')
     if st.toggle('Xem đặc trưng ảnh hưởng đến kết quả', key=key_prefix + '_features'):
         contributions = result['view_contributions']
-        chart = pd.DataFrame({'Nhóm': [VIEW_NAMES.get(k, k) for k in contributions],
-                              'Tỷ lệ đóng góp (%)': [100 * v for v in contributions.values()]})
-        st.bar_chart(chart.set_index('Nhóm'), color='#087F8C', horizontal=True)
+        contribution_chart(contributions, VIEW_NAMES)
         st.caption('Tỷ trọng SHAP tuyệt đối của mô hình chính. Cột cao nghĩa là nhóm ảnh hưởng nhiều hơn, chưa chứng minh nhóm đó gây ra backdoor.')
         for view, description in VIEW_HELP.items():
             st.write('**' + VIEW_NAMES[view] + ':** ' + description)
-        features = pd.DataFrame(result['top_features']).rename(columns={
-            'Feature index': 'Vị trí', 'Feature name': 'Đặc trưng', 'Feature value': 'Giá trị', 'SHAP': 'SHAP'})
-        st.dataframe(features, hide_index=True, use_container_width=True)
+        st.markdown('**Cách đọc từng đặc trưng**')
+        for row in feature_rows(result):
+            st.markdown(f"**{row['title']}** · {row['direction']} · Giá trị **{row['value']:.6g}** · SHAP **{row['shap']:+.6f}**")
+            st.caption(row['name'] + ' — ' + row['description'])
+        features = pd.DataFrame([{'Đặc trưng': row['name'], 'Giá trị': row['value'], 'SHAP': row['shap'],
+                                  'Chiều ảnh hưởng': row['direction']} for row in feature_rows(result)])
+        st.dataframe(features, hide_index=True, use_container_width=True,
+                     column_config={'Đặc trưng': st.column_config.TextColumn(width='large')})
         st.caption('SHAP dương đẩy raw margin về mã độc; SHAP âm đẩy về nhãn lành. Giá trị SHAP không phải phần trăm xác suất.')
     if st.toggle('Xem chi tiết nghiên cứu', key=key_prefix + '_research'):
         rows = pd.DataFrame(result['scores']).copy()
@@ -126,6 +137,15 @@ def render_result(result, timings=None, key_prefix='result'):
         st.success('Đã lưu vào lịch sử · ' + result['request_id'])
     else:
         st.caption('Kết quả local, chưa lưu vào database.')
+    pdf_key = 'pdf_' + key_prefix
+    if st.button('Xuất PDF kết quả', key='export_' + key_prefix):
+        from xsentinel.result_pdf import result_pdf
+        with st.spinner('Đang tạo báo cáo PDF từ kết quả hiện có…'):
+            st.session_state[pdf_key] = result_pdf(result)
+    if pdf_key in st.session_state:
+        st.download_button('Tải file PDF', data=st.session_state[pdf_key],
+                           file_name='X_SENTINEL_ket_qua.pdf', mime='application/pdf',
+                           on_click='ignore', key='download_' + key_prefix)
 
 
 if page == 'Lịch sử':
@@ -159,7 +179,8 @@ if page == 'Lịch sử':
 
 st.title('Nghiên cứu' if page == 'Nghiên cứu' else 'Phân tích file PE')
 st.caption('Chọn đầu vào, đọc hai kết luận và mở giải thích khi cần.')
-dataset = st.selectbox('Bộ mô hình', ['EMBER2018', 'EMBER2024'], key='dataset',
+model_column, variant_column = st.columns(2)
+dataset = model_column.selectbox('Bộ mô hình', ['EMBER2018', 'EMBER2024'], key='dataset',
                        help='EMBER2018 dùng schema V2 với 2.381 chiều; EMBER2024 dùng V3 với 2.568 chiều. Không dùng chéo model/schema.')
 catalog = primary_catalog(dataset)
 if not catalog:
@@ -168,20 +189,24 @@ if not catalog:
 preferences = st.session_state.setdefault('preferences', {})
 prefs = preferences.setdefault(dataset, {'experiment': next(iter(catalog)), 'variant': 'reduced', 'method': None})
 custom_path = None
+experiment = prefs['experiment']
 if page == 'Nghiên cứu':
     st.info('Các lựa chọn bên dưới xác định mô hình của một thí nghiệm đã lưu; không đầu độc hoặc sửa file bạn đưa vào.')
     keys = list(catalog)
     experiment = st.selectbox('Cấu hình thí nghiệm', keys, index=keys.index(prefs['experiment']),
                               format_func=experiment_label, key='experiment_' + dataset,
                               help='Family là loại trigger khi huấn luyện; seed là mã khởi tạo; poison rate tính trên toàn fit.')
-    variants = list(catalog[experiment])
-    variant = st.selectbox('Chế độ', ['reduced', 'full'], index=0 if prefs['variant'] == 'reduced' else 1,
-                           format_func=lambda value: 'Reduced · mô hình đang kiểm tra' if value == 'reduced' else 'Full · thêm mô hình sạch theo nhóm',
-                           key='variant_' + dataset)
-    if experiment != prefs['experiment'] or variant != prefs['variant']:
-        prefs['method'] = None
-        st.session_state.pop('method_' + dataset, None)
-    prefs.update(experiment=experiment, variant=variant)
+variants = [v for v in ('reduced', 'full') if v in catalog[experiment]]
+variant = variant_column.selectbox('Chế độ', variants,
+                        index=variants.index(prefs['variant']) if prefs['variant'] in variants else 0,
+                        format_func=lambda value: 'Reduced · dùng mô hình chính' if value == 'reduced' else 'Full · thêm mô hình sạch theo nhóm',
+                        key='variant_' + dataset,
+                        help='Hai chế độ cùng thí nghiệm dùng chung mô hình phân loại chính. Full dùng thêm mô hình sạch để tính cảnh báo trigger.')
+if experiment != prefs['experiment'] or variant != prefs['variant']:
+    prefs['method'] = None
+    st.session_state.pop('method_' + dataset, None)
+prefs.update(experiment=experiment, variant=variant)
+if page == 'Nghiên cứu':
     if not api_base:
         with st.expander('Bộ mô hình khác trong chế độ local'):
             if st.checkbox('Dùng đường dẫn bundle riêng', key='custom_enabled'):
@@ -214,9 +239,8 @@ st.caption(dataset + ' · ' + prefs['variant'].capitalize() + ' · ' + method_na
 with st.expander('Thông tin bộ mô hình đang dùng'):
     st.write('Cấu hình thí nghiệm:', experiment_label(prefs['experiment']))
     st.write('Schema:', schema, '· Protocol:', state.get('method_version', 'archive'))
-    st.write('Ngưỡng đã cố định:', state['thresholds'][method])
+    st.write(f"Ngưỡng cảnh báo đã cố định: {state['thresholds'][method]:.6f}")
     st.caption('M5 không được kiểm chứng trong primary. Behavioral là import/export tĩnh, không phải nhật ký chạy file.')
-    st.code(str(path))
     evidence_path = path.parent / 'result.json'
     if evidence_path.exists():
         evidence = json.loads(evidence_path.read_text(encoding='utf8'))
@@ -285,6 +309,12 @@ if st.button('Phân tích và lưu' if api_base else 'Phân tích', type='primar
                 with lock:
                     result = score_input(detector, prepared['x'], method)
                 result['input_metadata'] = prepared['metadata']
+                result['ground_truth'] = demo_ground_truth(state, prepared['x'], kind == 'demo')
+                result['demo_mode'] = kind == 'demo'
+                result['bundle_id'] = identity
+                result['created_at'] = datetime.now(timezone.utc).isoformat()
+                result['experiment'] = {'dataset': dataset, 'variant': prefs['variant'],
+                                        'family': prefs['experiment'][0], 'seed': prefs['experiment'][1], 'rate': prefs['experiment'][2]}
                 st.write('4 · Kết quả local sẵn sàng, chưa lưu database.')
             timings = {'Đọc/trích đặc trưng': prepared['metadata']['extraction_ms']}
             if rpc_ms is not None:

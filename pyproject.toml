@@ -7,7 +7,7 @@ name = "xsentinel"
 version = "0.1.0"
 description = "Per-input cross-view backdoor suspicion on EMBER2018 and EMBER2024"
 requires-python = ">=3.11,<3.13"
-dependencies = ["numpy==1.26.4", "lightgbm==4.6.0", "scikit-learn==1.6.1", "scipy==1.17.1", "pandas==2.3.3", "streamlit==1.45.1", "pyarrow==25.0.1", "lief==0.16.6"]
+dependencies = ["numpy==1.26.4", "lightgbm==4.6.0", "scikit-learn==1.6.1", "scipy==1.17.1", "pandas==2.3.3", "streamlit==1.45.1", "pyarrow==25.0.1", "lief==0.16.6", "reportlab==4.4.9"]
 
 [project.scripts]
 xsentinel = "xsentinel.cli:main"
@@ -23,7 +23,7 @@ binary-v3 = ["pefile==2024.8.26", "signify==0.7.1", "oscrypto @ https://github.c
 where = ["src"]
 
 [tool.setuptools.package-data]
-xsentinel = ["*_LICENSE.txt", "pefile_warnings.txt"]
+xsentinel = ["*_LICENSE.txt", "pefile_warnings.txt", "assets/*.json", "assets/fonts/*.ttf", "assets/fonts/LICENSE*"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]

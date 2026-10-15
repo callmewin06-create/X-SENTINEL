@@ -19,6 +19,8 @@ def score_input(detector, x, method):
         'dataset':detector.schema.dataset, 'schema':detector.schema.version,
         'protocol':detector.protocol, 'method':method,
         'malware_probability':p,
+        'malware_threshold':float(detector.config['malware_threshold']),
+        'explanation_version':'vi-results-v2',
         'main_classification':'MALWARE' if p>=detector.config['malware_threshold'] else 'BENIGN',
         'backdoor_alert':bool(flags[method][0]),
         'decision':'alert' if flags[method][0] else 'pass', 'elapsed_ms':elapsed,

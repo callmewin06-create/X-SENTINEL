@@ -123,6 +123,120 @@ Lịch sử có bảng ngắn: thời gian, tên/định danh đầu vào, bộ 
 
 Phong cách đề xuất: nền sáng, một màu nhấn, khoảng cách rõ, màu nổi bật cho trạng thái cần chú ý. Không dùng chữ “An toàn” hoặc dấu hiệu chứng nhận an toàn cho BENIGN/NO ALERT. Kiểm tra bằng giao diện chạy thật trên màn hình laptop; hiện bản kế hoạch được lập từ code, chưa phải đánh giá hình ảnh sau khi sửa.
 
+**Lỗi giao diện người dùng ghi nhận ngày 16/10/2026 — nhật ký trước khi sửa**
+
+Người dùng đã chốt triển khai. Các dòng “chưa sửa/chờ chốt” trong nhật ký và phương án ban đầu bên dưới ghi trạng thái lúc đề xuất, không phải trạng thái hiện tại. Bản sửa đã triển khai và kiểm chứng trên máy hiện tại; xem [bàn giao sửa giao diện ngày 16/10](../UI_REVISION_2026_10_16.md) để biết kết quả và giới hạn kiểm chứng. Việc thử trên máy vật lý thứ hai/Kali vẫn cần thực hiện riêng.
+
+- **UI-01 — Chữ kết quả gần như không đọc được khi bật Dark.** Vị trí: trang Phân tích → Kết quả phân tích → hai ô “Mô hình phân loại file” và “Dấu hiệu trigger”. Ảnh người dùng gửi cho thấy nền hai ô vẫn trắng trong khi chữ rất nhạt, khiến “Dự đoán lành”, “Chưa cảnh báo” và nhãn phía trên khó đọc. Đây là quan sát từ ảnh; chưa xác minh nguyên nhân trong CSS.
+- **Hướng sửa đề xuất:** cho màu nền và màu chữ của các ô kết quả thay đổi phù hợp với chế độ sáng/tối; kiểm tra cả nhãn và nội dung chính, mọi trạng thái phân loại/cảnh báo, cùng trang lịch sử nếu dùng chung cách hiển thị.
+- **Điều kiện hoàn thành:** các ô kết quả đọc rõ khi bật Light hoặc Dark và sau khi đổi qua lại giữa hai chế độ.
+- **Trạng thái:** đã ghi nhận; chưa sửa code, chưa kiểm thử bản sửa. Chỉ triển khai sau khi người dùng chốt danh sách lỗi.
+- **Ảnh đối chiếu:** [UI-01 — chữ nhạt trên nền trắng khi bật Dark](assets/UI-01_dark_result_low_contrast_2026_10_16.png).
+
+- **UI-02 — Biểu đồ đặc trưng quá nhỏ, tên nhóm bị cắt.** Vị trí: trang Phân tích → “Xem đặc trưng ảnh hưởng đến kết quả” → biểu đồ đóng góp theo nhóm. Ảnh người dùng gửi cho thấy biểu đồ thấp, chữ nhãn/trục nhỏ và cả ba nhãn Behavioral, Metadata, Structural bị rút gọn bằng dấu “…”, không đọc được đầy đủ mô tả.
+- **Hướng sửa đề xuất:** tăng chiều cao biểu đồ và cỡ chữ, dành đủ chỗ cho nhãn; cho phép tên nhóm xuống dòng hoặc trình bày tên/mô tả đầy đủ ở vùng riêng cạnh biểu đồ. Nội dung chính phải đọc được trực tiếp, không phụ thuộc hoàn toàn vào rê chuột.
+- **Điều kiện hoàn thành:** tên ba nhóm và mô tả đọc đầy đủ, số trên trục rõ, biểu đồ cân đối trên màn hình laptop ở mức thu phóng 100%; kiểm tra cả Light/Dark và khi cửa sổ hẹp hơn.
+- **Trạng thái:** đã ghi nhận; chưa sửa code, chưa kiểm thử bản sửa. Chỉ triển khai sau khi người dùng chốt danh sách lỗi.
+- **Ảnh đối chiếu:** [UI-02 — biểu đồ nhỏ và nhãn bị cắt](assets/UI-02_feature_chart_small_truncated_labels_2026_10_16.png).
+
+- **UI-03 — Xem biểu đồ và chi tiết vẫn không hiểu vì sao ra nhãn.** Vị trí: Kết quả phân tích, “Vì sao có kết quả này?”, “Xem đặc trưng ảnh hưởng đến kết quả” và “Xem chi tiết nghiên cứu”. Người dùng thấy điểm, tên đặc trưng, SHAP và JSON nhưng chưa có lời giải nối chúng với nhãn phân loại. Khung giải thích hiện chủ yếu mô tả cảnh báo trigger, chưa giải thích đủ quyết định lành/mã độc.
+- **Đối chiếu ảnh với code hiện tại:** điểm phân loại 0.5255 vượt ngưỡng malware 0.5 nên gán mã độc; chỉ vượt 0.0255, không được diễn giải thành mức chắc chắn cao hoặc xác suất thực tế đã được kiểm chứng. Điểm X-SENTINEL Reduced 0.586 không vượt ngưỡng riêng 0.945 nên chưa cảnh báo trigger. Đây là hai quyết định khác nhau. Dữ liệu hiển thị đã làm tròn; quyết định phải dùng giá trị đầy đủ.
+- **Hướng sửa đề xuất:** giải thích thành ba phần có câu ngắn bám đúng số thực: (1) vì sao mô hình phân loại lành/mã độc, hiện điểm và ngưỡng phân loại lấy từ bundle; (2) các đặc trưng đẩy về mã độc và đẩy về lành, với tên dễ hiểu, giá trị, chiều ảnh hưởng và lý do đọc được từ dữ liệu; (3) vì sao có/chưa có cảnh báo trigger, so riêng điểm với ngưỡng của phương pháp đang chọn. Không tự đổi công thức, ngưỡng hay thêm mức tin cậy chưa được kiểm chứng.
+- **Bảng đặc trưng:** bổ sung mô tả tiếng Việt và cột “Đẩy dự đoán về”, phân biệt giá trị đặc trưng với mức ảnh hưởng SHAP; tên dài phải đọc đủ. Ví dụ trong ảnh: cờ DLL bằng 1 có SHAP -2.0418, đẩy về lành; strings.entropy bằng 6.2335 có SHAP +0.5147, đẩy về mã độc trong mô hình này. Không kết luận một cờ DLL, entropy hoặc thiếu thông tin chữ ký tự nó chứng minh mã độc/an toàn. Trường chưa có ánh xạ đáng tin cậy phải ghi rõ giới hạn, không bịa ý nghĩa.
+- **Cách đọc biểu đồ:** tỷ trọng ảnh hưởng tuyệt đối cho biết nhóm nào ảnh hưởng nhiều, không cho biết hướng ảnh hưởng. Structural chiếm khoảng 52.59% trong ảnh không có nghĩa 52.59% khả năng mã độc. Nếu trình bày phép cộng để tái hiện điểm cuối, phải có mốc ban đầu của mô hình và phần đóng góp ngoài top 10; không cộng trực tiếp các số SHAP vào xác suất.
+- **Nguồn mẫu demo:** ảnh ghi “Mẫu reference demo”. Code hiện lấy vector đầu tiên từ reference, và quy trình primary chỉ cho reference nhãn lành. Với nguồn primary đúng quy trình này, dự đoán mã độc cho mẫu demo là dự đoán nhầm theo nhãn dữ liệu; không phải bằng chứng đã thử file ransomware. Đề xuất hiển thị nguồn mẫu và nhãn gốc đã xác minh bên cạnh nhãn dự đoán; với file upload chưa biết nhãn gốc thì ghi “chưa xác minh”, không tự gán. Không thay mẫu để che trường hợp dự đoán nhầm. Yêu cầu hiển thị và đối chiếu nhãn được ghi chi tiết tại UI-10; không cộng trùng công việc với mục này.
+- **Chi tiết nghiên cứu:** giữ bảng phương pháp/SHAP kỹ thuật/JSON trong phần mở rộng; phần kết quả chính phải hiểu được mà không cần đọc JSON hoặc biết công thức. Giải thích dùng kết quả đã tính; không gọi lại detector chỉ để tạo lời giải. Nếu bổ sung mốc ban đầu, lấy cùng lượt tính đóng góp hiện có và đối chiếu tính nhất quán trước khi dùng.
+- **Điều kiện hoàn thành:** người mới trả lời được vì sao có nhãn phân loại, đặc trưng nào đẩy mỗi hướng và vì sao cảnh báo trigger có thể khác; các ví dụ/chiều ảnh hưởng/điểm/ngưỡng khớp dữ liệu thật, cả khi xem lại lịch sử; kết quả khoa học không bị thay đổi bởi cách trình bày.
+- **Trạng thái:** đã ghi nhận và đề xuất; chưa sửa code, chưa kiểm thử bản sửa. Chỉ triển khai sau khi người dùng chốt danh sách lỗi.
+- **Ảnh đối chiếu:** [UI-03 — kết quả](assets/UI-03_01_result_2026_10_16.png), [chi tiết nghiên cứu](assets/UI-03_02_research_2026_10_16.png), [biểu đồ và bảng đặc trưng](assets/UI-03_03_features_2026_10_16.png).
+
+- **UI-04 — Trang Phân tích không có chỗ chọn Reduced/Full.** Người dùng chỉ thấy “EMBER2024 · Reduced · X-SENTINEL Reduced”, nên tưởng trang này không hỗ trợ Full. Code hiện khởi tạo Reduced mặc định và chỉ hiển thị bộ chọn biến thể tại trang Nghiên cứu. Cấu hình được giữ trong preferences theo dataset: theo code, chọn Full ở Nghiên cứu rồi quay lại Phân tích sẽ dùng cấu hình Full đó. Đây là cách bố trí giao diện, không phải hạn chế đầu vào PE hoặc thiếu Full trong hệ thống; đường thao tác này mới được đối chiếu bằng đọc code trong lượt ghi nhận, chưa thử trực tiếp trên máy người dùng.
+- **Hướng sửa đề xuất:** đưa bộ chọn Reduced/Full lên trang Phân tích, cạnh Bộ mô hình; giữ Reduced mặc định và kèm mô tả ngắn. Reduced dùng mô hình chính để tính các tín hiệu; Full dùng thêm các mô hình sạch theo nhóm, với thành phần M4-F sử dụng dự đoán Behavioral sạch. Trong cùng cấu hình thí nghiệm, hai bundle dùng chung mô hình chính, nên cần giải thích việc đổi biến thể chủ yếu thay cách tính cảnh báo trigger; không mặc định tuyên bố Full phân loại file chính xác hơn.
+- **Điều kiện hoàn thành:** chọn được cả hai chế độ ngay tại Phân tích cho các bundle thực có; bộ mô hình, phương pháp và ngưỡng cập nhật đúng; đổi chế độ không giữ nhầm kết quả trước đó, không phải sang Nghiên cứu để đổi. Kiểm tra cùng một đầu vào/cấu hình: điểm phân loại của mô hình chính nhất quán giữa hai biến thể, còn điểm/ngưỡng cảnh báo theo đúng bundle; lịch sử giữ rõ chế độ đã dùng. Không hứa Full nhanh hơn hoặc chính xác hơn khi chưa có bằng chứng phù hợp.
+- **Trạng thái:** đã ghi nhận và đề xuất; chưa sửa code, chưa kiểm thử bản sửa. Chỉ triển khai sau khi người dùng chốt danh sách lỗi.
+- **Ảnh đối chiếu:** [UI-04 — trang Phân tích chỉ hiện Reduced](assets/UI-04_analysis_missing_variant_selector_2026_10_16.png).
+
+- **UI-05 — Thay thao tác Print bằng xuất file PDF.** Yêu cầu người dùng: “Print sửa lại thành xuất file PDF”. Hướng triển khai dự kiến là thao tác “Xuất PDF” tải báo cáo của kết quả phân tích đang xem, tránh phải chọn máy in. Bản xuất gồm thông tin đầu vào thực có, bộ mô hình/chế độ, nhãn phân loại, cảnh báo trigger, các điểm/ngưỡng tương ứng, giải thích và giới hạn kết luận. Không xuất toàn bộ menu/JSON kỹ thuật mặc định. Chỉ tạo file khi bấm xuất và dùng kết quả đã có; không chạy lại detector. Kiểm tra tiếng Việt, bảng/biểu đồ không bị cắt, bản xuất dễ đọc dù trang đang Light hay Dark, và không gán dữ liệu thiếu thành giá trị giả. Print hiện là mục mặc định của Streamlit; API menu_items công khai không cung cấp cách đổi riêng mục Print, nên khi triển khai cần bố trí nút xuất riêng hoặc menu phù hợp, không mặc định coi việc đổi tên đã tạo được PDF. **Trạng thái:** đã ghi nhận yêu cầu; chưa sửa code, chờ chốt triển khai.
+
+- **UI-06 — About có GitHub của nhóm.** Yêu cầu người dùng: thêm đường dẫn GitHub nhóm vào phần About. URL đã đối chiếu với remote origin hiện tại: https://github.com/callmewin06-create/X-SENTINEL. Nội dung giới thiệu nêu tên X-SENTINEL, mô tả ngắn chức năng và liên kết có thể bấm; không tự thêm tên thành viên chưa được cung cấp. Có thể đặt nhãn tiếng Việt “Giới thiệu” nếu bố trí menu riêng. Streamlit hỗ trợ nội dung About dạng Markdown. **Điều kiện hoàn thành:** mở giới thiệu thấy đúng đường dẫn và truy cập được repo của nhóm. **Trạng thái:** đã ghi nhận yêu cầu; chưa sửa code, chờ chốt triển khai.
+
+- **UI-07 — Developer options trông như nút nhưng là tiêu đề nhóm.** Người dùng hỏi vì sao bấm không có phản hồi. Trong menu mặc định, đây là nhãn phân nhóm cho các công cụ như Clear cache, không có thao tác riêng khi bấm. **Đề xuất:** ẩn nhóm công cụ phát triển khỏi giao diện demo cho người dùng, giữ chỗ truy cập phù hợp cho người bảo trì khi cần. Cấu hình toolbarMode viewer của Streamlit hỗ trợ ẩn các mục phát triển; khi triển khai phải kiểm tra theo phiên bản đang dùng, vẫn giữ cách đổi Light/Dark và truy cập Giới thiệu/Xuất PDF. Đây là chỉnh cách trình bày menu, không được coi là cơ chế phân quyền. **Trạng thái:** đã giải thích và ghi đề xuất; chưa sửa code, chờ chốt triển khai.
+
+- **Ảnh đối chiếu UI-05–UI-07:** [Menu ứng dụng người dùng đang xem](assets/UI-05_07_app_menu_2026_10_16.png). Tài liệu đối chiếu: [Streamlit app chrome](https://docs.streamlit.io/develop/concepts/architecture/app-chrome) và [st.set_page_config](https://docs.streamlit.io/develop/api-reference/configuration/st.set_page_config).
+
+- **UI-08 — Menu tiếng Anh không thống nhất với giao diện tiếng Việt.** Người dùng yêu cầu phần menu góc trên dùng cùng ngôn ngữ với hệ thống. Phạm vi gồm tên thao tác, hộp thoại và thông báo liên quan mà người dùng gặp, không chỉ tên các trang chính.
+- **Nhãn dự kiến:** Rerun → “Tải lại giao diện”; Settings → “Cài đặt”; Print → “Xuất PDF” theo chức năng đã ghi ở UI-05; Record a screencast → “Quay video màn hình”; About → “Giới thiệu”; Clear cache → “Xóa dữ liệu tạm” nếu còn hiển thị ở khu bảo trì. Lựa chọn theme ghi “Sáng”, “Tối”, “Theo hệ thống”. Nhóm Developer options xử lý theo đề xuất UI-07, không để tiêu đề tiếng Anh gây hiểu nhầm là nút.
+- **Hướng triển khai:** kiểm tra khả năng tùy chỉnh menu của phiên bản Streamlit đang dùng; nếu menu mặc định không hỗ trợ thay nhãn đầy đủ, bố trí menu/điều khiển tiếng Việt riêng và xử lý phần menu mặc định tương ứng, giữ truy cập được các chức năng cần dùng. Không ghi nhận đã Việt hóa khi thực tế vẫn còn hộp thoại tiếng Anh trong luồng được chốt. Giữ tên riêng/thuật ngữ đã thống nhất như GitHub, PDF, SHAP, TADR, Reduced/Full và có giải thích tiếng Việt khi cần.
+- **Điều kiện hoàn thành:** các thao tác menu và hộp thoại thuộc phạm vi giao diện nhóm kiểm soát dùng tiếng Việt nhất quán; Xuất PDF, Giới thiệu và đổi sáng/tối hoạt động sau khi chỉnh menu. Hộp thoại do trình duyệt hoặc hệ điều hành quản lý được phân biệt rõ, không hứa thay ngôn ngữ của các phần đó bằng code ứng dụng.
+- **Trạng thái:** đã ghi nhận yêu cầu; chưa sửa code, chưa kiểm thử bản sửa. Chỉ triển khai sau khi người dùng chốt danh sách lỗi. **Ảnh đối chiếu:** dùng ảnh menu đã lưu cho UI-05–UI-07.
+
+- **UI-09 — Ẩn đường dẫn thư mục bộ mô hình khỏi giao diện.** Người dùng không cần thấy dòng như `outputs/primary/EMBER2018/protocol_v2/seed_17/concentrated_structural/rate_0.005/bundle_reduced`. Khi triển khai, bỏ dòng hiển thị đường dẫn nội bộ tại “Thông tin bộ mô hình đang dùng”; giữ các thông tin giúp nhận biết bộ mô hình và hiểu kết quả như dataset, Reduced/Full, cấu hình thí nghiệm và ngưỡng. Chỉ thay cách hiển thị, không xóa thư mục hay đổi đường dẫn nạp model. Không đưa lại đường dẫn nội bộ vào bản PDF cho người dùng. **Trạng thái:** đã ghi nhận yêu cầu; chưa sửa code, chờ chốt triển khai. **Ảnh đối chiếu:** ảnh đường dẫn người dùng gửi ngày 16/10/2026.
+
+- **UI-10 — Mẫu demo hiển thị nhãn gốc và đối chiếu dự đoán đúng/sai.** Người dùng muốn biết mẫu demo thực tế được gán nhãn gì để kiểm tra kết quả. Hiển thị ngay gần kết quả ba thông tin: “Nhãn gốc theo bộ dữ liệu”, “Mô hình dự đoán” và “Đối chiếu: khớp/không khớp nhãn gốc”. Có thể thêm cách nói dễ hiểu “Dự đoán đúng/sai theo nhãn bộ dữ liệu” và giải thích loại nhầm khi có dữ liệu. Ví dụ ảnh trước: nhãn gốc Lành, mô hình dự đoán Mã độc với điểm 0.5255 → không khớp, dự đoán nhầm mẫu lành thành mã độc.
+- **Nguồn nhãn:** dùng nhãn có nguồn gốc kiểm chứng và gắn đúng mẫu/schema/bộ mô hình; không suy nhãn gốc từ kết quả mô hình hoặc tên file do người dùng đặt. Demo hiện tại lấy từ reference primary có nhãn lành. Bundle riêng hoặc nguồn chưa xác minh thì ghi “Chưa có nhãn đối chiếu”. Không mặc định mọi nguồn demo đều lành chỉ vì mang tên demo. Nhãn gốc chỉ phục vụ hiển thị/đối chiếu, không được đưa vào đặc trưng hay dùng để đổi dự đoán/ngưỡng. Thêm mẫu demo mã độc có nhãn xác minh là công việc riêng nếu được chọn, không tự suy rằng hệ thống đã có sẵn mẫu đó.
+- **Phân biệt hai kết luận:** đúng/sai theo nhãn Lành/Mã độc chỉ áp dụng cho phân loại file. Chấm đúng/sai cảnh báo trigger cần nhãn trigger được xác minh riêng; không lấy nhãn Lành/Mã độc làm nhãn trigger. Với file upload không có nhãn gốc, hiện “Chưa có nhãn đối chiếu”, không tự tuyên bố đúng/sai.
+- **Điều kiện hoàn thành:** nguồn/nhãn gốc và dự đoán được phân biệt rõ; đối chiếu chính xác khi nhãn khớp hoặc khác nhau và khi chưa có nhãn; đổi mẫu/bộ mô hình không giữ nhầm nhãn cũ. Xem lịch sử và xuất PDF giữ nguồn nhãn/đối chiếu nếu đã được xác minh; bản ghi cũ thiếu nhãn phải được ghi rõ. Dùng dự đoán đã tính, không chạy lại detector để so nhãn. Đối chiếu một mẫu demo không được trình bày như độ chính xác toàn hệ thống.
+- **Trạng thái:** đã ghi nhận yêu cầu; chưa sửa code, chưa kiểm thử bản sửa. Chỉ triển khai sau khi người dùng chốt danh sách lỗi. Mục này tách rõ phần nhãn demo đã đề xuất trong UI-03, không phải phạm vi công việc cộng thêm hai lần.
+
+**Phương án sửa 10 mục giao diện — bản đề xuất ngày 16/10/2026 đã được chốt**
+
+Mục tiêu: người dùng đọc rõ kết quả, hiểu vì sao có nhãn/cảnh báo và đối chiếu được nhãn gốc của mẫu demo. Các yêu cầu được thực hiện trong cùng kế hoạch này. UI-03 và UI-10 dùng chung dữ liệu/giải thích, không cộng trùng công việc. Lượt đề xuất này chỉ chỉnh tài liệu; chưa triển khai các thay đổi ứng dụng.
+
+| Mục | Phương pháp sửa đề xuất | Kết quả người dùng nhận được |
+|---|---|---|
+| UI-01 | Bỏ nền trắng cố định đang áp lên ô kết quả; dùng màu theo theme, kiểm tra cả nhãn, giá trị và chú thích. | Hai ô kết luận đọc rõ khi dùng Sáng/Tối, cả ở lịch sử. |
+| UI-02 | Biểu đồ có chiều cao/cỡ chữ được cấu hình rõ; khởi điểm thử cao khoảng 280–320 px, chữ 14–16 px. Tên nhóm được hiện đủ hoặc xuống dòng, phần trăm ghi cạnh thanh. Tên đặc trưng dài có cách đọc đầy đủ. | Đọc trực tiếp tên/giá trị, không cần rê chuột để hiểu nội dung chính. |
+| UI-03 | Dùng phần giải thích chung cho kết quả mới, lịch sử và PDF: so điểm phân loại với ngưỡng thật; so riêng điểm trigger với ngưỡng phương pháp; trình bày các đặc trưng đẩy về mỗi phía bằng tiếng Việt. | Hiểu vì sao có nhãn lành/mã độc và vì sao có/chưa có cảnh báo trigger. |
+| UI-04 | Đặt bộ chọn Reduced/Full cạnh Bộ mô hình ngay trên trang Phân tích, lấy các lựa chọn thực có. Dùng chung lựa chọn giữa Phân tích/Nghiên cứu; đổi lựa chọn phải cập nhật đúng bundle/phương pháp/ngưỡng và bỏ kết quả cũ không còn phù hợp. | Chọn chế độ trực tiếp, không phải đổi trang; không nhầm Full là nhãn chứng nhận độ chính xác cao hơn. |
+| UI-05 | Làm nút tải PDF thực, tạo từ kết quả hiện có khi được bấm; nhúng font tiếng Việt, dùng bố cục báo cáo riêng dễ đọc. | Nhận file PDF có thông tin đầu vào thực có, hai kết luận, điểm/ngưỡng, đối chiếu demo nếu có và giải thích. |
+| UI-06 | Làm phần Giới thiệu bằng tiếng Việt, có tên/mô tả ngắn X-SENTINEL và link GitHub nhóm đã xác minh. | Tìm được thông tin dự án và mở repo đúng. |
+| UI-07 | Ẩn nhóm công cụ phát triển khỏi giao diện demo bằng cấu hình phù hợp. Chỗ xử lý cache của người bảo trì nằm ngoài luồng phân tích thông thường. | Không thấy tiêu đề Developer options gây hiểu nhầm là nút. |
+| UI-08 | Bố trí các thao tác tiếng Việt của ứng dụng; làm thử riêng giải pháp thay menu mặc định và đổi theme trước khi chốt cách ẩn menu. Rà soát cả hộp thoại thuộc ứng dụng. | Giao diện nhất quán tiếng Việt; các mục còn tiếng Anh phải được ghi rõ là chưa hoàn thành. |
+| UI-09 | Bỏ dòng đường dẫn bundle khỏi giao diện kết quả và PDF; giữ tên bộ mô hình/chế độ/cấu hình để nhận biết kết quả. | Không phải đọc đường dẫn nội bộ dài. |
+| UI-10 | Gắn nhãn gốc có nguồn xác minh với đúng mẫu demo; hiển thị nhãn gốc, dự đoán và khớp/không khớp. Nhãn thiếu ghi chưa có đối chiếu. | Biết mô hình đúng hay sai với mẫu đang xem theo nhãn bộ dữ liệu. |
+
+**Bố cục kết quả đề xuất**
+
+- Đầu trang: Bộ mô hình, Reduced/Full và đầu vào đang chọn.
+- Với mẫu demo đã xác minh: hiện nhãn gốc gần tên mẫu; sau phân tích hiện đối chiếu với dự đoán.
+- Hai ô kết luận: “Phân loại file” và “Dấu hiệu trigger”, mỗi ô có điểm/ngưỡng và câu giải thích riêng.
+- Mục “Vì sao có kết quả này?”: giải thích phép so điểm/ngưỡng; các đặc trưng đẩy về mã độc và đẩy về lành có tên dễ đọc. SHAP dùng để mô tả ảnh hưởng trong mô hình, không biến thành khẳng định hành vi thật của file.
+- Biểu đồ nhóm: tên và tỷ trọng rõ; ghi đây là mức ảnh hưởng, không phải xác suất mã độc. Bảng công thức/JSON nằm tại chi tiết nghiên cứu.
+- Các thao tác rõ ràng: Xuất PDF kết quả, Giới thiệu và điều khiển giao diện phù hợp sau khi làm thử.
+
+**Dữ liệu cần bổ sung và cách giữ kết quả nhất quán**
+
+Hiện kết quả đã có điểm phân loại, nhãn dự đoán, bảng điểm/ngưỡng cảnh báo và SHAP. Cần thêm ngưỡng phân loại thực từ cấu hình bundle vào kết quả được lưu; tránh giao diện tự mặc định mọi bản ghi đều dùng 0.5. Phần giải thích đầu tiên chỉ cần phép so ngưỡng và ảnh hưởng có dấu đã tính, chưa cần thêm sơ đồ cộng SHAP tái hiện xác suất. Nếu bổ sung sơ đồ đó sau này, phải lưu mốc ban đầu và phần ngoài top 10 từ cùng lượt tính.
+
+Nhãn demo được tra từ bảng thông tin mẫu đã xác minh, đối chiếu schema, hash bundle/reference và hash vector với nguồn dữ liệu gốc. Backend chỉ gắn nhãn khi khớp nguồn tin cậy; không tin nhãn tự khai từ giao diện hoặc chỉ dựa vào cờ demo. Với bundle riêng, nguồn chưa truy được hoặc file upload chưa có nhãn xác minh, ghi “Chưa có nhãn đối chiếu”. Local dùng cùng quy tắc. Giữ các bundle nghiên cứu hiện có; bảng nguồn demo được tách riêng và có phiên bản.
+
+Các thông tin thêm có thể lưu trong result_json đang có, không cần đổi cấu trúc bảng chỉ để thêm các trường này. Lịch sử cũ thiếu ngưỡng/nhãn nguồn hiện thông báo thiếu dữ liệu; không tự bù nhãn chỉ vì bản ghi cũ mang cờ demo. PDF đọc cùng dữ liệu và quy tắc giải thích với giao diện.
+
+**Điểm cần chỉnh lại trong đề xuất menu**
+
+Dự án đang cố định Streamlit 1.45.1. API menu công khai chỉ tùy chỉnh Get help, Report a Bug và nội dung About; không hỗ trợ đổi hết Print/Settings/Rerun thành tên tiếng Việt. Cấu hình viewer ẩn công cụ phát triển nhưng vẫn giữ menu người xem. Chế độ minimal có thể làm mất cả Settings, và đổi theme.base lúc ứng dụng đang chạy không được hỗ trợ qua st.set_option. Vì vậy không coi Việt hóa toàn bộ menu là thao tác đổi vài nhãn.
+
+Nút Xuất PDF và Giới thiệu tiếng Việt riêng là phương án cụ thể, độc lập với Print/About mặc định. Phần thay toàn bộ menu và đổi Sáng/Tối phải được làm thử trên đúng phiên bản, chứng minh vẫn hoạt động sau khi chạy lại trang rồi mới gộp vào bản triển khai. Nếu còn phải giữ Settings tiếng Anh để đổi theme, UI-08 phải được ghi rõ còn thiếu; không báo hoàn thành 100%. Không tự nâng cấp thư viện, sửa thư viện gốc hoặc vá chữ bằng JavaScript không được hỗ trợ mà coi như đã có giải pháp ổn định.
+
+**Thứ tự triển khai đề xuất**
+
+1. Chuẩn bị dữ liệu cho UI-03/UI-10: ngưỡng phân loại được lưu, nguồn nhãn demo và quy tắc giải thích chung. Đồng thời làm thử giới hạn menu/theme của UI-08 để nhận diện sớm phần chưa khả thi.
+2. Sửa trải nghiệm phân tích: UI-01, UI-02, UI-03, UI-04, UI-09, UI-10; đối chiếu cùng kết quả ở trang lịch sử.
+3. Hoàn thiện điều khiển và giới thiệu: UI-06, UI-07, UI-08 theo kết quả làm thử; chỉ ghi hoàn thành phần đã kiểm chứng.
+4. Làm UI-05 từ dữ liệu/bố cục giải thích đã thống nhất, kiểm tra PDF tiếng Việt và tình huống dữ liệu cũ thiếu trường.
+5. Nghiệm thu trên giao diện chạy thật, rebuild Docker và kiểm tra lại tại môi trường Kali của người dùng khi có thể.
+
+**Kiểm tra cần thiết trước khi bàn giao**
+
+- Sáng/Tối, màn hình laptop 100%, cửa sổ hẹp; cả kết quả mới và lịch sử đều rõ chữ, không cắt tên chính.
+- Điểm sát, bằng và vượt ngưỡng: phân loại dùng >=, cảnh báo trigger dùng >. Hiển thị có làm tròn nhưng quyết định theo giá trị đầy đủ. Kiểm tra bốn tổ hợp lành/mã độc và có/chưa cảnh báo.
+- Đổi dataset, biến thể và mẫu không giữ nhầm điểm/ngưỡng/nhãn gốc; cùng đầu vào và cặp Reduced/Full của một thí nghiệm giữ điểm phân loại chính nhất quán.
+- Demo đúng, demo dự đoán nhầm, mẫu chưa xác minh, yêu cầu tự khai demo giả, và lịch sử cũ thiếu nhãn. Nhãn lành/mã độc không được dùng để chấm trigger đúng/sai.
+- Xuất PDF và mở chi tiết dùng kết quả đã có, không phát sinh lượt dự đoán chỉ để giải thích; nội dung PDF khớp màn hình/lịch sử và không có đường dẫn nội bộ.
+- Đo trước/sau trên cùng máy và mẫu, tách thời gian phân tích khỏi tạo PDF. Không hứa tổng thời gian không tăng hoặc mục tiêu latency đã đạt trước khi đo. Giữ mô hình, công thức, ngưỡng và các kết quả nghiên cứu hiện có.
+
+Tài liệu đối chiếu: [Streamlit 1.45 — cấu hình menu](https://docs.streamlit.io/1.45.0/develop/api-reference/configuration/st.set_page_config), [biểu đồ Altair](https://docs.streamlit.io/1.45.0/develop/api-reference/charts/st.altair_chart), [nút tải file](https://docs.streamlit.io/1.45.0/develop/api-reference/widgets/st.download_button). Hạn chế menu/theme đã đối chiếu thêm source thư viện cài tại máy trong lượt đề xuất.
+
 **7. Chi tiết bước 4: backup và tài khoản**
 
 Backup đã có, còn thiếu bài phục hồi thực. Restore vào database thử riêng, đối chiếu số bản ghi và nội dung, rồi xác minh luồng đọc qua API. Không ghi đè database đang dùng để thử phục hồi.

@@ -4,6 +4,7 @@ Báo cáo, tiến độ, kế hoạch và tài liệu nghiên cứu tập trung 
 
 ## Tiến độ và kế hoạch
 
+- [Bàn giao sửa 10 mục giao diện ngày 16/10](UI_REVISION_2026_10_16.md)
 - [Ghép database/API và sử dụng lịch sử phân tích](database/INTEGRATION_2026_10_07.md)
 - [Dashboard và Docker đã kiểm chứng, cách mở/tắt](DASHBOARD_DOCKER_CHECK_2026_10_07.md)
 - [Hướng dẫn chạy primary và mốc tiến độ ngày 07/10](PRIMARY_RUN_GUIDE_2026_10_07.md)
