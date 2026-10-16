@@ -35,7 +35,7 @@ def test_dashboard_real_bundle(monkeypatch):
     from streamlit.testing.v1 import AppTest
     a=AppTest.from_file('dashboard/app.py').run(timeout=30)
     assert not a.exception and not a.metric
-    a.sidebar.radio(key='page').set_value('Nghiên cứu').run(timeout=30)
+    a.radio(key='page').set_value('Nghiên cứu').run(timeout=30)
     a.checkbox(key='custom_enabled').set_value(True).run(timeout=30)
     a.text_input(key='custom_path').set_value(str(bundle)).run(timeout=30)
     a.radio(key='mode_Nghiên cứu').set_value('Dùng mẫu demo').run(timeout=30)

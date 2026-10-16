@@ -2,6 +2,8 @@
 
 Đã triển khai theo yêu cầu người dùng từ UI-01 đến UI-10. Docker hiện tại đã được rebuild và chạy bản sửa tại http://127.0.0.1:8501. Chưa commit/push GitHub trong lượt này. Báo cáo Word và kết quả nghiên cứu không được viết lại bởi đợt sửa giao diện.
 
+**Cập nhật ghi chú ngày 16/10/2026:** bản sửa đã có commit `35c0e82` — `Fix Vietnamese UI, explanations, demo labels and PDF export`. Khi kiểm tra để ghi chú, HEAD và ref `origin/main` lưu trên máy cùng ở commit này; cây làm việc sạch trước lần cập nhật tài liệu này. Chưa fetch để xác minh GitHub trực tiếp trong lượt ghi chú. Các kết quả kiểm chứng bên dưới là bằng chứng của lần triển khai, không phải kiểm thử được chạy lại mỗi lần đọc tài liệu.
+
 ## Những gì đã thay đổi
 
 | Mục | Bản sửa hiện tại |
@@ -25,7 +27,41 @@ Nhãn gốc của mẫu demo chỉ dùng để đối chiếu phân loại lành
 2. Đọc hai kết luận riêng. Mở “Vì sao có kết quả này?” để thấy phép so điểm/ngưỡng và các đặc trưng ảnh hưởng.
 3. Với demo đã xác minh, đọc nhãn gốc và câu đối chiếu ngay cạnh kết quả. Một mẫu đúng/sai không đại diện độ chính xác toàn hệ thống.
 4. Bấm “Xuất PDF kết quả”, rồi “Tải file PDF”. Đây là báo cáo của lần phân tích đang xem, không phải báo cáo học phần Word của nhóm.
-5. Đổi Sáng/Tối ở thanh bên. Các thao tác giới thiệu/làm mới nằm trong “Tùy chọn ứng dụng”.
+5. Bấm bánh răng ở bên phải banner để đổi Sáng/Tối, tải lại giao diện, xem Giới thiệu hoặc mở bảng quay video. Bấm nút ba gạch bên trái để chuyển Phân tích/Lịch sử/Nghiên cứu.
+
+## Yêu cầu bố cục bổ sung — đã được duyệt triển khai
+
+Người dùng ban đầu yêu cầu chỉ ghi chú, sau đó đã duyệt phương án bằng yêu cầu “làm đi”. Phần dưới lưu yêu cầu và phương án đã duyệt; trạng thái triển khai mới được ghi ngay sau phương án.
+
+1. **Cài đặt bằng biểu tượng bánh răng ở góc trên bên phải:** dùng nút ⚙️ thay cho khối chọn giao diện và nút “Tùy chọn ứng dụng” hiện tại. Bấm nút mở menu chung chứa chọn Giao diện (Sáng/Tối/Theo hệ thống), Tải lại giao diện, Giới thiệu và Quay video màn hình; bỏ nhóm tùy chọn này khỏi thanh bên khi được triển khai. Giữ tên trợ năng “Cài đặt” để nút biểu tượng dễ nhận biết.
+2. **Làm nổi bật tên hệ thống:** tăng kích thước X-SENTINEL và dòng “Phân tích PE và dấu hiệu trigger”; có thể trình bày thành banner lớn ở đầu trang. Chưa chốt chi tiết bố cục/màu của banner.
+3. **Điều hướng bằng nút ba gạch ở góc trên bên trái:** dùng nút ☰ để mở/đóng vùng điều hướng chứa đúng ba mục Phân tích, Lịch sử và Nghiên cứu. Mặc định thu gọn để không chiếm một cột lớn; không hiện sẵn cả khối radio và cài đặt như thanh bên hiện tại. Điều hướng và Cài đặt là hai nút riêng, ở hai phía trên của giao diện.
+
+**Trạng thái cả ba mục: đã sửa code và kiểm tra giao diện chạy thật.**
+
+### Phương án bố cục đã duyệt
+
+- Một banner ngang dùng chung cho cả ba trang: nút ☰ ở trái, tên X-SENTINEL và dòng mô tả ở giữa, nút ⚙ ở phải. Trên laptop dự kiến cao khoảng 110–140 px, tên 36–44 px, mô tả 16–18 px; đây là kích thước khởi điểm để kiểm tra khi triển khai. Trên cửa sổ nhỏ giảm cỡ chữ/khoảng đệm và cho mô tả xuống dòng.
+- ☰ mở một menu điều hướng gọn phía trái do ứng dụng quản lý, chứa đúng Phân tích, Lịch sử, Nghiên cứu; đánh dấu trang hiện tại. Không hiển thị cột điều hướng lớn thường trực. Nếu chọn cách tiếp tục dùng sidebar, cần xác minh cách mở/đóng được hỗ trợ trên Streamlit 1.45.1 trước khi hứa nút tùy chỉnh điều khiển được sidebar.
+- ⚙ mở menu Cài đặt ở phải: chọn Giao diện đặt đầu tiên, tiếp theo Tải lại giao diện, Giới thiệu và Quay video màn hình. Hai nút có tên trợ năng/tooltip “Điều hướng” và “Cài đặt”; kích thước bấm tối thiểu dự kiến 44 × 44 px.
+- Nội dung phân tích, lịch sử hoặc nghiên cứu nằm bên dưới banner; không lặp lại tên X-SENTINEL ở thanh bên. Thông tin kết nối/lưu và giới hạn kết luận vẫn có vị trí đọc được, không bỏ mất khi thu gọn thanh bên.
+- Mở/đóng menu và đổi Sáng/Tối phải giữ kết quả hiện tại và không gọi detector. “Tải lại giao diện” giữ đúng ý nghĩa làm mới phần hiển thị; không biến thành lệnh phân tích lại. Giữ key điều hướng/theme và đối chiếu dataset/chế độ/phương pháp sau thay bố cục.
+- Kiểm tra Sáng/Tối, cửa sổ hẹp, bàn phím, chuyển cả ba trang và thao tác với kết quả đã có. Bộ quay video dùng iframe nên phải kiểm tra ảnh hưởng của rerun/đóng menu; chưa hứa bản quay vẫn tiếp tục nếu component bị tháo khỏi trang.
+
+### Kiểm chứng riêng cho banner/menu mới
+
+- Banner X-SENTINEL ở đầu cả ba trang; menu Điều hướng bên trái và Cài đặt bên phải đều dùng popover của ứng dụng, không còn sidebar thường trực. Nhãn trợ năng/tooltip vẫn đọc được khi nút chỉ hiện biểu tượng.
+- Theo yêu cầu bổ sung, banner được kéo gần sát hai mép cửa sổ, hai nút đi theo hai đầu banner; nội dung bên dưới giữ chiều rộng dễ đọc. Đã xem ở 1884 px và 390 px, không tràn ngang; menu Cài đặt vẫn nằm trong màn hình. Đây là thay đổi CSS, không chạy lại bộ kiểm tra mô hình.
+- Yêu cầu tiếp theo: ghim thanh đầu trang khi cuộn và tiết kiệm chiều cao. Đã bỏ dòng mô tả dưới tên X-SENTINEL, giảm thanh xuống 72 px (64 px ở màn hình nhỏ), ghim ở mép trên và chừa khoảng cho nội dung đầu trang. Kiểm tra trình duyệt xác nhận cuộn nội dung nhưng thanh vẫn ở vị trí 0; menu Điều hướng/Cài đặt mở được khi đã cuộn, kể cả chế độ sáng trên màn hình 390 px. Lần chỉnh này chỉ thay phần trình bày, không chạy lại benchmark/model.
+- Chỉnh tiếp theo yêu cầu: thanh ghim sát hoàn toàn hai mép (`left/right: 0`), góc vuông (`border-radius: 0`), chỉ giữ viền dưới. Đã xác nhận trên Docker ở kích thước 1280 px và 390 px; vẫn giữ chiều cao gọn và chức năng ghim khi cuộn.
+- 19 kiểm tra liên quan đã pass: `tests/test_ui_revision.py`, `tests/test_primary_dashboard.py`, `tests/test_pipeline.py`. Log mới: `outputs/ui_header_2026_10_16/tests.xml`. Các kiểm tra cũ tham chiếu radio trong sidebar đã được cập nhật theo vị trí điều hướng mới.
+- Đã xem trực tiếp cả ba trang, Sáng/Tối, mở menu bằng Enter và bố cục rộng 390 px. Menu cài đặt nằm trong màn hình; banner và hai nút không đè lên nhau.
+- Bảng quay video nằm ngoài popover. Đã xác nhận đóng Cài đặt vẫn giữ iframe và nút Bắt đầu quay trên trang. Chưa cấp quyền/quay video thực; người dùng cần dừng và tải video trước khi tải lại trang hoặc tắt bảng quay.
+- Kết quả phân tích được giữ khi đổi giao diện và xuất PDF; kiểm tra có đếm lượt gọi detector để bảo đảm không dự đoán lại chỉ để hiển thị.
+- Đã rebuild và khởi động bản Docker mới tại cổng 8501. Kiểm tra Linux qua API thật đạt bốn cấu hình EMBER2018/EMBER2024 × Reduced/Full và trang lịch sử: `outputs/ui_header_2026_10_16/linux_runtime.json`. Đây là kiểm tra cùng máy vật lý, chưa thay thế nghiệm thu trên máy thành viên nhóm.
+- Ảnh bản mới: `outputs/ui_header_2026_10_16/header_navigation_dark.jpg`, `header_settings_dark.jpg` và `settings_390.jpg`. Lượt sửa banner/menu chưa commit hoặc push GitHub.
+
+Các kết quả 80 test của lần sửa trước bên dưới là bằng chứng lịch sử, không phải số test chạy lại cho thay đổi banner/menu này.
 
 Máy khác chỉ nhận được bản sửa sau khi thay đổi này được đưa lên GitHub và máy đó pull rồi rebuild. Từ thư mục repository đã có `.env` và bộ mô hình, chạy:
 

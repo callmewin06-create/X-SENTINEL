@@ -30,7 +30,7 @@ def test_dashboard_real_primary_bundles_and_details_do_not_rescore(monkeypatch):
     assert not app.exception and not app.metric
     for dataset in ('EMBER2018','EMBER2024'):
         app.selectbox(key='dataset').set_value(dataset).run(timeout=45)
-        app.sidebar.radio(key='page').set_value('Nghiên cứu').run(timeout=45)
+        app.radio(key='page').set_value('Nghiên cứu').run(timeout=45)
         for variant in ('reduced','full'):
             app.selectbox(key='variant_'+dataset).set_value(variant).run(timeout=45)
             assert app.selectbox(key='method_'+dataset).value=='X_primary_'+variant

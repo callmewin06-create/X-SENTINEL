@@ -15,18 +15,33 @@ def about():
     st.link_button('Mở GitHub của nhóm', GITHUB)
 
 
-def controls():
-    choice = st.sidebar.selectbox('Giao diện', ['Theo hệ thống', 'Sáng', 'Tối'], key='appearance')
-    with st.sidebar.popover('Tùy chọn ứng dụng', use_container_width=True):
-        st.button('Tải lại giao diện', help='Làm mới phần hiển thị, giữ kết quả phân tích trong phiên.', key='refresh_app')
-        if st.button('Giới thiệu', key='about_app'):
-            about()
-        if st.checkbox('Quay video màn hình', key='record_screen'):
-            st.caption('Chọn tab hoặc cửa sổ cần quay. Video được tải trực tiếp bằng trình duyệt.')
-            components.html(RECORDER, height=145)
+def controls(api_connected=False):
+    with st.container(key='app_header'):
+        with st.container(key='nav_menu'):
+            with st.popover('Điều hướng', icon=':material/menu:', help='Điều hướng'):
+                with st.container(key='nav_items'):
+                    page = st.radio('Điều hướng', ['Phân tích', 'Lịch sử', 'Nghiên cứu'], key='page', label_visibility='collapsed')
+        st.markdown('<div class="xs-brand" role="banner" aria-label="X-SENTINEL">'
+                    '<div class="xs-brand-name">X-SENTINEL</div></div>', unsafe_allow_html=True)
+        with st.container(key='settings_menu'):
+            with st.popover('Cài đặt', icon=':material/settings:', help='Cài đặt'):
+                choice = st.selectbox('Giao diện', ['Theo hệ thống', 'Sáng', 'Tối'], key='appearance')
+                st.button('Tải lại giao diện', help='Làm mới phần hiển thị, giữ kết quả phân tích trong phiên.', key='refresh_app')
+                if st.button('Giới thiệu', key='about_app'):
+                    about()
+                st.checkbox('Quay video màn hình', key='record_screen')
     base = DARK if choice == 'Tối' else LIGHT
     automatic = f'@media(prefers-color-scheme:dark){{:root{{{DARK}}}}}' if choice == 'Theo hệ thống' else ''
     st.markdown('<style>:root{' + base + '}' + automatic + CSS + '</style>', unsafe_allow_html=True)
+    connection = 'API + lịch sử dùng chung' if api_connected else 'Local · kết quả chưa lưu database'
+    st.caption(connection + ' · File được đọc, không được thực thi. Chưa có cảnh báo không chứng nhận an toàn.')
+    if st.session_state.get('record_screen'):
+        # Keep the recorder outside the popover so closing settings does not remove its iframe.
+        with st.container(key='screen_recorder_panel', border=True):
+            st.markdown('**Quay video màn hình**')
+            st.caption('Chọn tab hoặc cửa sổ cần quay. Video được tải trực tiếp bằng trình duyệt. Dừng và tải video trước khi tải lại trang hoặc tắt bảng quay.')
+            components.html(RECORDER, height=145)
+    return page
 
 
 def contribution_chart(contributions, names):
@@ -44,12 +59,27 @@ def contribution_chart(contributions, names):
 
 
 CSS = r'''
-.block-container {max-width:1180px;padding-top:2rem;padding-bottom:3rem;}
+.block-container {max-width:1180px;padding-top:6rem;padding-bottom:3rem;}
+[data-testid="stMain"] {scroll-padding-top:6rem;}
+/* Reserve space above the page and keep menus below Streamlit's popover layer. */
+.st-key-app_header {position:fixed!important;top:0;left:0;right:0;width:auto!important;max-width:none!important;height:72px;min-height:72px;padding:12px 76px;justify-content:center;z-index:999991;border:0;border-bottom:1px solid var(--xs-border);border-radius:0;background:linear-gradient(115deg,var(--xs-panel),var(--xs-soft));box-shadow:0 4px 14px #00000020;}
+.st-key-nav_menu,.st-key-settings_menu {position:absolute!important;top:11px;width:48px!important;z-index:2;}
+.st-key-nav_menu {left:16px;}
+.st-key-settings_menu {right:16px;}
+.st-key-nav_menu [data-testid="stPopover"] button,.st-key-settings_menu [data-testid="stPopover"] button {width:48px;height:48px;padding:0;justify-content:center;border-radius:12px;}
+.st-key-nav_menu [data-testid="stPopover"] button [data-testid="stMarkdownContainer"],.st-key-settings_menu [data-testid="stPopover"] button [data-testid="stMarkdownContainer"] {position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;}
+.st-key-nav_menu [data-testid="stPopoverButton"]>div:has(svg),.st-key-settings_menu [data-testid="stPopoverButton"]>div:has(svg) {display:none;}
+.st-key-nav_items [role="radiogroup"] label {min-height:40px;align-items:center;}
+.st-key-app_header [data-testid="stMarkdownContainer"]:has(>.xs-brand) {margin-bottom:0;}
+.xs-brand {text-align:center;}
+.xs-brand-name {font-size:30px;font-weight:800;letter-spacing:0.035em;line-height:1.2;color:var(--xs-text);}
+@media(max-width:650px){.block-container{padding-top:5.5rem}[data-testid="stMain"]{scroll-padding-top:5.5rem}.st-key-app_header{padding:8px 60px;height:64px;min-height:64px}.st-key-nav_menu{left:8px}.st-key-settings_menu{right:8px}.xs-brand-name{font-size:clamp(20px,5.4vw,26px)}.st-key-nav_menu,.st-key-settings_menu{top:7px}}
 h1 {letter-spacing:-0.035em;}
 #MainMenu, [data-testid="stMainMenu"], .stAppDeployButton, .stDeployButton {display:none!important;}
 [data-testid="stApp"], [data-testid="stAppViewContainer"], [data-testid="stMain"], [data-testid="stHeader"] {background:var(--xs-bg)!important;color:var(--xs-text)!important;}
 [data-testid="stSidebar"], [data-testid="stPopoverBody"], [role="dialog"] {background:var(--xs-panel)!important;color:var(--xs-text)!important;}
 [data-testid="stPopoverBody"]>div {background:var(--xs-panel)!important;color:var(--xs-text)!important;}
+[data-baseweb="tooltip"],[data-baseweb="tooltip"]>div {background:var(--xs-panel)!important;color:var(--xs-text)!important;}
 [role="dialog"]>div, [role="dialog"]>button {color:var(--xs-text)!important;}
 [data-testid="stLinkButton"] a {background:var(--xs-panel)!important;color:var(--xs-text)!important;border-color:var(--xs-border)!important;}
 [data-testid="stExpander"] summary svg {color:var(--xs-text)!important;}

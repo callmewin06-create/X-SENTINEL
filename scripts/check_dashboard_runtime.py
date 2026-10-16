@@ -21,7 +21,7 @@ def main():
     if app.exception:
         raise AssertionError('Initial dashboard failed')
     connected = bool(os.getenv('XS_API_BASE_URL'))
-    app.sidebar.radio(key='page').set_value('Nghiên cứu').run(timeout=60)
+    app.radio(key='page').set_value('Nghiên cứu').run(timeout=60)
     cases = []
     for dataset in ('EMBER2018', 'EMBER2024'):
         if len(primary_catalog(dataset)) != 27:
@@ -58,7 +58,7 @@ def main():
         assert not app.metric
     history_ok = None
     if connected:
-        app.sidebar.radio(key='page').set_value('Lịch sử').run(timeout=60)
+        app.radio(key='page').set_value('Lịch sử').run(timeout=60)
         history_ok = not app.exception and not app.error and len(app.dataframe[0].value) >= 4
         assert history_ok
         assert app.dataframe[0].value['Bộ mô hình'].isin(['EMBER2018', 'EMBER2024']).all()

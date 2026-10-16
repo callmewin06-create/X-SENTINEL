@@ -22,14 +22,9 @@ from xsentinel.service.client import api_request
 from xsentinel.service.scoring import score_input
 from xsentinel.data.limits import MAX_UPLOAD_BYTES
 
-st.set_page_config(page_title='X-SENTINEL · Phân tích PE', layout='wide', initial_sidebar_state='expanded')
+st.set_page_config(page_title='X-SENTINEL · Phân tích PE', layout='wide', initial_sidebar_state='collapsed')
 api_base = os.getenv('XS_API_BASE_URL', '')
-st.sidebar.title('X-SENTINEL')
-st.sidebar.caption('Phân tích PE và dấu hiệu trigger')
-page = st.sidebar.radio('Điều hướng', ['Phân tích', 'Lịch sử', 'Nghiên cứu'], key='page')
-controls()
-st.sidebar.caption('API + lịch sử dùng chung' if api_base else 'Local · kết quả chưa lưu database')
-st.sidebar.caption('File được đọc, không được thực thi. Chưa có cảnh báo không chứng nhận an toàn.')
+page = controls(api_connected=bool(api_base))
 
 
 @st.cache_resource(max_entries=4, show_spinner=False)
