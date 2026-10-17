@@ -16,7 +16,7 @@ from xsentinel.detection.detector import Detector
 from xsentinel.dashboard_catalog import primary_catalog, experiment_label, preferred_method
 from xsentinel.dashboard_input import context_key, prepare_input, reader_signature
 from xsentinel.dashboard_presentation import explain_result, feature_rows, friendly_error, method_name, format_size, VIEW_NAMES, VIEW_HELP
-from xsentinel.dashboard_chrome import controls, contribution_chart
+from xsentinel.dashboard_chrome import controls, contribution_chart, render_verdict_card
 from xsentinel.demo_provenance import demo_ground_truth, demo_comparison
 from xsentinel.service.client import api_request
 from xsentinel.service.scoring import score_input
@@ -52,10 +52,20 @@ def render_result(result, timings=None, key_prefix='result'):
     metadata = result.get('input_metadata') or {}
     st.subheader('Kết quả phân tích')
     if metadata:
-        name = html.escape(metadata['name'])
+        name = html.escape(metadata.get('name', 'Mẫu phân tích'))
         size = metadata.get('size_bytes')
-        suffix = ' · ' + format_size(size) if size is not None else ' · Mẫu demo'
-        st.markdown(f'<strong>{name}</strong>{suffix}', unsafe_allow_html=True)
+        size_str = format_size(size) if size is not None else 'Mẫu demo reference'
+        sha = result.get('input_sha256', '')
+        sha_short = (sha[:16] + '…') if sha else 'N/A'
+        elapsed = result.get('elapsed_ms', 0)
+        st.markdown(f'''
+        <div class="xs-meta-chips">
+            <span class="xs-meta-chip"><strong>Tệp:</strong> {name}</span>
+            <span class="xs-meta-chip"><strong>Kích thước:</strong> {size_str}</span>
+            <span class="xs-meta-chip"><strong>SHA-256:</strong> <code>{sha_short}</code></span>
+            <span class="xs-meta-chip"><strong>Độ trễ tính toán:</strong> {elapsed:.2f} ms</span>
+        </div>
+        ''', unsafe_allow_html=True)
     comparison = demo_comparison(result)
     if comparison['known']:
         st.markdown('**Nhãn gốc theo bộ dữ liệu: ' + comparison['expected'] + '**')
@@ -63,7 +73,37 @@ def render_result(result, timings=None, key_prefix='result'):
         st.caption(comparison['source'] + ' · Đối chiếu này chỉ chấm phân loại file, không chấm trigger.')
     else:
         st.caption(comparison['text'])
+
+    selected = explanation['selected']
+    is_malware = result['main_classification'] == 'MALWARE'
+    is_backdoor = bool(result['backdoor_alert'])
+
+    left_card = render_verdict_card(
+        title='Quyết định 1 · Phân Loại Tệp PE',
+        subtitle='Mô hình chính (LightGBM)',
+        verdict_text=explanation['classification'],
+        is_danger=is_malware,
+        score=result['malware_probability'],
+        threshold=0.5,
+        score_text='Xác suất mã độc p(x)',
+        note='Điểm dự đoán > 0.5000 kết luận mã độc; < 0.5000 kết luận tệp lành tính.'
+    )
+
+    right_card = render_verdict_card(
+        title='Quyết định 2 · Giám Sát Cửa Hậu',
+        subtitle=explanation['method_label'],
+        verdict_text=explanation['alert'],
+        is_danger=is_backdoor,
+        score=float(selected['Score']),
+        threshold=float(selected['Threshold']),
+        score_text='Điểm tín hiệu S(x)',
+        note=f"Ngưỡng cảnh báo τ = {float(selected['Threshold']):.6f} (Chuẩn hóa P99 tại FPR ≤ 1.0%)."
+    )
+
     left, right = st.columns(2)
+    left.markdown(left_card, unsafe_allow_html=True)
+    right.markdown(right_card, unsafe_allow_html=True)
+
     left.metric('Mô hình phân loại file', explanation['classification'])
     right.metric('Dấu hiệu trigger', explanation['alert'])
     left.caption(f"Điểm dự đoán mã độc: {result['malware_probability']:.4f}. Gần 1 nghĩa là mô hình nghiêng về mã độc, gần 0 nghiêng về nhãn lành.")
@@ -76,13 +116,40 @@ def render_result(result, timings=None, key_prefix='result'):
         st.caption('Điểm sát ngưỡng có thể đổi nhãn khi điểm thay đổi ít. Điểm mô hình không phải mức chắc chắn thực tế đã được kiểm chứng.')
         st.markdown('**2. Đặc điểm nào đẩy dự đoán về mỗi phía?**')
         features = feature_rows(result)
-        for column, positive, label in zip(st.columns(2), (True, False), ('Đẩy về mã độc', 'Đẩy về lành')):
-            column.markdown('**' + label + '**')
-            items = [row for row in features if (row['shap'] > 0 if positive else row['shap'] < 0)][:3]
-            for row in items:
-                column.markdown(f"- **{row['title']}**: giá trị {row['value']:.6g}; ảnh hưởng SHAP {row['shap']:+.4f}.")
+        malware_items = [row for row in features if row['shap'] > 0][:3]
+        benign_items = [row for row in features if row['shap'] < 0][:3]
+
+        def _render_force_box(items, is_danger):
             if not items:
-                column.caption('Không có trong 10 đặc trưng ảnh hưởng mạnh nhất đang hiển thị.')
+                return '<div style="color:var(--xs-muted); font-size:12.5px; padding:6px 0;">Không có trong 10 đặc trưng ảnh hưởng mạnh nhất đang hiển thị.</div>'
+            rendered = []
+            for row in items:
+                v = f"{row['value']:.6g}"
+                s = f"{row['shap']:+.4f}"
+                c = 'var(--xs-malware)' if is_danger else 'var(--xs-benign)'
+                rendered.append(
+                    f'<div class="xs-force-item">'
+                    f'<div class="xs-force-item-title">{html.escape(row["title"])}</div>'
+                    f'<div class="xs-force-item-meta">'
+                    f'<span>Giá trị: <strong>{v}</strong></span>'
+                    f'<span style="color:{c}; font-weight:700;">SHAP: {s}</span>'
+                    f'</div></div>'
+                )
+            return ''.join(rendered)
+
+        st.markdown(
+            f'<div class="xs-feature-grid">'
+            f'<div class="xs-force-col xs-force-danger">'
+            f'<div class="xs-force-head">🚨 Đặc trưng Đẩy Về Phía MÃ ĐỘC (SHAP &gt; 0)</div>'
+            f'{_render_force_box(malware_items, True)}'
+            f'</div>'
+            f'<div class="xs-force-col xs-force-safe">'
+            f'<div class="xs-force-head">🛡️ Đặc trưng Kéo Về Phía LÀNH TÍNH (SHAP &lt; 0)</div>'
+            f'{_render_force_box(benign_items, False)}'
+            f'</div>'
+            f'</div>',
+            unsafe_allow_html=True
+        )
         st.caption('Các đặc điểm có thể kéo về hai phía. Mô hình gộp tất cả đóng góp cùng mốc ban đầu để ra điểm cuối; các số SHAP không cộng trực tiếp vào xác suất.')
         st.markdown('**3. Vì sao có hoặc chưa có cảnh báo trigger?**')
         st.markdown(f"**{explanation['method_label']}** · Điểm **{selected['Score']:.6f}** · Ngưỡng **{selected['Threshold']:.6f}**")
@@ -145,7 +212,7 @@ def render_result(result, timings=None, key_prefix='result'):
 
 if page == 'Lịch sử':
     st.title('Lịch sử phân tích')
-    st.caption('Xem lại kết quả đã lưu. Bản ghi cũ có thể chưa có tên file.')
+    st.caption('Xem lại các bản ghi phân tích đã được lưu trữ an toàn trong PostgreSQL Audit Log.')
     if not api_base:
         st.info('Chế độ local chưa kết nối database. Kết quả của phiên hiện tại chưa có lịch sử lưu.')
         st.stop()
@@ -155,6 +222,37 @@ if page == 'Lịch sử':
         if not history:
             st.info('Chưa có kết quả. Vào Phân tích, chọn đầu vào và nhấn Phân tích.')
         else:
+            total_scans = len(history)
+            malware_count = sum(1 for row in history if row.get('main_classification') == 'MALWARE')
+            backdoor_count = sum(1 for row in history if row.get('backdoor_alert'))
+            benign_count = total_scans - malware_count
+            malware_rate = (malware_count / total_scans * 100) if total_scans else 0
+
+            st.markdown(f'''
+            <div class="xs-kpi-grid">
+                <div class="xs-kpi-card">
+                    <div class="xs-kpi-label">Tổng Lượt Phân Tích</div>
+                    <div class="xs-kpi-val">{total_scans}</div>
+                    <div class="xs-kpi-sub">Lưu trữ trong PostgreSQL</div>
+                </div>
+                <div class="xs-kpi-card xs-kpi-danger">
+                    <div class="xs-kpi-label">Phát Hiện Mã Độc</div>
+                    <div class="xs-kpi-val">{malware_count}</div>
+                    <div class="xs-kpi-sub">{malware_rate:.1f}% tổng số tệp</div>
+                </div>
+                <div class="xs-kpi-card xs-kpi-alert">
+                    <div class="xs-kpi-label">Cảnh Báo Backdoor</div>
+                    <div class="xs-kpi-val">{backdoor_count}</div>
+                    <div class="xs-kpi-sub">Vượt ngưỡng kiểm soát trigger</div>
+                </div>
+                <div class="xs-kpi-card xs-kpi-safe">
+                    <div class="xs-kpi-label">Tệp Lành Tính</div>
+                    <div class="xs-kpi-val">{benign_count}</div>
+                    <div class="xs-kpi-sub">Xác suất p(x) &lt; 0.5000</div>
+                </div>
+            </div>
+            ''', unsafe_allow_html=True)
+
             table = []
             labels = {}
             for row in history:
@@ -174,6 +272,7 @@ if page == 'Lịch sử':
 
 st.title('Nghiên cứu' if page == 'Nghiên cứu' else 'Phân tích file PE')
 st.caption('Chọn đầu vào, đọc hai kết luận và mở giải thích khi cần.')
+st.markdown('<div class="xs-section-title"><span>BƯỚC 1</span> CẤU HÌNH BỘ MÔ HÌNH VÀ CHẾ ĐỘ PHÒNG THỦ</div>', unsafe_allow_html=True)
 model_column, variant_column = st.columns(2)
 dataset = model_column.selectbox('Bộ mô hình', ['EMBER2018', 'EMBER2024'], key='dataset',
                        help='EMBER2018 dùng schema V2 với 2.381 chiều; EMBER2024 dùng V3 với 2.568 chiều. Không dùng chéo model/schema.')
@@ -242,6 +341,7 @@ with st.expander('Thông tin bộ mô hình đang dùng'):
         st.caption('Cấu hình đã qua screening và confirmation.' if evidence.get('independently_confirmed_strong_and_stealth')
                    else 'Cấu hình chưa qua screening/confirmation strong-and-stealth. Giữ để thể hiện đầy đủ kết quả thí nghiệm.')
 
+st.markdown('<div class="xs-section-title"><span>BƯỚC 2</span> CHỌN ĐẦU VÀO PHÂN TÍCH</div>', unsafe_allow_html=True)
 labels = {'Tải file PE': 'pe', 'Dùng mẫu demo': 'demo'}
 if page == 'Nghiên cứu':
     labels.update({'Vector EMBER (.npy)': 'vector', 'Raw EMBER (.json)': 'raw_json'})
