@@ -50,7 +50,7 @@ def show_error(error):
 def render_result(result, timings=None, key_prefix='result'):
     explanation = explain_result(result)
     metadata = result.get('input_metadata') or {}
-    st.subheader('Kết quả phân tích')
+    st.markdown('<div class="xs-section-title"><span>BƯỚC 3</span> KẾT QUẢ PHÂN TÍCH & BẰNG CHỨNG KIỂM TOÁN</div>', unsafe_allow_html=True)
     if metadata:
         name = html.escape(metadata.get('name', 'Mẫu phân tích'))
         size = metadata.get('size_bytes')
@@ -60,10 +60,10 @@ def render_result(result, timings=None, key_prefix='result'):
         elapsed = result.get('elapsed_ms', 0)
         st.markdown(f'''
         <div class="xs-meta-chips">
-            <span class="xs-meta-chip"><strong>Tệp:</strong> {name}</span>
-            <span class="xs-meta-chip"><strong>Kích thước:</strong> {size_str}</span>
-            <span class="xs-meta-chip"><strong>SHA-256:</strong> <code>{sha_short}</code></span>
-            <span class="xs-meta-chip"><strong>Độ trễ tính toán:</strong> {elapsed:.2f} ms</span>
+            <span class="xs-meta-chip"><strong>📄 Tệp:</strong> {name}</span>
+            <span class="xs-meta-chip"><strong>💾 Kích thước:</strong> {size_str}</span>
+            <span class="xs-meta-chip"><strong>🔑 SHA-256:</strong> <code>{sha_short}</code></span>
+            <span class="xs-meta-chip"><strong>⚡ Độ trễ:</strong> {elapsed:.2f} ms</span>
         </div>
         ''', unsafe_allow_html=True)
     comparison = demo_comparison(result)
@@ -121,18 +121,24 @@ def render_result(result, timings=None, key_prefix='result'):
 
         def _render_force_box(items, is_danger):
             if not items:
-                return '<div style="color:var(--xs-muted); font-size:12.5px; padding:6px 0;">Không có trong 10 đặc trưng ảnh hưởng mạnh nhất đang hiển thị.</div>'
+                return '<div style="color:var(--xs-muted); font-size:12.5px; padding:8px 0;">Không có trong 10 đặc trưng ảnh hưởng mạnh nhất đang hiển thị.</div>'
+            max_abs = max((abs(row['shap']) for row in items), default=1.0) or 1.0
             rendered = []
             for row in items:
                 v = f"{row['value']:.6g}"
                 s = f"{row['shap']:+.4f}"
-                c = 'var(--xs-malware)' if is_danger else 'var(--xs-benign)'
+                rel_width = min(100.0, max(8.0, (abs(row['shap']) / max_abs) * 100))
+                pill_class = 'xs-shap-malware' if is_danger else 'xs-shap-benign'
+                bar_color = 'var(--xs-malware)' if is_danger else 'var(--xs-benign)'
                 rendered.append(
                     f'<div class="xs-force-item">'
                     f'<div class="xs-force-item-title">{html.escape(row["title"])}</div>'
+                    f'<div style="height:4px; border-radius:2px; background:var(--xs-soft); margin:6px 0; overflow:hidden;">'
+                    f'<div style="height:100%; width:{rel_width:.1f}%; background:{bar_color}; border-radius:2px;"></div>'
+                    f'</div>'
                     f'<div class="xs-force-item-meta">'
                     f'<span>Giá trị: <strong>{v}</strong></span>'
-                    f'<span style="color:{c}; font-weight:700;">SHAP: {s}</span>'
+                    f'<span class="xs-shap-pill {pill_class}">SHAP: {s}</span>'
                     f'</div></div>'
                 )
             return ''.join(rendered)
@@ -231,24 +237,24 @@ if page == 'Lịch sử':
             st.markdown(f'''
             <div class="xs-kpi-grid">
                 <div class="xs-kpi-card">
-                    <div class="xs-kpi-label">Tổng Lượt Phân Tích</div>
+                    <div class="xs-kpi-label">🗄️ Tổng Lượt Phân Tích</div>
                     <div class="xs-kpi-val">{total_scans}</div>
-                    <div class="xs-kpi-sub">Lưu trữ trong PostgreSQL</div>
+                    <div class="xs-kpi-sub">Lưu trữ kiểm toán trong PostgreSQL</div>
                 </div>
                 <div class="xs-kpi-card xs-kpi-danger">
-                    <div class="xs-kpi-label">Phát Hiện Mã Độc</div>
+                    <div class="xs-kpi-label">🚨 Phát Hiện Mã Độc</div>
                     <div class="xs-kpi-val">{malware_count}</div>
-                    <div class="xs-kpi-sub">{malware_rate:.1f}% tổng số tệp</div>
+                    <div class="xs-kpi-sub">{malware_rate:.1f}% tổng số tệp đã quét</div>
                 </div>
                 <div class="xs-kpi-card xs-kpi-alert">
-                    <div class="xs-kpi-label">Cảnh Báo Backdoor</div>
+                    <div class="xs-kpi-label">⚡ Cảnh Báo Backdoor</div>
                     <div class="xs-kpi-val">{backdoor_count}</div>
-                    <div class="xs-kpi-sub">Vượt ngưỡng kiểm soát trigger</div>
+                    <div class="xs-kpi-sub">Vượt ngưỡng kiểm soát trigger &tau;</div>
                 </div>
                 <div class="xs-kpi-card xs-kpi-safe">
-                    <div class="xs-kpi-label">Tệp Lành Tính</div>
+                    <div class="xs-kpi-label">🛡️ Tệp Lành Tính</div>
                     <div class="xs-kpi-val">{benign_count}</div>
-                    <div class="xs-kpi-sub">Xác suất p(x) &lt; 0.5000</div>
+                    <div class="xs-kpi-sub">Xác nhận an toàn p(x) &lt; 0.5000</div>
                 </div>
             </div>
             ''', unsafe_allow_html=True)
