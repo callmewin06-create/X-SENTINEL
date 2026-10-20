@@ -80,12 +80,12 @@ def test_analysis_full_theme_and_pdf_do_not_rescore(monkeypatch):
     from streamlit.testing.v1 import AppTest
     from xsentinel.detection.detector import Detector
     monkeypatch.delenv('XS_API_BASE_URL', raising=False)
-    predict = Detector.predict
+    predict = Detector.predict_selected
     calls = []
-    def counted(self, x):
+    def counted(self, x, method):
         calls.append(True)
-        return predict(self, x)
-    monkeypatch.setattr(Detector, 'predict', counted)
+        return predict(self, x, method)
+    monkeypatch.setattr(Detector, 'predict_selected', counted)
     app = AppTest.from_file('dashboard/app.py').run(timeout=60)
     app.selectbox(key='dataset').set_value('EMBER2024').run(timeout=60)
     assert app.selectbox(key='variant_EMBER2024').value == 'reduced'
@@ -93,6 +93,7 @@ def test_analysis_full_theme_and_pdf_do_not_rescore(monkeypatch):
     app.button(key='analyze').click().run(timeout=60)
     assert not app.exception and not app.error
     result = copy.deepcopy(app.session_state['analysis']['result'])
+    assert len(result['input_sha256'])==64
     assert result['ground_truth']['label'] == 'BENIGN'
     assert result['malware_threshold'] == .5
     before = len(calls)

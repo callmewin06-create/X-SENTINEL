@@ -1,5 +1,7 @@
 # Bàn giao sửa giao diện ngày 16/10/2026
 
+**Yêu cầu và triển khai bổ sung ngày 20/10/2026:** [UI-11 đến UI-14](UI_FOLLOWUP_2026_10_20.md) đã được sửa trong code; đọc [bằng chứng và giới hạn mới](IMPLEMENTATION_2026_10_20.md) cho UI/PDF và latency A+B. Bằng chứng ngày 16/10 bên dưới được giữ làm lịch sử, không dùng thay kết quả kiểm tra cho lần sửa mới.
+
 Đã triển khai theo yêu cầu người dùng từ UI-01 đến UI-10. Docker hiện tại đã được rebuild và chạy bản sửa tại http://127.0.0.1:8501. Chưa commit/push GitHub trong lượt này. Báo cáo Word và kết quả nghiên cứu không được viết lại bởi đợt sửa giao diện.
 
 **Cập nhật ghi chú ngày 16/10/2026:** bản sửa đã có commit `35c0e82` — `Fix Vietnamese UI, explanations, demo labels and PDF export`. Khi kiểm tra để ghi chú, HEAD và ref `origin/main` lưu trên máy cùng ở commit này; cây làm việc sạch trước lần cập nhật tài liệu này. Chưa fetch để xác minh GitHub trực tiếp trong lượt ghi chú. Các kết quả kiểm chứng bên dưới là bằng chứng của lần triển khai, không phải kiểm thử được chạy lại mỗi lần đọc tài liệu.

@@ -19,8 +19,10 @@ from xsentinel.dashboard_presentation import explain_result, feature_rows, frien
 from xsentinel.dashboard_chrome import controls, contribution_chart, render_verdict_card
 from xsentinel.demo_provenance import demo_ground_truth, demo_comparison
 from xsentinel.service.client import api_request
-from xsentinel.service.scoring import score_input
+from xsentinel.service.scoring import score_input,input_digest
 from xsentinel.data.limits import MAX_UPLOAD_BYTES
+from xsentinel.dashboard_exports import (snapshot_digest,input_hash_rows,local_timestamp,
+    classification_label,trigger_label,timing_description)
 
 st.set_page_config(page_title='X-SENTINEL · Phân tích PE', layout='wide', initial_sidebar_state='collapsed')
 api_base = os.getenv('XS_API_BASE_URL', '')
@@ -47,25 +49,49 @@ def show_error(error):
         st.code(str(error))
 
 
+def render_pdf_export(result,key_prefix):
+    pdf_key='pdf_'+key_prefix
+    identity=snapshot_digest(result)
+    if st.session_state.get(pdf_key+'_snapshot')!=identity:
+        st.session_state.pop(pdf_key,None)
+        st.session_state[pdf_key+'_snapshot']=identity
+    if st.button('Xuất PDF lần phân tích này' if key_prefix.startswith('history_') else 'Xuất PDF kết quả',key='export_'+key_prefix):
+        from xsentinel.result_pdf import result_pdf
+        with st.spinner('Đang tạo PDF từ kết quả đã có…'):
+            st.session_state[pdf_key]=result_pdf(result)
+    if pdf_key in st.session_state:
+        st.download_button('Tải file PDF',data=st.session_state[pdf_key],file_name='X_SENTINEL_ket_qua.pdf',
+            mime='application/pdf',on_click='ignore',key='download_'+key_prefix)
+
+
+def themed_table(frame):
+    # HTML tables inherit the app palette, including OS changes in automatic mode.
+    # Streamlit's canvas dataframes use a separate, fixed native theme.
+    st.markdown('<div class="xs-data-table">'+frame.to_html(index=False,escape=True,border=0)+'</div>',unsafe_allow_html=True)
+
+
 def render_result(result, timings=None, key_prefix='result'):
     explanation = explain_result(result)
     metadata = result.get('input_metadata') or {}
+    elapsed=result.get('elapsed_ms')
+    elapsed_text=f'{elapsed:.2f} ms' if elapsed is not None else 'Chưa lưu'
     st.markdown('<div class="xs-section-title"><span>BƯỚC 3</span> KẾT QUẢ PHÂN TÍCH & BẰNG CHỨNG KIỂM TOÁN</div>', unsafe_allow_html=True)
     if metadata:
         name = html.escape(metadata.get('name', 'Mẫu phân tích'))
         size = metadata.get('size_bytes')
         size_str = format_size(size) if size is not None else 'Mẫu demo reference'
-        sha = result.get('input_sha256', '')
-        sha_short = (sha[:16] + '…') if sha else 'N/A'
-        elapsed = result.get('elapsed_ms', 0)
         st.markdown(f'''
         <div class="xs-meta-chips">
             <span class="xs-meta-chip"><strong>📄 Tệp:</strong> {name}</span>
             <span class="xs-meta-chip"><strong>💾 Kích thước:</strong> {size_str}</span>
-            <span class="xs-meta-chip"><strong>🔑 SHA-256:</strong> <code>{sha_short}</code></span>
-            <span class="xs-meta-chip"><strong>⚡ Độ trễ:</strong> {elapsed:.2f} ms</span>
+            <span class="xs-meta-chip"><strong>⚡ Thời gian tính điểm:</strong> {elapsed_text}</span>
         </div>
         ''', unsafe_allow_html=True)
+    for label,value in input_hash_rows(result):
+        st.caption(label)
+        st.code(value,language=None,wrap_lines=True)
+    if key_prefix.startswith('history_'):
+        render_pdf_export(result,key_prefix)
     comparison = demo_comparison(result)
     if comparison['known']:
         st.markdown('**Nhãn gốc theo bộ dữ liệu: ' + comparison['expected'] + '**')
@@ -84,9 +110,9 @@ def render_result(result, timings=None, key_prefix='result'):
         verdict_text=explanation['classification'],
         is_danger=is_malware,
         score=result['malware_probability'],
-        threshold=0.5,
+        threshold=result.get('malware_threshold'),
         score_text='Xác suất mã độc p(x)',
-        note='Điểm dự đoán > 0.5000 kết luận mã độc; < 0.5000 kết luận tệp lành tính.'
+        note=explanation['classification_explanation']
     )
 
     right_card = render_verdict_card(
@@ -97,7 +123,7 @@ def render_result(result, timings=None, key_prefix='result'):
         score=float(selected['Score']),
         threshold=float(selected['Threshold']),
         score_text='Điểm tín hiệu S(x)',
-        note=f"Ngưỡng cảnh báo τ = {float(selected['Threshold']):.6f} (Chuẩn hóa P99 tại FPR ≤ 1.0%)."
+        note=f"Ngưỡng cảnh báo τ = {float(selected['Threshold']):.6f}. Mục tiêu calibration không bảo đảm FPR tương lai."
     )
 
     left, right = st.columns(2)
@@ -176,28 +202,31 @@ def render_result(result, timings=None, key_prefix='result'):
             st.caption(row['name'] + ' — ' + row['description'])
         features = pd.DataFrame([{'Đặc trưng': row['name'], 'Giá trị': row['value'], 'SHAP': row['shap'],
                                   'Chiều ảnh hưởng': row['direction']} for row in feature_rows(result)])
-        st.dataframe(features, hide_index=True, use_container_width=True,
-                     column_config={'Đặc trưng': st.column_config.TextColumn(width='large')})
+        themed_table(features)
         st.caption('SHAP dương đẩy raw margin về mã độc; SHAP âm đẩy về nhãn lành. Giá trị SHAP không phải phần trăm xác suất.')
     if st.toggle('Xem chi tiết nghiên cứu', key=key_prefix + '_research'):
         rows = pd.DataFrame(result['scores']).copy()
         rows['Method'] = rows['Method'].map(method_name)
         rows['Flagged'] = rows['Flagged'].map({True: 'Có', False: 'Chưa'})
-        st.dataframe(rows.rename(columns={'Method': 'Phương pháp', 'Score': 'Điểm',
-                      'Threshold': 'Ngưỡng', 'Flagged': 'Cảnh báo'}), hide_index=True, use_container_width=True)
-        st.caption('Mỗi dòng có ngưỡng riêng. Kết luận chính chỉ theo phương pháp đang chọn.')
+        themed_table(rows.rename(columns={'Method': 'Phương pháp', 'Score': 'Điểm',
+                      'Threshold': 'Ngưỡng', 'Flagged': 'Cảnh báo'}))
+        st.caption('Chỉ hiện các điểm đã tính, mỗi dòng có ngưỡng riêng. Kết luận chính theo phương pháp đang chọn.')
+        if result.get('not_computed_methods'):
+            st.caption('Chưa tính: '+', '.join(method_name(k) for k in result['not_computed_methods'])+'. Chọn STRIP tại Nghiên cứu nếu cần chạy STRIP.')
         predictions = result.get('view_predictions') or {}
         if predictions:
             st.write('**Dự đoán mã độc của mô hình sạch theo nhóm**')
-            st.dataframe(pd.DataFrame([{'Nhóm': VIEW_NAMES.get(k, k), 'Điểm dự đoán': v}
-                                      for k, v in predictions.items()]), hide_index=True)
+            themed_table(pd.DataFrame([{'Nhóm': VIEW_NAMES.get(k, k), 'Điểm dự đoán': v}
+                                      for k, v in predictions.items()]))
+            if result.get('computation_scope')=='selected':
+                st.caption('Đường tính gọn chỉ chạy mô hình nhóm cần cho phương pháp; nhóm không xuất hiện chưa được tính.')
         else:
-            st.caption('Reduced không dùng mô hình sạch theo nhóm; mục này không có dữ liệu.')
+            st.caption('Không tính dự đoán mô hình sạch theo nhóm trong lượt này.')
         st.write('Tổng SHAP có dấu theo nhóm', result['view_signed_shap'])
         st.json({k: result.get(k) for k in ('dataset', 'schema', 'protocol', 'method', 'bundle_id',
                                           'request_id', 'input_sha256', 'input_metadata')})
         st.caption('Metadata đầu vào do giao diện khai báo; checksum file khác checksum vector. Không lưu toàn bộ file/vector trong database.')
-    st.caption(f"Thời gian tính toàn bộ điểm và STRIP: {result['elapsed_ms']:.2f} ms. Chưa gồm upload, đọc file, API/lưu hoặc hiển thị trình duyệt.")
+    st.caption(timing_description(result)+': '+elapsed_text+'. Chưa gồm upload, đọc file, API/lưu hoặc hiển thị trình duyệt.')
     if timings:
         st.caption(' · '.join(f'{name}: {value:.2f} ms' for name, value in timings.items()))
         st.caption('Thời gian xử lý sau khi bấm được đo phía ứng dụng, chưa gồm upload trước khi bấm và render của trình duyệt.')
@@ -205,15 +234,8 @@ def render_result(result, timings=None, key_prefix='result'):
         st.success('Đã lưu vào lịch sử · ' + result['request_id'])
     else:
         st.caption('Kết quả local, chưa lưu vào database.')
-    pdf_key = 'pdf_' + key_prefix
-    if st.button('Xuất PDF kết quả', key='export_' + key_prefix):
-        from xsentinel.result_pdf import result_pdf
-        with st.spinner('Đang tạo báo cáo PDF từ kết quả hiện có…'):
-            st.session_state[pdf_key] = result_pdf(result)
-    if pdf_key in st.session_state:
-        st.download_button('Tải file PDF', data=st.session_state[pdf_key],
-                           file_name='X_SENTINEL_ket_qua.pdf', mime='application/pdf',
-                           on_click='ignore', key='download_' + key_prefix)
+    if not key_prefix.startswith('history_'):
+        render_pdf_export(result,key_prefix)
 
 
 if page == 'Lịch sử':
@@ -231,7 +253,7 @@ if page == 'Lịch sử':
             total_scans = len(history)
             malware_count = sum(1 for row in history if row.get('main_classification') == 'MALWARE')
             backdoor_count = sum(1 for row in history if row.get('backdoor_alert'))
-            benign_count = total_scans - malware_count
+            benign_count = sum(1 for row in history if row.get('main_classification')=='BENIGN')
             malware_rate = (malware_count / total_scans * 100) if total_scans else 0
 
             st.markdown(f'''
@@ -254,7 +276,7 @@ if page == 'Lịch sử':
                 <div class="xs-kpi-card xs-kpi-safe">
                     <div class="xs-kpi-label">🛡️ Tệp Lành Tính</div>
                     <div class="xs-kpi-val">{benign_count}</div>
-                    <div class="xs-kpi-sub">Xác nhận an toàn p(x) &lt; 0.5000</div>
+                    <div class="xs-kpi-sub">Dự đoán lành theo bản ghi đã lưu</div>
                 </div>
             </div>
             ''', unsafe_allow_html=True)
@@ -264,13 +286,32 @@ if page == 'Lịch sử':
             for row in history:
                 metadata = row.get('input_metadata') or {}
                 name = metadata.get('name') or 'Bản ghi cũ · ' + row['request_id'][:16]
-                timestamp = pd.Timestamp(row['created_at']).tz_convert('Asia/Bangkok').strftime('%d/%m/%Y %H:%M:%S')
+                timestamp = local_timestamp(row.get('created_at'))
                 labels[row['request_id']] = timestamp + ' · ' + name
                 table.append({'Thời gian': timestamp, 'Đầu vào': name, 'Bộ mô hình': row['dataset'],
-                              'Phân loại': 'Mã độc' if row['main_classification'] == 'MALWARE' else 'Lành',
-                              'Trigger': 'Có cảnh báo' if row['backdoor_alert'] else 'Chưa cảnh báo'})
-            st.dataframe(pd.DataFrame(table), hide_index=True, use_container_width=True)
-            chosen = st.selectbox('Xem một lần phân tích', list(labels), format_func=lambda value: labels[value])
+                              'Phân loại': classification_label(row.get('main_classification')),
+                              'Trigger': trigger_label(row.get('backdoor_alert'))})
+            st.caption(f'Đang hiển thị {len(history)} bản ghi, tối đa 100 bản gần nhất; không phải toàn bộ database.')
+            identity=snapshot_digest(history)
+            if st.session_state.get('history_pdf_snapshot')!=identity:
+                st.session_state.pop('history_pdf_bytes',None)
+                for cached_key in list(st.session_state):
+                    if cached_key.startswith('pdf_history_'):
+                        del st.session_state[cached_key]
+                st.session_state['history_pdf_snapshot']=identity
+            if st.button('Xuất PDF lịch sử đang hiển thị',key='export_history_list'):
+                from xsentinel.result_pdf import history_pdf
+                st.session_state['history_pdf_bytes']=history_pdf(history)
+            if 'history_pdf_bytes' in st.session_state:
+                st.download_button('Tải PDF lịch sử',data=st.session_state['history_pdf_bytes'],
+                    file_name='X_SENTINEL_lich_su.pdf',mime='application/pdf',on_click='ignore',key='download_history_list')
+            themed_table(pd.DataFrame(table))
+            record_ids=list(labels)
+            previous=st.session_state.get('history_chosen_id')
+            chosen = st.selectbox('Xem một lần phân tích',record_ids,
+                index=record_ids.index(previous) if previous in record_ids else 0,
+                format_func=lambda value: labels[value],key='history_record')
+            st.session_state['history_chosen_id']=chosen
             render_result(api_request(api_base, '/v1/analyses/' + chosen), key_prefix='history_' + chosen)
     except Exception as error:
         show_error(error)
@@ -408,7 +449,8 @@ if st.button('Phân tích và lưu' if api_base else 'Phân tích', type='primar
                 st.session_state.pop('pending', None)
             else:
                 with lock:
-                    result = score_input(detector, prepared['x'], method)
+                    result = score_input(detector, prepared['x'], method,scope='selected')
+                    result['input_sha256']=input_digest(prepared['x'])
                 result['input_metadata'] = prepared['metadata']
                 result['ground_truth'] = demo_ground_truth(state, prepared['x'], kind == 'demo')
                 result['demo_mode'] = kind == 'demo'

@@ -20,12 +20,12 @@ def test_dashboard_real_primary_bundles_and_details_do_not_rescore(monkeypatch):
     monkeypatch.delenv('XS_API_BASE_URL', raising=False)
     from streamlit.testing.v1 import AppTest
     from xsentinel.detection.detector import Detector
-    original = Detector.predict
+    original = Detector.predict_selected
     calls = []
-    def counted(self, x):
+    def counted(self, x, method):
         calls.append(self.schema.dataset)
-        return original(self, x)
-    monkeypatch.setattr(Detector, 'predict', counted)
+        return original(self, x, method)
+    monkeypatch.setattr(Detector, 'predict_selected', counted)
     app=AppTest.from_file('dashboard/app.py').run(timeout=45)
     assert not app.exception and not app.metric
     for dataset in ('EMBER2018','EMBER2024'):
@@ -42,7 +42,7 @@ def test_dashboard_real_primary_bundles_and_details_do_not_rescore(monkeypatch):
             app.toggle[0].set_value(True).run(timeout=45)
             app.toggle[1].set_value(True).run(timeout=45)
             assert not app.exception and len(calls)==before
-            assert len(app.dataframe)>=2
+            assert sum('xs-data-table' in item.value for item in app.markdown)>=2
     wrong=next(iter(primary_catalog('EMBER2018').values()))['full']
     app.checkbox(key='custom_enabled').set_value(True).run(timeout=45)
     app.text_input(key='custom_path').set_value(wrong).run(timeout=45)

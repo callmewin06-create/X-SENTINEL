@@ -6,6 +6,7 @@ import streamlit.components.v1 as components
 GITHUB = 'https://github.com/callmewin06-create/X-SENTINEL'
 
 LIGHT = (
+    '--xs-scheme:light;'
     '--xs-bg:#f8fafc;'
     '--xs-bg-ambient:radial-gradient(circle at 15% 10%, rgba(2, 132, 199, 0.05) 0%, transparent 40%), radial-gradient(circle at 85% 25%, rgba(99, 102, 241, 0.04) 0%, transparent 45%), #f8fafc;'
     '--xs-panel:rgba(255, 255, 255, 0.95);'
@@ -16,8 +17,10 @@ LIGHT = (
     '--xs-border-strong:#cbd5e1;'
     '--xs-soft:#f1f5f9;'
     '--xs-soft-hover:#e2e8f0;'
-    '--xs-accent:#0284c7;'
-    '--xs-accent-gradient:linear-gradient(135deg, #0284c7 0%, #2563eb 100%);'
+    '--xs-accent:#0369a1;'
+    '--xs-on-accent:#ffffff;--xs-purple:#7e22ce;--xs-cyan:#0e7490;'
+    '--xs-control-track:#64748b;--xs-control-thumb:#ffffff;'
+    '--xs-accent-gradient:linear-gradient(135deg, #0369a1 0%, #1d4ed8 100%);'
     '--xs-accent-glow:rgba(2, 132, 199, 0.2);'
     '--xs-malware:#e11d48;'
     '--xs-malware-bg:rgba(225, 29, 72, 0.06);'
@@ -36,6 +39,7 @@ LIGHT = (
 )
 
 DARK = (
+    '--xs-scheme:dark;'
     '--xs-bg:#080b11;'
     '--xs-bg-ambient:radial-gradient(circle at 15% 10%, rgba(14, 165, 233, 0.08) 0%, transparent 40%), radial-gradient(circle at 85% 25%, rgba(99, 102, 241, 0.07) 0%, transparent 45%), #080b11;'
     '--xs-panel:rgba(15, 23, 42, 0.75);'
@@ -47,7 +51,9 @@ DARK = (
     '--xs-soft:rgba(24, 33, 47, 0.65);'
     '--xs-soft-hover:rgba(33, 46, 65, 0.8);'
     '--xs-accent:#38bdf8;'
-    '--xs-accent-gradient:linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);'
+    '--xs-on-accent:#06101f;--xs-purple:#c084fc;--xs-cyan:#22d3ee;'
+    '--xs-control-track:#475569;--xs-control-thumb:#f8fafc;'
+    '--xs-accent-gradient:linear-gradient(135deg, #38bdf8 0%, #60a5fa 100%);'
     '--xs-accent-glow:rgba(56, 189, 248, 0.25);'
     '--xs-malware:#ff3366;'
     '--xs-malware-bg:rgba(255, 51, 102, 0.09);'
@@ -137,7 +143,7 @@ def controls(api_connected=False):
         f'<div class="xs-status-left">'
         f'{api_status_html}'
         f'<span class="xs-pill xs-pill-blue">🔒 Kiểm toán tĩnh (Zero-Execution)</span>'
-        f'<span class="xs-pill xs-pill-purple">⚡ LightGBM TreeSHAP &lt; 30ms</span>'
+        f'<span class="xs-pill xs-pill-purple">⚡ LightGBM TreeSHAP</span>'
         f'<span class="xs-pill xs-pill-cyan">🎯 3 Góc nhìn trực giao (Vs, Vb, Vm)</span>'
         f'</div>'
         f'<div class="xs-status-right">'
@@ -152,7 +158,7 @@ def controls(api_connected=False):
         with st.container(key='screen_recorder_panel', border=True):
             st.markdown('**🎬 Quay video màn hình để báo cáo / thuyết minh**')
             st.caption('Chọn tab hoặc cửa sổ cần quay. Video được lưu trực tiếp dưới dạng WebM qua trình duyệt. Nhớ dừng và tải video trước khi tải lại trang.')
-            components.html(RECORDER, height=145)
+            components.html(RECORDER.replace('<style>','<style>:root{'+base+'}'+automatic), height=145)
     return page
 
 
@@ -160,14 +166,18 @@ def render_verdict_card(title, subtitle, verdict_text, is_danger, score, thresho
     """Render a visual verdict card for Classification or Backdoor Alert."""
     theme_class = 'xs-verdict-danger' if is_danger else 'xs-verdict-safe'
     icon = '🚨' if is_danger else '🛡️'
-    tag_text = 'MỨC NGUY HIỂM CAO' if is_danger else 'TRẠNG THÁI AN TOÀN'
+    tag_text = 'CẦN XEM XÉT' if is_danger else 'KẾT QUẢ MÔ HÌNH'
     tag_class = 'xs-tag-danger' if is_danger else 'xs-tag-safe'
     
     # Progress gauge calculation
     pct = max(0.0, min(100.0, float(score) * 100))
-    threshold_pct = max(0.0, min(100.0, float(threshold) * 100))
-    delta = score - threshold
-    delta_sign = '+' if delta > 0 else ''
+    threshold_pct = max(0.0, min(100.0, float(threshold) * 100)) if threshold is not None else None
+    delta_text=f'{score-threshold:+.4f}' if threshold is not None else 'Chưa lưu ngưỡng'
+    threshold_text=f'{threshold:.4f}' if threshold is not None else 'Chưa lưu'
+    marker=(f'<div class="xs-gauge-marker" style="left:{threshold_pct:.2f}%;" title="Ngưỡng {threshold_text}"><div class="xs-marker-pointer"></div></div>'
+            if threshold is not None else '')
+    scale_marker=(f'<span style="left:{threshold_pct:.2f}%;position:absolute;transform:translateX(-50%);">τ = {threshold_text}</span>'
+                  if threshold is not None else '')
     
     html_card = f'''
     <div class="xs-verdict-box {theme_class}">
@@ -183,23 +193,21 @@ def render_verdict_card(title, subtitle, verdict_text, is_danger, score, thresho
                 <div class="xs-verdict-icon-wrap">{icon}</div>
                 <div class="xs-verdict-text-group">
                     <span class="xs-verdict-text">{escape(verdict_text)}</span>
-                    <span class="xs-verdict-delta">Độ lệch so với ngưỡng: <strong>{delta_sign}{delta:.4f}</strong></span>
+                    <span class="xs-verdict-delta">Độ lệch so với ngưỡng: <strong>{delta_text}</strong></span>
                 </div>
             </div>
             <div class="xs-gauge-wrap">
                 <div class="xs-gauge-labels">
                     <span class="xs-gauge-score-label">{escape(score_text)}: <strong>{score:.4f}</strong></span>
-                    <span class="xs-gauge-thresh-label">Ngưỡng &tau;: <strong>{threshold:.4f}</strong></span>
+                    <span class="xs-gauge-thresh-label">Ngưỡng &tau;: <strong>{threshold_text}</strong></span>
                 </div>
                 <div class="xs-gauge-track">
                     <div class="xs-gauge-fill" style="width: {pct:.2f}%;"></div>
-                    <div class="xs-gauge-marker" style="left: {threshold_pct:.2f}%;" title="Ngưỡng quyết định &tau; = {threshold:.4f}">
-                        <div class="xs-marker-pointer"></div>
-                    </div>
+                    {marker}
                 </div>
                 <div class="xs-gauge-scale">
                     <span>0.00</span>
-                    <span style="left: {threshold_pct:.2f}%; position: absolute; transform: translateX(-50%); font-weight:700;">&tau; = {threshold:.4f}</span>
+                    {scale_marker}
                     <span>1.00</span>
                 </div>
             </div>
@@ -221,11 +229,6 @@ def contribution_chart(contributions, names):
         'behavioral': 'linear-gradient(90deg, #8b5cf6 0%, #c084fc 100%)',
         'metadata': 'linear-gradient(90deg, #059669 0%, #34d399 100%)',
     }
-    view_icons = {
-        'structural': '📐',
-        'behavioral': '⚙️',
-        'metadata': '🔤',
-    }
     view_codes = {
         'structural': 'V_S · Cấu trúc PE',
         'behavioral': 'V_B · Hành vi API',
@@ -236,14 +239,12 @@ def contribution_chart(contributions, names):
         value = 100 * float(fraction)
         width = max(0.0, min(100.0, value))
         grad = view_gradients.get(key, 'var(--xs-accent-gradient)')
-        icon = view_icons.get(key, '📊')
         label = names.get(key, key)
         code = view_codes.get(key, key)
         
         rows.append(
             f'<div class="xs-bar-row">'
             f'<div class="xs-bar-label">'
-            f'<span class="xs-view-icon">{icon}</span>'
             f'<div class="xs-view-text-group">'
             f'<span class="xs-view-name">{escape(label)}</span>'
             f'<span class="xs-view-code">{escape(code)}</span>'
@@ -267,9 +268,8 @@ def contribution_chart(contributions, names):
         f'</div>'
         f'<div class="xs-chart-body">{"".join(rows)}</div>'
         f'<div class="xs-chart-foot">'
-        f'<strong>📌 Định lý Module M3 (View-Mass Dominance):</strong> '
-        f'Khi kẻ tấn công sử dụng kỹ thuật phân tán (Spread Trigger $T_{{\\text{{spread}}}}$), các thay đổi trải rộng trên nhiều section/header sẽ làm '
-        f'góc nhìn Cấu trúc ($V_S$) thâu tóm phần lớn attribution (&gt; 90%), làm lộ dấu hiệu backdoor ngay cả khi hành vi API hoàn toàn lành tính.'
+        f'<strong>Cách đọc M3:</strong> lấy tỷ trọng SHAP tuyệt đối lớn nhất trong ba nhóm. '
+        f'Tỷ trọng cao cho biết nhóm có ảnh hưởng lớn; riêng biểu đồ này chưa chứng minh file mang trigger hay backdoor.'
         f'</div>'
         f'</div>',
         unsafe_allow_html=True
@@ -512,8 +512,8 @@ h1, h2, h3, h4, h5, h6, .xs-brand-title, .xs-verdict-title, .xs-chart-title {
     font-weight: 600;
 }
 .xs-pill-blue {background: rgba(2, 132, 199, 0.12); color: var(--xs-accent); border: 1px solid rgba(2, 132, 199, 0.3);}
-.xs-pill-purple {background: rgba(168, 85, 247, 0.12); color: #a855f7; border: 1px solid rgba(168, 85, 247, 0.3);}
-.xs-pill-cyan {background: rgba(6, 182, 212, 0.12); color: #06b6d4; border: 1px solid rgba(6, 182, 212, 0.3);}
+.xs-pill-purple {background: rgba(168, 85, 247, 0.12); color: var(--xs-purple); border: 1px solid rgba(168, 85, 247, 0.3);}
+.xs-pill-cyan {background: rgba(6, 182, 212, 0.12); color: var(--xs-cyan); border: 1px solid rgba(6, 182, 212, 0.3);}
 
 /* Dual Forensic Verdict Cards */
 .xs-verdict-box {
@@ -871,7 +871,7 @@ h1, h2, h3, h4, h5, h6, .xs-brand-title, .xs-verdict-title, .xs-chart-title {
     align-items: center;
     justify-content: center;
     background: var(--xs-accent-gradient);
-    color: #ffffff;
+    color: var(--xs-on-accent);
     font-size: 11px;
     font-weight: 900;
     padding: 3px 9px;
@@ -1012,14 +1012,14 @@ h1, h2, h3, h4, h5, h6, .xs-brand-title, .xs-verdict-title, .xs-chart-title {
 }
 
 /* Form Controls & Inputs */
-[data-baseweb="select"]>div, [data-baseweb="input"], input, textarea {
+[data-baseweb="select"]>div, [data-baseweb="input"], input:not([type="checkbox"]):not([type="radio"]), textarea {
     background: var(--xs-panel) !important;
     color: var(--xs-text) !important;
     border-color: var(--xs-border) !important;
     border-radius: 10px !important;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
-[data-baseweb="select"]>div:hover, [data-baseweb="input"]:hover, input:hover {
+[data-baseweb="select"]>div:hover, [data-baseweb="input"]:hover, input:not([type="checkbox"]):not([type="radio"]):hover {
     border-color: var(--xs-border-strong) !important;
 }
 [data-testid="stFileUploaderDropzone"] {
@@ -1038,7 +1038,7 @@ h1, h2, h3, h4, h5, h6, .xs-brand-title, .xs-verdict-title, .xs-chart-title {
 button[kind="primary"] {
     background: var(--xs-accent-gradient) !important;
     border: none !important;
-    color: #ffffff !important;
+    color: var(--xs-on-accent) !important;
     font-weight: 800 !important;
     letter-spacing: 0.03em !important;
     border-radius: 12px !important;
@@ -1073,7 +1073,86 @@ button[kind="secondary"]:hover {
 }
 '''
 
-RECORDER = '''<!doctype html><html lang="vi"><meta charset="utf-8"><style>body{font:13px sans-serif;color:#172b4d;background:#fff;margin:4px}button,a{padding:8px 12px;margin:3px;border-radius:6px;border:1px solid #cbd5e1;cursor:pointer;font-weight:600}#start{background:#0284c7;color:#fff;border-color:#0284c7}#stop{background:#f1f5f9;color:#475569}#save{background:#059669;color:#fff;text-decoration:none;display:inline-block}#status{margin:8px;font-size:12.5px;color:#64748b;line-height:1.4}</style>
+CSS += r'''
+/* App and native components share the selected palette, including OS mode. */
+html {color-scheme:var(--xs-scheme);}
+/* BaseWeb paints these controls itself; the OS/Streamlit theme can differ
+   from our chosen palette. Style the visible track/dot, not hidden inputs. */
+[data-baseweb="checkbox"]:has(>input[type="checkbox"])>div:first-child {
+    background:var(--xs-control-track) !important;
+    box-shadow:inset 0 0 0 1px var(--xs-control-track);
+}
+[data-baseweb="checkbox"]:has(>input[type="checkbox"])>div:first-child>div {
+    background:var(--xs-control-thumb) !important;
+    box-shadow:0 0 0 1px var(--xs-control-track);
+}
+[data-baseweb="checkbox"]:has(>input:checked)>div:first-child {
+    background:var(--xs-accent) !important;
+    box-shadow:inset 0 0 0 1px var(--xs-accent);
+}
+[data-baseweb="checkbox"]:has(>input:checked)>div:first-child>div {
+    background:var(--xs-on-accent) !important;
+    box-shadow:0 0 0 1px var(--xs-accent);
+}
+[data-baseweb="radio"]>div:first-child {
+    background:var(--xs-card) !important;
+    border:2px solid var(--xs-control-track) !important;
+}
+[data-baseweb="radio"]>div:first-child>div {background:transparent !important;}
+[data-baseweb="radio"]:has(>input:checked)>div:first-child {
+    background:var(--xs-accent) !important;
+    border-color:var(--xs-accent) !important;
+}
+[data-baseweb="radio"]:has(>input:checked)>div:first-child>div {
+    background:var(--xs-on-accent) !important;
+}
+[data-baseweb="checkbox"]:has(>input:focus-visible)>:first-child,
+[data-baseweb="radio"]:has(>input:focus-visible)>:first-child {
+    outline:2px solid var(--xs-accent);outline-offset:3px;
+}
+[data-testid="stMarkdownContainer"] p,
+[data-testid="stMarkdownContainer"] li,
+[data-testid="stMarkdownContainer"] h1,
+[data-testid="stMarkdownContainer"] h2,
+[data-testid="stMarkdownContainer"] h3,
+[data-testid="stWidgetLabel"] p,
+[data-testid="stCheckbox"] label,
+[data-testid="stRadio"] label,
+[data-testid="stExpander"] summary,
+[data-testid="stAlertContentInfo"], [data-testid="stAlertContentWarning"],
+[data-testid="stAlertContentError"], [data-testid="stAlertContentSuccess"] {
+    color:var(--xs-text) !important;
+}
+[data-testid="stCaptionContainer"] p {color:var(--xs-muted) !important;}
+[data-baseweb="select"] span, [data-baseweb="select"] input,
+[data-baseweb="popover"], [data-baseweb="menu"], [role="listbox"], [role="option"] {
+    color:var(--xs-text) !important;
+    background-color:var(--xs-card) !important;
+}
+[role="option"]:hover, [aria-selected="true"][role="option"] {background:var(--xs-soft-hover) !important;}
+[data-testid="stExpander"], [data-testid="stCode"], [data-testid="stCode"] pre,
+[data-testid="stCode"] code, [data-testid="stJson"] {
+    color:var(--xs-text) !important;
+    background:var(--xs-soft) !important;
+    border-color:var(--xs-border) !important;
+}
+[data-testid="stCode"] pre, [data-testid="stCode"] code {overflow-wrap:anywhere !important;white-space:pre-wrap !important;}
+input::placeholder, textarea::placeholder {color:var(--xs-muted) !important;opacity:1;}
+button[kind="secondary"] p, button[kind="secondary"] span {color:var(--xs-text) !important;}
+button[kind="primary"] p, button[kind="primary"] span {color:var(--xs-on-accent) !important;}
+[data-testid="stMarkdownContainer"] a {color:var(--xs-accent) !important;}
+[data-testid="stCode"] button {color:var(--xs-text) !important;}
+.xs-meta-chip, .xs-view-text-group {min-width:0;}
+.xs-meta-chip code {overflow-wrap:anywhere;word-break:break-all;}
+.xs-data-table {overflow:auto;max-height:580px;border:1px solid var(--xs-border);border-radius:10px;margin:10px 0 18px;background:var(--xs-panel);}
+.xs-data-table table {border-collapse:collapse;width:100%;font-size:13px;color:var(--xs-text);}
+.xs-data-table th {background:var(--xs-soft);color:var(--xs-text);position:sticky;top:0;text-align:left;}
+.xs-data-table th,.xs-data-table td {padding:10px 12px;border-bottom:1px solid var(--xs-border);vertical-align:top;overflow-wrap:anywhere;}
+.xs-data-table td {max-width:340px;min-width:90px;}
+.xs-data-table tr:hover td {background:var(--xs-soft-hover);}
+'''
+
+RECORDER = '''<!doctype html><html lang="vi"><meta charset="utf-8"><style>body{font:13px sans-serif;color:var(--xs-text);background:var(--xs-bg);margin:4px}button,a{padding:8px 12px;margin:3px;border-radius:6px;border:1px solid var(--xs-border);cursor:pointer;font-weight:600}#start{background:#0284c7;color:#fff;border-color:#0284c7}#stop{background:var(--xs-soft);color:var(--xs-text)}#save{background:#059669;color:#fff;text-decoration:none;display:inline-block}#status{margin:8px;font-size:12.5px;color:var(--xs-muted);line-height:1.4}</style>
 <button id="start">▶ Bắt đầu quay</button><button id="stop" disabled>⏹ Dừng quay</button><div id="status">Sẵn sàng quay màn hình.</div><a id="save" hidden>💾 Tải video WebM</a>
 <script>
 let recorder,stream,url;const start=document.querySelector('#start'),stop=document.querySelector('#stop'),status=document.querySelector('#status'),save=document.querySelector('#save');

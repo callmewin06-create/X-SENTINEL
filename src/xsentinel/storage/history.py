@@ -38,7 +38,7 @@ def analyze_and_store(engine, registry, identity, features, method, request_id, 
             return old_result
         started = datetime.now(timezone.utc)
         with lock:
-            result = score_input(detector,x,method)
+            result = score_input(detector,x,method,scope='selected')
         result['ground_truth'] = demo_ground_truth(entry['state'], x, demo_mode)
         job_id = uuid.uuid4()
         result.update({'request_id':request_id,'analysis_id':str(job_id),'bundle_id':identity,

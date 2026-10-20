@@ -20,6 +20,8 @@ class Detector:
         if protocol==PRIMARY_PROTOCOL and self.schema.version==SCHEMA_VERSION:
             raise ValueError('Primary detector requires a versioned primary schema')
         self.schema.check_model(model)
+        self._view_indices=self.schema.views
+        for indices in self._view_indices.values(): indices.setflags(write=False)
         self.model=model; self.reference=self.schema.matrix(reference).copy(); self.views=dict(view_models or {})
         if not len(self.reference): raise ValueError('Empty benign reference')
         if self.views and protocol==PRIMARY_PROTOCOL and set(self.views)!=set(self.schema.views):
@@ -37,36 +39,51 @@ class Detector:
                             if self.enable_m5 else (np.array([]),np.array([])))
         self.rank_reference=None; self.thresholds={}
 
-    def components(self,x,include_strip=True):
+    def components(self,x,include_strip=True,view_names=None,needed_methods=None):
+        profile={}; started=time.perf_counter()
         x=self.schema.matrix(x); p=np.asarray(self.model.predict(x,num_threads=4))
+        profile['classifier_ms']=(time.perf_counter()-started)*1000
         if p.shape!=(len(x),) or not np.isfinite(p).all() or np.any((p<0)|(p>1)):
             raise ValueError('Main model must return binary malware probabilities')
-        phi=contributions(self.model,x,schema=self.schema); total=np.abs(phi).sum(axis=1)
-        views=self.schema.views
-        mass={v:np.abs(phi[:,idx]).sum(axis=1) for v,idx in views.items()}
-        frac={v:np.divide(a,total,out=np.zeros(len(x)),where=total>1e-9) for v,a in mass.items()}
-        g=phi[:,views['behavioral']].sum(axis=1)
-        m4r=(1-p)*np.divide(np.maximum(g,0),total,out=np.zeros(len(x)),where=total>1e-9)
-        rare=(x[:,self.candidates]<self.low)|(x[:,self.candidates]>self.high)
-        negative=np.maximum(-phi,0); benign_mass=negative.sum(axis=1)
-        rare_mass=(negative[:,self.candidates]*rare).sum(axis=1)
-        share=np.divide(rare_mass,benign_mass,out=np.zeros(len(x)),where=benign_mass>1e-9)
+        started=time.perf_counter()
+        phi=contributions(self.model,x,schema=self.schema)
+        profile['shap_ms']=(time.perf_counter()-started)*1000
+        views=self._view_indices
+        if self.protocol!=PRIMARY_PROTOCOL:
+            total=np.abs(phi).sum(axis=1)
+            mass={v:np.abs(phi[:,idx]).sum(axis=1) for v,idx in views.items()}
+            frac={v:np.divide(a,total,out=np.zeros(len(x)),where=total>1e-9) for v,a in mass.items()}
+            g=phi[:,views['behavioral']].sum(axis=1)
+            m4r=(1-p)*np.divide(np.maximum(g,0),total,out=np.zeros(len(x)),where=total>1e-9)
+        share=np.zeros(len(x))
+        if self.enable_m5:
+            rare=(x[:,self.candidates]<self.low)|(x[:,self.candidates]>self.high)
+            negative=np.maximum(-phi,0); benign_mass=negative.sum(axis=1)
+            rare_mass=(negative[:,self.candidates]*rare).sum(axis=1)
+            share=np.divide(rare_mass,benign_mass,out=np.zeros(len(x)),where=benign_mass>1e-9)
         m5=np.where((p<self.config['malware_threshold'])&(share>0.8),(1-p)*share,0)
-        view_p={v:np.asarray(m.predict(x[:,views[v]],num_threads=4)) for v,m in self.views.items()}
+        started=time.perf_counter()
+        view_p={v:np.asarray(m.predict(x[:,views[v]],num_threads=4)) for v,m in self.views.items()
+                if view_names is None or v in view_names}
+        profile['view_models_ms']=(time.perf_counter()-started)*1000
         for pv in view_p.values():
             if pv.shape!=p.shape or not np.isfinite(pv).all() or np.any((pv<0)|(pv>1)):
                 raise ValueError('View model must return binary malware probabilities')
         if self.protocol==PRIMARY_PROTOCOL:
-            scores,frac,net=primary_components(phi,p,self.schema,view_p.get('behavioral'))
+            scores,frac,net=primary_components(phi,p,self.schema,view_p.get('behavioral'),view_indices=views,methods=needed_methods)
         else:
             scores={'TADR':tadr(phi),'M3':np.max(np.stack(list(frac.values())),axis=0),'M4_reduced':m4r}
             if 'behavioral' in view_p: scores['M4_full']=(1-p)*view_p['behavioral']
+            net={v:phi[:,idx].sum(axis=1) for v,idx in views.items()}
         if self.enable_m5: scores['M5_limited']=m5
+        started=time.perf_counter()
         if include_strip: scores['STRIP']=strip(self.model,x,self.reference,self.config['strip_n'],self.config['strip_alpha'],self.config['seed'],schema=self.schema)
-        details={'malware_probability':p,'view_contributions':frac,'view_signed_shap':{v:phi[:,idx].sum(axis=1) for v,idx in views.items()},
+        profile['strip_ms']=(time.perf_counter()-started)*1000 if include_strip else None
+        details={'malware_probability':p,'view_contributions':frac,'view_signed_shap':net,
                  'view_predictions':view_p,'m5_rare_benign_share':share,'m5_sensitive_branch':'unsupported_group_only',
                  'top_features':np.argsort(-np.abs(phi),axis=1)[:,:10], 'phi':phi,
-                 'dataset':self.schema.dataset,'schema':self.schema.version,'protocol':self.protocol,'m5_enabled':self.enable_m5}
+                 'dataset':self.schema.dataset,'schema':self.schema.version,'protocol':self.protocol,'m5_enabled':self.enable_m5,
+                 'phase_timings_ms':profile}
         return scores,details
 
     def scores(self,x):
@@ -107,6 +124,30 @@ class Detector:
         start=time.perf_counter(); scores,details=self.scores(x)
         flags={k:v>self.thresholds[k] for k,v in scores.items()}
         return scores,flags,details,(time.perf_counter()-start)*1000
+
+    def predict_selected(self,x,method):
+        """Exact selected primary method; suite remains available through predict()."""
+        if method not in self.thresholds: raise ValueError('Unknown calibrated method')
+        if self.protocol!=PRIMARY_PROTOCOL or self.enable_m5:
+            return self.predict(x)
+        start=time.perf_counter()
+        m3='M3_view_mass'
+        m4={'X_primary_reduced':'M4_shap_behavioral_conflict',
+            'X_primary_full':'M4_prob_gap'}.get(method)
+        needed={m3,m4} if m4 else {method}
+        if 'M4_prob_gap' in needed and 'behavioral' not in self.views:
+            raise ValueError('Selected method requires the clean Behavioral model')
+        scores,details=self.components(x,include_strip=method=='STRIP',
+            view_names={'behavioral'} if 'M4_prob_gap' in needed else set(),needed_methods=needed)
+        scores={k:v for k,v in scores.items() if k in needed}
+        if m4:
+            if self.rank_reference is None: raise RuntimeError('Detector not calibrated')
+            scores[method]=np.mean([rank(self.rank_reference[k],scores[k]) for k in (m3,m4)],axis=0)
+        flags={k:v>self.thresholds[k] for k,v in scores.items()}
+        elapsed=(time.perf_counter()-start)*1000
+        profile=details['phase_timings_ms']
+        profile['other_core_ms']=max(0.0,elapsed-sum(value for value in profile.values() if value is not None))
+        return scores,flags,details,elapsed
 
     def save(self,directory,main_path,view_paths=None):
         if not self.thresholds: raise RuntimeError('Cannot export uncalibrated detector')

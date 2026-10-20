@@ -7,13 +7,15 @@ def input_digest(x):
     return hashlib.sha256(np.asarray(x,dtype='<f4').tobytes()).hexdigest()
 
 
-def score_input(detector, x, method):
+def score_input(detector, x, method, scope='suite'):
     x = detector.schema.matrix(x)
     if len(x)!=1:
         raise ValueError('Exactly one vector is required')
     if method not in detector.thresholds:
         raise ValueError('Unknown method for this bundle')
-    scores,flags,details,elapsed = detector.predict(x)
+    if scope not in ('selected','suite'): raise ValueError('Unknown computation scope')
+    selected=scope=='selected' and detector.protocol=='xsentinel-primary-v2' and not detector.enable_m5
+    scores,flags,details,elapsed = (detector.predict_selected(x,method) if selected else detector.predict(x))
     p = float(details['malware_probability'][0])
     return {
         'dataset':detector.schema.dataset, 'schema':detector.schema.version,
@@ -24,6 +26,10 @@ def score_input(detector, x, method):
         'main_classification':'MALWARE' if p>=detector.config['malware_threshold'] else 'BENIGN',
         'backdoor_alert':bool(flags[method][0]),
         'decision':'alert' if flags[method][0] else 'pass', 'elapsed_ms':elapsed,
+        'computation_scope':'selected' if selected else 'suite',
+        'computed_methods':list(scores),
+        'not_computed_methods':[k for k in detector.thresholds if k not in scores],
+        'phase_timings_ms':details.get('phase_timings_ms',{}),
         'scores':[{'Method':k,'Score':float(v[0]),'Threshold':float(detector.thresholds[k]),
                    'Flagged':bool(flags[k][0])} for k,v in scores.items()],
         'view_contributions':{k:float(v[0]) for k,v in details['view_contributions'].items()},

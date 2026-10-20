@@ -1,5 +1,13 @@
 # X-SENTINEL — Bàn giao chat mới, cập nhật 06/10/2026
 
+**Triển khai theo phê duyệt ngày 20/10/2026:** đọc [bàn giao mới](IMPLEMENTATION_2026_10_20.md). Đã sửa UI-11 đến UI-14, thêm đường tính chọn method chính xác và kiểm tra 54 cấu hình fusion trên Development cũ rồi tập source IDs mới. Giữ W50 làm primary vì W25 có tradeoff; không đổi bundle/report cũ. BODMAS chờ bạn phụ trách, auth tạm hoãn. 88 kiểm tra không thuộc BODMAS đạt; đã xem trình duyệt Sáng/Tối, 390 px và tải PDF thật. Docker/PostgreSQL thật chưa được chạy lại do daemon chưa hoạt động. Bằng chứng mới tại `outputs/implementation_2026_10_20/` và `outputs/fusion_binary_latency_2026_10_20/`.
+
+**Quyết định bổ sung ngày 19/10/2026:** đọc [năm lựa chọn đã được người dùng chốt](plans/QUYET_DINH_5_DIEM_2026_10_19.md) cùng file này. Cho phép khảo sát Cross/fusion M3-M4 có giới hạn, bổ sung BODMAS tĩnh và tối ưu latency A+B giữ nguyên phép tính; xác thực tạm hoãn, tiếp tục local/shared history. Reduced/Full vẫn là trọng tâm; Shadow chỉ là đối chứng có thêm tài nguyên. [Bản thảo chờ chốt](plans/CAC_DIEM_CHO_CHOT_2026_10_19.md) được giữ để truy lịch sử. Đây là phê duyệt hướng công việc, không phải bằng chứng đã triển khai hay đã có kết quả mới; giữ artifact/report primary khi kiểm tra hiện trạng.
+
+**Bàn giao kế hoạch và Kali VM (chuẩn bị 19–20/10/2026):** [kế hoạch triển khai/demo](plans/KE_HOACH_TRIEN_KHAI_VA_DEMO_2026_10_19.md), [hướng dẫn BODMAS trên Kali](HUONG_DAN_BODMAS_KALI_2026_10_19.md), bản Word và gói công cụ tại `output/bodmas_demo_2026_10_19/`. Công cụ mới `scripts/check_bodmas_static.py` đọc mẫu tĩnh, lưu manifest/CSV/JSON; không thực thi mẫu, không ghi database, không đổi model/ngưỡng. Xem `VALIDATION.md` trong thư mục bàn giao cho kiểm tra thực tế; chưa nhận/chạy BODMAS, chưa nghiệm thu trên Kali VM, chưa thực hiện thí nghiệm fusion hoặc tối ưu latency theo kế hoạch.
+
+**Bổ sung UI ngày 20/10/2026:** [UI-11 đến UI-14](UI_FOLLOWUP_2026_10_20.md) gồm đồng bộ màu chữ Sáng/Tối, PDF lịch sử, SHA-256 đầy đủ tại Bước 3 và bỏ biểu tượng trước ba view. Đã gộp vào kế hoạch triển khai/demo; trạng thái là đã ghi yêu cầu, chưa sửa hoặc kiểm thử UI. PDF từng bản ghi đã có trong code; phần mới gồm thao tác dễ thấy và PDF tổng hợp danh sách đang hiển thị, ghi đúng giới hạn/phạm vi dữ liệu.
+
 ## 0. Đọc phần này trước
 
 Workspace: `D:\.f tư bản ko cho t ngủ\IAM302t\Project`. Windows/PowerShell; ngày theo Asia/Bangkok. Người dùng muốn chuyển sang chat mới để triển khai kế hoạch sau chuỗi review/chốt từng vấn đề. Người dùng cần được giải thích từng bước bằng tiếng Việt dễ hiểu; báo cáo/dashboard/slide dự kiến tiếng Anh, hướng dẫn thao tác tiếng Việt.
