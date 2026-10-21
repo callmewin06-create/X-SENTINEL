@@ -91,36 +91,39 @@ def about():
 
 def controls(api_connected=False):
     with st.container(key='app_header'):
-        with st.container(key='nav_menu'):
-            with st.popover('Điều hướng', icon=':material/menu:', help='Mở menu điều hướng'):
-                with st.container(key='nav_items'):
-                    st.markdown('<div class="xs-menu-title">CHUYỂN PHÂN KHU</div>', unsafe_allow_html=True)
-                    page = st.radio('Điều hướng', ['Phân tích', 'Lịch sử', 'Nghiên cứu'], key='page', label_visibility='collapsed')
+        col_nav, col_brand, col_set = st.columns([1, 12, 1], vertical_alignment='center')
+        with col_nav:
+            with st.container(key='nav_menu'):
+                with st.popover('Điều hướng', icon=':material/menu:', help='Mở menu điều hướng'):
+                    with st.container(key='nav_items'):
+                        st.markdown('<div class="xs-menu-title">CHUYỂN PHÂN KHU</div>', unsafe_allow_html=True)
+                        page = st.radio('Điều hướng', ['Phân tích', 'Lịch sử', 'Nghiên cứu'], key='page', label_visibility='collapsed')
         
-        # Center Brand
-        st.markdown(
-            '<div class="xs-brand" role="banner" aria-label="X-SENTINEL">'
-            '<div class="xs-brand-wrapper">'
-            '<span class="xs-brand-shield">🛡️</span>'
-            '<div class="xs-brand-text-group">'
-            '<span class="xs-brand-title">X-SENTINEL</span>'
-            '<span class="xs-brand-badge">SOC APEX v2.4</span>'
-            '</div>'
-            '</div>'
-            '<div class="xs-brand-sub">HỆ THỐNG PHÁT HIỆN CỬA HẬU MÃ ĐỘC PE BẰNG TÍNH NHẤT QUÁN NGỮ NGHĨA ĐA GÓC NHÌN</div>'
-            '</div>',
-            unsafe_allow_html=True
-        )
+        with col_brand:
+            st.markdown(
+                '<div class="xs-brand" role="banner" aria-label="X-SENTINEL">'
+                '<div class="xs-brand-wrapper">'
+                '<span class="xs-brand-shield">🛡️</span>'
+                '<div class="xs-brand-text-group">'
+                '<span class="xs-brand-title">X-SENTINEL</span>'
+                '<span class="xs-brand-badge">SOC APEX v2.4</span>'
+                '</div>'
+                '</div>'
+                '<div class="xs-brand-sub">HỆ THỐNG PHÁT HIỆN CỬA HẬU MÃ ĐỘC PE BẰNG TÍNH NHẤT QUÁN NGỮ NGHĨA ĐA GÓC NHÌN</div>'
+                '</div>',
+                unsafe_allow_html=True
+            )
 
-        with st.container(key='settings_menu'):
-            with st.popover('Cài đặt', icon=':material/settings:', help='Tùy chỉnh hệ thống'):
-                st.markdown('<div class="xs-menu-title">TÙY CHỈNH GIAO DIỆN</div>', unsafe_allow_html=True)
-                choice = st.selectbox('Chủ đề hiển thị', ['Theo hệ thống', 'Sáng', 'Tối'], key='appearance')
-                st.button('Tải lại giao diện', help='Làm mới phần hiển thị, giữ nguyên kết quả phân tích trong phiên.', key='refresh_app')
-                if st.button('Giới thiệu đề tài', key='about_app'):
-                    about()
-                st.divider()
-                st.checkbox('Bảng quay video màn hình', key='record_screen')
+        with col_set:
+            with st.container(key='settings_menu'):
+                with st.popover('Cài đặt', icon=':material/settings:', help='Tùy chỉnh hệ thống'):
+                    st.markdown('<div class="xs-menu-title">TÙY CHỈNH GIAO DIỆN</div>', unsafe_allow_html=True)
+                    choice = st.selectbox('Chủ đề hiển thị', ['Theo hệ thống', 'Sáng', 'Tối'], key='appearance')
+                    st.button('Tải lại giao diện', help='Làm mới phần hiển thị, giữ nguyên kết quả phân tích trong phiên.', key='refresh_app')
+                    if st.button('Giới thiệu đề tài', key='about_app'):
+                        about()
+                    st.divider()
+                    st.checkbox('Bảng quay video màn hình', key='record_screen')
 
     base = DARK if choice == 'Tối' else LIGHT
     automatic = f'@media(prefers-color-scheme:dark){{:root{{{DARK}}}}}' if choice == 'Theo hệ thống' else ''
@@ -311,7 +314,8 @@ h1, h2, h3, h4, h5, h6, .xs-brand-title, .xs-verdict-title, .xs-chart-title {
     top: 0; left: 0; right: 0;
     width: 100% !important; max-width: none !important;
     height: 78px; min-height: 78px;
-    padding: 10px 80px !important;
+    padding: 0 16px !important;
+    box-sizing: border-box !important;
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
@@ -325,65 +329,70 @@ h1, h2, h3, h4, h5, h6, .xs-brand-title, .xs-verdict-title, .xs-chart-title {
     box-shadow: var(--xs-shadow);
 }
 
-/* 2 buttons at the far left and far right edges */
-.st-key-nav_menu, .st-key-settings_menu {
-    position: absolute !important;
-    top: 15px !important;
-    width: 48px !important;
-    height: 48px !important;
-    min-width: 48px !important;
-    max-width: 48px !important;
-    min-height: 48px !important;
-    max-height: 48px !important;
-    z-index: 999992 !important;
+.st-key-app_header > [data-testid="stHorizontalBlock"] {
+    display: grid !important;
+    grid-template-columns: 44px minmax(0, 1fr) 44px !important;
+    width: 100% !important;
+    max-width: none !important;
     margin: 0 !important;
-    padding: 0 !important;
+    align-items: center !important;
+    gap: 12px !important;
+}
+
+.st-key-app_header > [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-}
-.st-key-nav_menu {
-    left: 24px !important;
-    right: auto !important;
-}
-.st-key-settings_menu {
-    right: 24px !important;
-    left: auto !important;
+    padding: 0 !important;
+    min-width: 0 !important;
+    width: 100% !important;
 }
 
-/* Ensure inner popover wrappers have exact 48x48 size */
-.st-key-nav_menu > div,
-.st-key-settings_menu > div,
+.st-key-app_header > [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:first-child {
+    justify-content: flex-start !important;
+}
+
+.st-key-app_header > [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:nth-child(2) {
+    justify-content: center !important;
+}
+
+.st-key-app_header > [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:last-child {
+    justify-content: flex-end !important;
+}
+
+.st-key-nav_menu, .st-key-settings_menu {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
 .st-key-nav_menu [data-testid="stPopover"],
 .st-key-settings_menu [data-testid="stPopover"],
 .st-key-nav_menu [data-testid="stPopoverButton"],
 .st-key-settings_menu [data-testid="stPopoverButton"] {
-    width: 48px !important;
-    height: 48px !important;
-    min-width: 48px !important;
-    min-height: 48px !important;
-    max-width: 48px !important;
-    max-height: 48px !important;
+    width: 44px !important;
+    height: 44px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
     margin: 0 !important;
     padding: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
 }
 
-/* Force the button element to 48x48 square with ZERO padding and ZERO gap */
-.st-key-nav_menu button,
-.st-key-settings_menu button,
-.st-key-nav_menu [data-testid^="baseButton"],
-.st-key-settings_menu [data-testid^="baseButton"],
-.st-key-nav_menu [data-testid*="Button"],
-.st-key-settings_menu [data-testid*="Button"] {
-    width: 48px !important;
-    height: 48px !important;
-    min-width: 48px !important;
-    min-height: 48px !important;
-    max-width: 48px !important;
-    max-height: 48px !important;
+.st-key-nav_menu [data-testid="stPopoverButton"],
+.st-key-settings_menu [data-testid="stPopoverButton"] {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    max-width: 44px !important;
+    max-height: 44px !important;
     padding: 0 !important;
     margin: 0 !important;
     display: flex !important;
@@ -399,66 +408,59 @@ h1, h2, h3, h4, h5, h6, .xs-brand-title, .xs-verdict-title, .xs-chart-title {
     box-sizing: border-box !important;
     line-height: 1 !important;
     overflow: hidden !important;
-    position: relative !important;
 }
-
-.st-key-nav_menu button:hover,
-.st-key-settings_menu button:hover,
-.st-key-nav_menu [data-testid^="baseButton"]:hover,
-.st-key-settings_menu [data-testid^="baseButton"]:hover {
-    border-color: var(--xs-accent) !important;
+.st-key-nav_menu [data-testid="stPopoverButton"]:hover,
+.st-key-settings_menu [data-testid="stPopoverButton"]:hover {
+    border-color: var(--xs-accent);
     background: var(--xs-soft-hover) !important;
-    box-shadow: 0 0 16px var(--xs-accent-glow) !important;
-    transform: translateY(-1px) !important;
+    box-shadow: 0 0 16px var(--xs-accent-glow);
+    transform: translateY(-1px);
 }
 
-/* Completely remove/hide any label text or chevron SVG from popover button */
-.st-key-nav_menu button [data-testid="stMarkdownContainer"],
-.st-key-settings_menu button [data-testid="stMarkdownContainer"],
-.st-key-nav_menu button p,
-.st-key-settings_menu button p,
-.st-key-nav_menu button svg,
-.st-key-settings_menu button svg,
-.st-key-nav_menu button div:has(svg),
-.st-key-settings_menu button div:has(svg) {
-    display: none !important;
-    width: 0 !important;
-    height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
+.st-key-nav_menu [data-testid="stPopoverButton"] > [data-testid="stMarkdownContainer"],
+.st-key-settings_menu [data-testid="stPopoverButton"] > [data-testid="stMarkdownContainer"] {
+    /* Preserve the Vietnamese accessible name without reserving label space. */
     position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    margin: -1px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    clip-path: inset(50%) !important;
+    white-space: nowrap !important;
 }
 
-/* Center all child spans (the icon wrapper and the icon glyph) */
-.st-key-nav_menu button span,
-.st-key-settings_menu button span {
+.st-key-nav_menu [data-testid="stPopoverButton"] > span:has([data-testid="stIconMaterial"]),
+.st-key-settings_menu [data-testid="stPopoverButton"] > span:has([data-testid="stIconMaterial"]) {
+    /* Streamlit's icon wrapper otherwise retains an 8px right margin. */
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    margin: 0 auto !important;
+    flex: 0 0 22px !important;
+    width: 22px !important;
+    height: 22px !important;
+    margin: 0 !important;
     padding: 0 !important;
-    width: 24px !important;
-    height: 24px !important;
-    line-height: 24px !important;
+}
+
+.st-key-nav_menu [data-testid="stPopoverButton"] [data-testid="stIconMaterial"],
+.st-key-settings_menu [data-testid="stPopoverButton"] [data-testid="stIconMaterial"] {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 22px !important;
+    height: 22px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 22px !important;
+    line-height: 22px !important;
     text-align: center !important;
     vertical-align: middle !important;
 }
 
-/* Material symbol glyph text itself ('menu' / 'settings') */
-.st-key-nav_menu button span span,
-.st-key-settings_menu button span span,
-.st-key-nav_menu [data-testid="stIconMaterial"],
-.st-key-settings_menu [data-testid="stIconMaterial"] {
-    font-size: 24px !important;
-    line-height: 24px !important;
-    width: 24px !important;
-    height: 24px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    margin: 0 auto !important;
-    padding: 0 !important;
-    text-align: center !important;
+.st-key-nav_menu [data-testid="stPopoverButton"]>div:has(svg),
+.st-key-settings_menu [data-testid="stPopoverButton"]>div:has(svg) {
+    display: none !important;
 }
 
 .xs-menu-title {
@@ -485,6 +487,8 @@ h1, h2, h3, h4, h5, h6, .xs-brand-title, .xs-verdict-title, .xs-chart-title {
 
 /* Brand header */
 .xs-brand {
+    width: 100%;
+    min-width: 0;
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -533,6 +537,9 @@ h1, h2, h3, h4, h5, h6, .xs-brand-title, .xs-verdict-title, .xs-chart-title {
     white-space: nowrap !important;
 }
 .xs-brand-sub {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
     font-size: 10.5px;
     font-weight: 600;
     letter-spacing: 0.06em;
@@ -544,10 +551,9 @@ h1, h2, h3, h4, h5, h6, .xs-brand-title, .xs-verdict-title, .xs-chart-title {
 
 @media(max-width: 768px) {
     .block-container {padding-top: 5.8rem;}
-    .st-key-app_header {padding: 8px 60px; height: 68px; min-height: 68px;}
-    .st-key-nav_menu {left: 12px !important; top: 10px !important;}
-    .st-key-settings_menu {right: 12px !important; top: 10px !important;}
-    .xs-brand-title {font-size: 21px;}
+    .st-key-app_header {padding: 8px max(8px, env(safe-area-inset-right)) 8px max(8px, env(safe-area-inset-left)) !important; height: 68px; min-height: 68px;}
+    .st-key-app_header > [data-testid="stHorizontalBlock"] {gap: 8px !important;}
+    .xs-brand-title {font-size: 19px;}
     .xs-brand-badge {display: none;}
     .xs-brand-sub {display: none;}
 }

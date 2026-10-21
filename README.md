@@ -88,7 +88,13 @@ Read the [14 October deployment handoff and second-machine checklist](docs/DELIV
 docker compose up -d --build
 ```
 
-Open http://127.0.0.1:8501. Compose mounts only `outputs/primary` read-only, binds localhost and limits CPU/RAM; raw datasets are excluded. The bundles must be present locally because generated outputs/models are excluded from Git. See the [verified setup and stop commands](docs/DASHBOARD_DOCKER_CHECK_2026_10_07.md). The user published the initial implementation to [GitHub](https://github.com/callmewin06-create/X-SENTINEL) at commit `5e96806`; later local changes have not been pushed by this task. Google Drive model sharing is not configured.
+The Dockerfile installs third-party runtime dependencies from `pyproject.toml` before copying application code. UI/source changes reuse that dependency layer while its inputs and the builder cache remain unchanged. BuildKit also keeps pip downloads in a cache mount; installing the local package uses `--no-deps` and preserves its declared build backend. The first build, a new builder, or a dependency/base-image change can still require downloads. This does not fully lock Linux transitive dependencies or guarantee offline builds.
+
+For separate build and startup logs, run `docker compose --progress plain build dashboard`, then `docker compose up -d --no-build`, and inspect `docker compose ps -a`. All application services use the same image tag. Retain the existing PostgreSQL volume when updating.
+
+The header places navigation at the left viewport edge and settings at the right, with symmetric padding and X-SENTINEL centered. Both 44 px square buttons center their icons independently of hidden labels and the popover arrow. Validation for this revision is recorded in the [Docker cache/header handoff](docs/DOCKER_CACHE_HEADER_2026_10_21.md).
+
+Open http://127.0.0.1:8501. Compose mounts only `outputs/primary` read-only, binds localhost and limits CPU/RAM; raw datasets are excluded. The bundles must be present locally because generated outputs/models are excluded from Git. See the [verified setup and stop commands](docs/DASHBOARD_DOCKER_CHECK_2026_10_07.md). The user published the initial implementation to [GitHub](https://github.com/callmewin06-create/X-SENTINEL) at commit `5e96806`; inspect Git history and status for the current revision and remote synchronization. Google Drive model sharing is not configured.
 
 ## Sharing
 
