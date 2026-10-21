@@ -91,36 +91,39 @@ def about():
 
 def controls(api_connected=False):
     with st.container(key='app_header'):
-        with st.container(key='nav_menu'):
-            with st.popover('Điều hướng', icon=':material/menu:', help='Mở menu điều hướng'):
-                with st.container(key='nav_items'):
-                    st.markdown('<div class="xs-menu-title">CHUYỂN PHÂN KHU</div>', unsafe_allow_html=True)
-                    page = st.radio('Điều hướng', ['Phân tích', 'Lịch sử', 'Nghiên cứu'], key='page', label_visibility='collapsed')
+        col_nav, col_brand, col_set = st.columns([1, 12, 1], vertical_alignment='center')
+        with col_nav:
+            with st.container(key='nav_menu'):
+                with st.popover('Điều hướng', icon=':material/menu:', help='Mở menu điều hướng'):
+                    with st.container(key='nav_items'):
+                        st.markdown('<div class="xs-menu-title">CHUYỂN PHÂN KHU</div>', unsafe_allow_html=True)
+                        page = st.radio('Điều hướng', ['Phân tích', 'Lịch sử', 'Nghiên cứu'], key='page', label_visibility='collapsed')
         
-        # Center Brand
-        st.markdown(
-            '<div class="xs-brand" role="banner" aria-label="X-SENTINEL">'
-            '<div class="xs-brand-wrapper">'
-            '<span class="xs-brand-shield">🛡️</span>'
-            '<div class="xs-brand-text-group">'
-            '<span class="xs-brand-title">X-SENTINEL</span>'
-            '<span class="xs-brand-badge">SOC APEX v2.4</span>'
-            '</div>'
-            '</div>'
-            '<div class="xs-brand-sub">HỆ THỐNG PHÁT HIỆN CỬA HẬU MÃ ĐỘC PE BẰNG TÍNH NHẤT QUÁN NGỮ NGHĨA ĐA GÓC NHÌN</div>'
-            '</div>',
-            unsafe_allow_html=True
-        )
+        with col_brand:
+            st.markdown(
+                '<div class="xs-brand" role="banner" aria-label="X-SENTINEL">'
+                '<div class="xs-brand-wrapper">'
+                '<span class="xs-brand-shield">🛡️</span>'
+                '<div class="xs-brand-text-group">'
+                '<span class="xs-brand-title">X-SENTINEL</span>'
+                '<span class="xs-brand-badge">SOC APEX v2.4</span>'
+                '</div>'
+                '</div>'
+                '<div class="xs-brand-sub">HỆ THỐNG PHÁT HIỆN CỬA HẬU MÃ ĐỘC PE BẰNG TÍNH NHẤT QUÁN NGỮ NGHĨA ĐA GÓC NHÌN</div>'
+                '</div>',
+                unsafe_allow_html=True
+            )
 
-        with st.container(key='settings_menu'):
-            with st.popover('Cài đặt', icon=':material/settings:', help='Tùy chỉnh hệ thống'):
-                st.markdown('<div class="xs-menu-title">TÙY CHỈNH GIAO DIỆN</div>', unsafe_allow_html=True)
-                choice = st.selectbox('Chủ đề hiển thị', ['Theo hệ thống', 'Sáng', 'Tối'], key='appearance')
-                st.button('Tải lại giao diện', help='Làm mới phần hiển thị, giữ nguyên kết quả phân tích trong phiên.', key='refresh_app')
-                if st.button('Giới thiệu đề tài', key='about_app'):
-                    about()
-                st.divider()
-                st.checkbox('Bảng quay video màn hình', key='record_screen')
+        with col_set:
+            with st.container(key='settings_menu'):
+                with st.popover('Cài đặt', icon=':material/settings:', help='Tùy chỉnh hệ thống'):
+                    st.markdown('<div class="xs-menu-title">TÙY CHỈNH GIAO DIỆN</div>', unsafe_allow_html=True)
+                    choice = st.selectbox('Chủ đề hiển thị', ['Theo hệ thống', 'Sáng', 'Tối'], key='appearance')
+                    st.button('Tải lại giao diện', help='Làm mới phần hiển thị, giữ nguyên kết quả phân tích trong phiên.', key='refresh_app')
+                    if st.button('Giới thiệu đề tài', key='about_app'):
+                        about()
+                    st.divider()
+                    st.checkbox('Bảng quay video màn hình', key='record_screen')
 
     base = DARK if choice == 'Tối' else LIGHT
     automatic = f'@media(prefers-color-scheme:dark){{:root{{{DARK}}}}}' if choice == 'Theo hệ thống' else ''
@@ -281,8 +284,8 @@ CSS = r'''
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 /* Global Reset & Base Typography */
-html, body, [data-testid="stApp"], [data-testid="stAppViewContainer"] {
-    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+html, body, [data-testid="stApp"], [data-testid="stAppViewContainer"], [data-testid="stMain"] {
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
 }
@@ -292,7 +295,7 @@ code, kbd, samp, pre, .xs-mono {
 }
 
 h1, h2, h3, h4, h5, h6, .xs-brand-title, .xs-verdict-title, .xs-chart-title {
-    font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif !important;
+    font-family: 'Outfit', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
 }
 
 .block-container {
@@ -311,10 +314,10 @@ h1, h2, h3, h4, h5, h6, .xs-brand-title, .xs-verdict-title, .xs-chart-title {
     top: 0; left: 0; right: 0;
     width: 100% !important; max-width: none !important;
     height: 78px; min-height: 78px;
-    padding: 10px 80px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    padding: 0 16px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
     z-index: 999991;
     border: 0;
     border-bottom: 1px solid var(--xs-border);
@@ -325,27 +328,88 @@ h1, h2, h3, h4, h5, h6, .xs-brand-title, .xs-verdict-title, .xs-chart-title {
     box-shadow: var(--xs-shadow);
 }
 
-.st-key-nav_menu, .st-key-settings_menu {
-    position: absolute !important;
-    top: 14px;
-    width: 48px !important;
-    z-index: 2;
+.st-key-app_header [data-testid="stHorizontalBlock"] {
+    width: 100% !important;
+    max-width: 720px !important;
+    margin: 0 auto !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 12px !important;
 }
-.st-key-nav_menu {left: 24px;}
-.st-key-settings_menu {right: 24px;}
+
+.st-key-app_header [data-testid="column"] {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    min-width: 0 !important;
+}
+
+.st-key-app_header [data-testid="column"]:first-child {
+    justify-content: flex-end !important;
+    flex: 0 0 48px !important;
+    width: 48px !important;
+}
+
+.st-key-app_header [data-testid="column"]:nth-child(2) {
+    flex: 1 1 auto !important;
+    justify-content: center !important;
+}
+
+.st-key-app_header [data-testid="column"]:last-child {
+    justify-content: flex-start !important;
+    flex: 0 0 48px !important;
+    width: 48px !important;
+}
+
+.st-key-nav_menu, .st-key-settings_menu {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.st-key-nav_menu [data-testid="stPopover"],
+.st-key-settings_menu [data-testid="stPopover"],
+.st-key-nav_menu [data-testid="stPopoverButton"],
+.st-key-settings_menu [data-testid="stPopoverButton"] {
+    width: 44px !important;
+    height: 44px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
 
 .st-key-nav_menu [data-testid="stPopover"] button,
 .st-key-settings_menu [data-testid="stPopover"] button {
-    width: 48px; height: 48px;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 12px;
-    border: 1px solid var(--xs-border);
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    max-width: 44px !important;
+    max-height: 44px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+    border-radius: 12px !important;
+    border: 1px solid var(--xs-border) !important;
     background: var(--xs-soft) !important;
     color: var(--xs-text) !important;
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    gap: 0 !important;
+    box-sizing: border-box !important;
+    line-height: 1 !important;
+    overflow: hidden !important;
 }
 .st-key-nav_menu [data-testid="stPopover"] button:hover,
 .st-key-settings_menu [data-testid="stPopover"] button:hover {
@@ -357,10 +421,30 @@ h1, h2, h3, h4, h5, h6, .xs-brand-title, .xs-verdict-title, .xs-chart-title {
 
 .st-key-nav_menu [data-testid="stPopover"] button [data-testid="stMarkdownContainer"],
 .st-key-settings_menu [data-testid="stPopover"] button [data-testid="stMarkdownContainer"] {
-    position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+    display: none !important;
 }
+
+.st-key-nav_menu [data-testid="stPopover"] button [data-testid="stIconMaterial"],
+.st-key-settings_menu [data-testid="stPopover"] button [data-testid="stIconMaterial"] {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    font-size: 22px !important;
+    line-height: 1 !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+
 .st-key-nav_menu [data-testid="stPopoverButton"]>div:has(svg),
-.st-key-settings_menu [data-testid="stPopoverButton"]>div:has(svg) {display: none;}
+.st-key-settings_menu [data-testid="stPopoverButton"]>div:has(svg),
+.st-key-nav_menu [data-testid="stPopover"] svg,
+.st-key-settings_menu [data-testid="stPopover"] svg {
+    display: none !important;
+}
 
 .xs-menu-title {
     font-size: 11px;
@@ -385,29 +469,41 @@ h1, h2, h3, h4, h5, h6, .xs-brand-title, .xs-verdict-title, .xs-chart-title {
 }
 
 /* Brand header */
-.xs-brand {text-align: center; display: flex; flex-direction: column; align-items: center;}
+.xs-brand {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap !important;
+    padding: 0 4px;
+}
 .xs-brand-wrapper {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
+    justify-content: center;
+    gap: 8px;
+    white-space: nowrap !important;
 }
 .xs-brand-shield {
-    font-size: 26px;
+    font-size: 25px;
     filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.4));
 }
 .xs-brand-text-group {
     display: flex;
     align-items: center;
     gap: 8px;
+    white-space: nowrap !important;
 }
 .xs-brand-title {
-    font-size: 27px;
+    font-size: 26px;
     font-weight: 900;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.03em;
     line-height: 1;
     background: var(--xs-accent-gradient);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    white-space: nowrap !important;
 }
 .xs-brand-badge {
     font-size: 10px;
@@ -419,22 +515,23 @@ h1, h2, h3, h4, h5, h6, .xs-brand-title, .xs-verdict-title, .xs-chart-title {
     color: var(--xs-accent);
     border: 1px solid rgba(56, 189, 248, 0.3);
     text-transform: uppercase;
+    white-space: nowrap !important;
 }
 .xs-brand-sub {
-    font-size: 11px;
+    font-size: 10.5px;
     font-weight: 600;
-    letter-spacing: 0.07em;
+    letter-spacing: 0.06em;
     color: var(--xs-muted);
     text-transform: uppercase;
-    margin-top: 3px;
+    margin-top: 2px;
+    white-space: nowrap !important;
 }
 
 @media(max-width: 768px) {
     .block-container {padding-top: 5.8rem;}
-    .st-key-app_header {padding: 8px 60px; height: 68px; min-height: 68px;}
-    .st-key-nav_menu {left: 12px; top: 10px;}
-    .st-key-settings_menu {right: 12px; top: 10px;}
-    .xs-brand-title {font-size: 21px;}
+    .st-key-app_header {padding: 8px 8px; height: 68px; min-height: 68px;}
+    .st-key-app_header > div {gap: 8px !important;}
+    .xs-brand-title {font-size: 19px;}
     .xs-brand-badge {display: none;}
     .xs-brand-sub {display: none;}
 }
@@ -598,17 +695,22 @@ h1, h2, h3, h4, h5, h6, .xs-brand-title, .xs-verdict-title, .xs-chart-title {
 .xs-verdict-text-group {display: flex; flex-direction: column; gap: 2px;}
 .xs-verdict-text {
     font-size: 24px;
-    font-weight: 900;
-    letter-spacing: -0.02em;
+    font-weight: 800;
+    letter-spacing: -0.01em;
     color: var(--xs-text);
-    font-family: 'Outfit', sans-serif !important;
+    font-family: 'Outfit', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
 }
 .xs-verdict-danger .xs-verdict-text {color: var(--xs-malware);}
 .xs-verdict-safe .xs-verdict-text {color: var(--xs-benign);}
 .xs-verdict-delta {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--xs-muted);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+.xs-verdict-delta strong {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    font-weight: 700;
+    color: var(--xs-text);
 }
 
 /* Gauge Bar */
@@ -616,13 +718,13 @@ h1, h2, h3, h4, h5, h6, .xs-brand-title, .xs-verdict-title, .xs-chart-title {
 .xs-gauge-labels {
     display: flex;
     justify-content: space-between;
-    font-size: 13px;
+    font-size: 13.5px;
     color: var(--xs-muted);
     margin-bottom: 8px;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
 }
-.xs-gauge-score-label strong {color: var(--xs-text); font-size: 14px;}
-.xs-gauge-thresh-label strong {color: var(--xs-text); font-size: 14px;}
+.xs-gauge-score-label strong {color: var(--xs-text); font-size: 14px; font-weight: 700; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;}
+.xs-gauge-thresh-label strong {color: var(--xs-text); font-size: 14px; font-weight: 700; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;}
 
 .xs-gauge-track {
     position: relative;
@@ -670,8 +772,8 @@ h1, h2, h3, h4, h5, h6, .xs-brand-title, .xs-verdict-title, .xs-chart-title {
     display: flex;
     justify-content: space-between;
     position: relative;
-    font-size: 10.5px;
-    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
     color: var(--xs-muted);
     margin-top: 6px;
 }
@@ -746,8 +848,18 @@ h1, h2, h3, h4, h5, h6, .xs-brand-title, .xs-verdict-title, .xs-chart-title {
 }
 .xs-view-icon {font-size: 22px;}
 .xs-view-text-group {display: flex; flex-direction: column;}
-.xs-view-name {font-size: 14.5px; font-weight: 700; color: var(--xs-text);}
-.xs-view-code {font-size: 11.5px; font-family: 'JetBrains Mono', monospace; color: var(--xs-muted);}
+.xs-view-name {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--xs-text);
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+.xs-view-code {
+    font-size: 12px;
+    color: var(--xs-muted);
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    margin-top: 2px;
+}
 
 .xs-bar-track-wrap {width: 100%;}
 .xs-bar-track {
@@ -770,8 +882,8 @@ h1, h2, h3, h4, h5, h6, .xs-brand-title, .xs-verdict-title, .xs-chart-title {
     background: var(--xs-soft);
     border: 1px solid var(--xs-border);
     font-size: 13.5px;
-    font-weight: 800;
-    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
     color: var(--xs-text);
 }
 .xs-chart-foot {
@@ -840,8 +952,8 @@ h1, h2, h3, h4, h5, h6, .xs-brand-title, .xs-verdict-title, .xs-chart-title {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 12px;
-    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
     color: var(--xs-muted);
 }
 .xs-shap-pill {
@@ -1144,11 +1256,11 @@ button[kind="primary"] p, button[kind="primary"] span {color:var(--xs-on-accent)
 [data-testid="stCode"] button {color:var(--xs-text) !important;}
 .xs-meta-chip, .xs-view-text-group {min-width:0;}
 .xs-meta-chip code {overflow-wrap:anywhere;word-break:break-all;}
-.xs-data-table {overflow:auto;max-height:580px;border:1px solid var(--xs-border);border-radius:10px;margin:10px 0 18px;background:var(--xs-panel);}
-.xs-data-table table {border-collapse:collapse;width:100%;font-size:13px;color:var(--xs-text);}
-.xs-data-table th {background:var(--xs-soft);color:var(--xs-text);position:sticky;top:0;text-align:left;}
-.xs-data-table th,.xs-data-table td {padding:10px 12px;border-bottom:1px solid var(--xs-border);vertical-align:top;overflow-wrap:anywhere;}
-.xs-data-table td {max-width:340px;min-width:90px;}
+.xs-data-table {overflow:auto;max-height:580px;border:1px solid var(--xs-border);border-radius:10px;margin:10px 0 18px;background:var(--xs-panel);font-family:'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;}
+.xs-data-table table {border-collapse:collapse;width:100%;font-size:13.5px;color:var(--xs-text);font-family:'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;}
+.xs-data-table th {background:var(--xs-soft);color:var(--xs-text);position:sticky;top:0;text-align:left;font-size:12.5px !important;font-weight:700 !important;letter-spacing:0.03em !important;font-family:'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;}
+.xs-data-table th,.xs-data-table td {padding:10px 14px;border-bottom:1px solid var(--xs-border);vertical-align:middle;overflow-wrap:anywhere;font-family:'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;}
+.xs-data-table td {max-width:340px;min-width:90px;font-size:13.5px !important;}
 .xs-data-table tr:hover td {background:var(--xs-soft-hover);}
 '''
 
