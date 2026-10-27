@@ -19,6 +19,7 @@ import time
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
 from xsentinel.dashboard_catalog import preferred_method
 from xsentinel.data.limits import MAX_UPLOAD_BYTES
+from xsentinel.data.pe_isolation import ExtractionError, extract_pe_isolated, timeout_seconds
 from xsentinel.schema import V2_PRIMARY, V3_PRIMARY
 from xsentinel.service.registry import BundleRegistry
 from xsentinel.service.scoring import score_input
@@ -208,13 +209,7 @@ def _load_manifest(path, root, limit, seed, declaration):
 
 
 def _extract(data, schema):
-    if schema == V3_PRIMARY:
-        from xsentinel.data.pe_v3 import extract_pe_v3
-        return extract_pe_v3(data)
-    if schema == V2_PRIMARY:
-        from xsentinel.data.pe import extract_pe
-        return extract_pe(data)
-    raise ValueError('Only primary V2/V3 binary extraction is supported')
+    return extract_pe_isolated(data, schema)
 
 
 def list_bundles(bundle_root):
@@ -305,6 +300,9 @@ def scan(*, input_dir, bundle_root, bundle_id, out, limit, seed=17,
                            prediction_ms=result['elapsed_ms'])
             except InputRejected as exc:
                 row.update(scan_status='input_rejected', error_code=exc.code, error=str(exc))
+            except ExtractionError as exc:
+                row.update(scan_status=exc.code if exc.code in ('timeout', 'worker_crashed', 'busy') else 'parse_failed',
+                           parse_status='failed', error_code=exc.code, error=str(exc)[:2000])
             except Exception as exc:
                 row.update(error_code=type(exc).__name__, error=str(exc)[:2000])
             row['file_total_ms'] = (time.perf_counter() - file_start) * 1000
@@ -316,7 +314,8 @@ def scan(*, input_dir, bundle_root, bundle_id, out, limit, seed=17,
     ok = sum(row['scan_status'] == 'ok' for row in records)
     alerts = sum(row['trigger_alert'] is True for row in records)
     summary = {
-        'format': 'xsentinel-static-check-v1', 'completed_utc': datetime.now(timezone.utc).isoformat(),
+        'format': 'xsentinel-static-check-v2', 'completed_utc': datetime.now(timezone.utc).isoformat(),
+        'extraction_policy': {'worker': 'pe-worker-v1', 'timeout_seconds': timeout_seconds()},
         'status': 'completed' if ok == count else 'completed_with_errors',
         'execution': 'Samples were read for static extraction only; NEVER EXECUTED',
         'input_dir': str(root), 'bundle_root': str(bundle_root), 'bundle_id': bundle_id,

@@ -145,6 +145,21 @@ def test_parse_failure_stays_in_csv_and_all_selected_denominator(runtime, tmp_pa
     assert 'Synthetic parse failure' in failure['error']
 
 
+def test_worker_timeout_remains_unavailable(runtime, tmp_path, monkeypatch):
+    from xsentinel.data.pe_isolation import ExtractionError
+    samples, _, calls = runtime
+    (samples / 'slow.bin').write_bytes(b'synthetic only')
+    def timeout(*args):
+        raise ExtractionError('timeout', 'Synthetic deadline exceeded')
+    monkeypatch.setattr(check, '_extract', timeout)
+    result = check.scan(**options(runtime, tmp_path / 'timeout'))
+    assert result['status_counts'] == {'timeout': 1}
+    assert result['classification_unavailable_count'] == 1
+    assert result['records'][0]['trigger_alert'] is None
+    assert result['records'][0]['main_classification'] is None
+    assert not calls['score']
+
+
 def test_actual_non_pe_is_rejected_by_existing_reader_without_prediction(runtime, tmp_path, monkeypatch):
     samples, _, calls = runtime
     (samples / 'not-pe').write_bytes(b'This is harmless text, not an executable.')

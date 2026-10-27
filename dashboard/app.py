@@ -377,6 +377,7 @@ except Exception as error:
     st.stop()
 
 st.caption(dataset + ' · ' + prefs['variant'].capitalize() + ' · ' + method_name(method))
+st.caption('Bộ mô hình nghiên cứu đã được đầu độc có chủ đích. Dự đoán mã độc và cảnh báo backdoor là hai kết quả riêng.')
 with st.expander('Thông tin bộ mô hình đang dùng'):
     st.write('Cấu hình thí nghiệm:', experiment_label(prefs['experiment']))
     st.write('Schema:', schema, '· Protocol:', state.get('method_version', 'archive'))
@@ -427,6 +428,8 @@ if st.session_state.get('active_context') != context:
     st.session_state.pop('pending', None)
 
 if st.button('Phân tích và lưu' if api_base else 'Phân tích', type='primary', key='analyze'):
+    # A failed retry must not display the previous success as the current result.
+    st.session_state.pop('analysis', None)
     start = time.perf_counter()
     try:
         with st.status('Đang xử lý đầu vào', expanded=True) as status:
@@ -467,6 +470,7 @@ if st.button('Phân tích và lưu' if api_base else 'Phân tích', type='primar
                                             'provenance': prepared['provenance']}
             status.update(label='Đã có kết quả', state='complete', expanded=False)
     except Exception as error:
+        st.session_state.pop('analysis', None)
         show_error(error)
 record = st.session_state.get('analysis')
 if record and record['context'] == context:

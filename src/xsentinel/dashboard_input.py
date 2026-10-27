@@ -11,9 +11,10 @@ from xsentinel.schema import get_schema, V3_PRIMARY
 
 def reader_signature(schema_version):
     root = Path(__file__).parent
-    files = ['data/pe.py', 'data/vectorizer.py', 'data/limits.py']
+    files = ['data/pe.py', 'data/vectorizer.py', 'data/limits.py', 'data/pe_isolation.py', 'data/pe_worker.py']
     files += ['data/pe_v3.py', 'data/v3_raw.py', 'thrember_upstream.py', 'pefile_warnings.txt'] if schema_version == V3_PRIMARY else ['ember_upstream.py']
-    digest = hashlib.sha256(schema_version.encode())
+    from xsentinel.data.pe_isolation import timeout_seconds
+    digest = hashlib.sha256((schema_version + str(timeout_seconds())).encode())
     for name in files:
         digest.update((root / name).read_bytes())
     return digest.hexdigest()
@@ -37,13 +38,11 @@ def prepare_input(kind, data, name, schema_version, reference=None):
     else:
         verify_size(len(data))
         if kind == 'pe':
+            from xsentinel.data.pe_isolation import extract_pe_isolated
+            vector, provenance = extract_pe_isolated(data, schema_version)
             if schema.version == V3_PRIMARY:
-                from xsentinel.data.pe_v3 import extract_pe_v3
-                vector, provenance = extract_pe_v3(data)
                 extractor = 'EMBER2024 upstream ' + provenance['upstream_commit']
             else:
-                from xsentinel.data.pe import extract_pe
-                vector, provenance = extract_pe(data)
                 extractor = 'EMBER2018 experimental LIEF ' + provenance['lief_version']
             x = schema.matrix(vector)
         elif kind == 'vector':

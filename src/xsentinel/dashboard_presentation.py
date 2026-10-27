@@ -121,6 +121,15 @@ def feature_rows(result):
 
 
 def friendly_error(error):
+    code = getattr(error, 'code', None)
+    if code == 'timeout':
+        return 'Không phân tích được: đọc file quá thời hạn nên tác vụ đã dừng. Bạn có thể thử file khác; chưa có kết luận lành hay độc cho file này.'
+    if code == 'worker_crashed':
+        return 'Không phân tích được: tiến trình đọc file đã dừng bất thường. Bạn có thể thử file khác; chưa có kết quả cho file này.'
+    if code == 'busy':
+        return 'Đang đọc một file khác. Hãy chờ tác vụ đó hoàn tất rồi thử lại.'
+    if code == 'invalid_output':
+        return 'Không phân tích được: dữ liệu trả về từ bộ đọc không hợp lệ. Hệ thống chưa chấm điểm file này.'
     text = str(error)
     if 'exceeds' in text or '50 MiB' in text:
         return 'File vượt giới hạn 50 MB. Hãy chọn file nhỏ hơn.'

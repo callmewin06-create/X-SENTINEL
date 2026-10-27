@@ -6,3 +6,6 @@ outputs/** -text
 docs/upstream/* -text
 src/xsentinel/*_upstream.py -text
 src/xsentinel/pefile_warnings.txt -text
+
+# Shell heredocs are executed by Linux during image builds.
+Dockerfile text eol=lf
