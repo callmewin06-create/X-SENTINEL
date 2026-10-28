@@ -1,0 +1,1285 @@
+{
+  "schema_version": 1,
+  "snapshot_id": "teacher-revision-2026-10-28",
+  "as_of": "2026-10-28",
+  "scope": {
+    "kind": "frozen_offline_snapshot",
+    "live_service_status": false,
+    "feature_space_attacks": true,
+    "observed_final_reused": true,
+    "deployment_thresholds_changed": false,
+    "rates_unit": "fraction_0_to_1",
+    "gain_pp_unit": "percentage_points"
+  },
+  "primary": {
+    "configuration_count": 54,
+    "bundle_count": 108,
+    "original_seeds": [
+      17,
+      29,
+      43
+    ],
+    "datasets": [
+      {
+        "dataset": "EMBER2018",
+        "schema": "V2",
+        "schema_version": "ember-v2-2381-views-v2",
+        "feature_count": 2381,
+        "view_feature_counts": {
+          "structural": 357,
+          "behavioral": 1408,
+          "metadata": 616
+        },
+        "configurations": 27,
+        "confirmed": 12,
+        "restricted_confirmed": 12,
+        "cross_confirmed": 0
+      },
+      {
+        "dataset": "EMBER2024",
+        "schema": "V3",
+        "schema_version": "ember-v3-2568-views-v1",
+        "feature_count": 2568,
+        "view_feature_counts": {
+          "structural": 467,
+          "behavioral": 1411,
+          "metadata": 690
+        },
+        "configurations": 27,
+        "confirmed": 12,
+        "restricted_confirmed": 3,
+        "cross_confirmed": 9
+      }
+    ],
+    "m5_assessed": false,
+    "benign_reference_records": 500,
+    "benign_calibration_records": 2000,
+    "original_clean_fit_records": 200000
+  },
+  "methods": {
+    "Reduced": {
+      "components": [
+        "VMC",
+        "BGS"
+      ],
+      "fusion": "mean_right_reference_ecdf_ranks",
+      "requires_clean_auxiliary_prediction": false
+    },
+    "Full": {
+      "components": [
+        "VMC",
+        "BPG"
+      ],
+      "fusion": "mean_right_reference_ecdf_ranks",
+      "used_auxiliary_views": [
+        "behavioral"
+      ],
+      "required_bundle_view_files": [
+        "structural",
+        "behavioral",
+        "metadata"
+      ]
+    }
+  },
+  "fixed_threshold": {
+    "positive_group": "successful_eligible",
+    "aggregation": "equal_run_mean",
+    "threshold_source": "original_benign_calibration",
+    "rows": [
+      {
+        "dataset": "EMBER2018",
+        "cohort": "restricted",
+        "method": "Reduced",
+        "runs": 12,
+        "recall": 0.3574609945739087,
+        "fpr": 0.005216666666666667,
+        "post_asr": 0.3991924488240602
+      },
+      {
+        "dataset": "EMBER2018",
+        "cohort": "restricted",
+        "method": "Full",
+        "runs": 12,
+        "recall": 0.4293951040145331,
+        "fpr": 0.007808333333333334,
+        "post_asr": 0.3522415650557846
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "restricted",
+        "method": "Reduced",
+        "runs": 3,
+        "recall": 0.48326752468345574,
+        "fpr": 0.007766666666666667,
+        "post_asr": 0.29375243932561035
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "restricted",
+        "method": "Full",
+        "runs": 3,
+        "recall": 0.5975077223932805,
+        "fpr": 0.008266666666666667,
+        "post_asr": 0.22776986359192775
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "cross",
+        "method": "Reduced",
+        "runs": 9,
+        "recall": 1.1571663310884307e-05,
+        "fpr": 0.007511111111111111,
+        "post_asr": 0.9950980733011802
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "cross",
+        "method": "Full",
+        "runs": 9,
+        "recall": 0.05557454467955966,
+        "fpr": 0.0093,
+        "post_asr": 0.9399879651471666
+      }
+    ]
+  },
+  "same_fpr": {
+    "fpr_cap": 0.01,
+    "positive_group": "successful_eligible",
+    "retrospective": true,
+    "aggregation": "equal_run_mean",
+    "pauc_definition": "sklearn_standardized_max_fpr_0.01",
+    "rows": [
+      {
+        "dataset": "EMBER2018",
+        "cohort": "restricted",
+        "method": "VMC",
+        "runs": 12,
+        "tpr": 0.16940988178167826,
+        "fpr": 0.01,
+        "pauc": 0.5477782885624546
+      },
+      {
+        "dataset": "EMBER2018",
+        "cohort": "restricted",
+        "method": "BPG",
+        "runs": 12,
+        "tpr": 0.38156147527881895,
+        "fpr": 0.0099,
+        "pauc": 0.6250870457557167
+      },
+      {
+        "dataset": "EMBER2018",
+        "cohort": "restricted",
+        "method": "BGS",
+        "runs": 12,
+        "tpr": 0.08874509439710997,
+        "fpr": 0.01,
+        "pauc": 0.5174331081303606
+      },
+      {
+        "dataset": "EMBER2018",
+        "cohort": "restricted",
+        "method": "SHAP-IF",
+        "runs": 12,
+        "tpr": 0.001604347737828348,
+        "fpr": 0.009933333333333334,
+        "pauc": 0.4978196160023374
+      },
+      {
+        "dataset": "EMBER2018",
+        "cohort": "restricted",
+        "method": "STRIP",
+        "runs": 12,
+        "tpr": 0.0,
+        "fpr": 0.01,
+        "pauc": 0.49748743718592964
+      },
+      {
+        "dataset": "EMBER2018",
+        "cohort": "restricted",
+        "method": "STRIP inverse",
+        "runs": 12,
+        "tpr": 0.05259606673023174,
+        "fpr": 0.01,
+        "pauc": 0.5097902047841991
+      },
+      {
+        "dataset": "EMBER2018",
+        "cohort": "restricted",
+        "method": "Shadow",
+        "runs": 12,
+        "tpr": 0.9998853710428138,
+        "fpr": 0.01,
+        "pauc": 0.9994605223123066
+      },
+      {
+        "dataset": "EMBER2018",
+        "cohort": "restricted",
+        "method": "TADR",
+        "runs": 12,
+        "tpr": 0.35699806834143283,
+        "fpr": 0.009658333333333333,
+        "pauc": 0.6694542978308887
+      },
+      {
+        "dataset": "EMBER2018",
+        "cohort": "restricted",
+        "method": "Full",
+        "runs": 12,
+        "tpr": 0.44723601009164154,
+        "fpr": 0.009625,
+        "pauc": 0.6796874297171888
+      },
+      {
+        "dataset": "EMBER2018",
+        "cohort": "restricted",
+        "method": "Reduced",
+        "runs": 12,
+        "tpr": 0.3769492212206506,
+        "fpr": 0.008658333333333334,
+        "pauc": 0.6713347947572097
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "cross",
+        "method": "VMC",
+        "runs": 9,
+        "tpr": 0.018042031854337188,
+        "fpr": 0.01,
+        "pauc": 0.5020273688260014
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "cross",
+        "method": "BPG",
+        "runs": 9,
+        "tpr": 0.12016619465952834,
+        "fpr": 0.01,
+        "pauc": 0.5277027894308919
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "cross",
+        "method": "BGS",
+        "runs": 9,
+        "tpr": 0.0010631219725761771,
+        "fpr": 0.01,
+        "pauc": 0.49782954374873145
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "cross",
+        "method": "SHAP-IF",
+        "runs": 9,
+        "tpr": 0.00020794975008866528,
+        "fpr": 0.01,
+        "pauc": 0.4975430758650561
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "cross",
+        "method": "STRIP",
+        "runs": 9,
+        "tpr": 0.0,
+        "fpr": 0.01,
+        "pauc": 0.4974874371859296
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "cross",
+        "method": "STRIP inverse",
+        "runs": 9,
+        "tpr": 0.001981677996822147,
+        "fpr": 0.01,
+        "pauc": 0.49776791476581217
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "cross",
+        "method": "Shadow",
+        "runs": 9,
+        "tpr": 0.9960394921651342,
+        "fpr": 0.01,
+        "pauc": 0.9906633333426894
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "cross",
+        "method": "TADR",
+        "runs": 9,
+        "tpr": 0.0,
+        "fpr": 0.01,
+        "pauc": 0.4974874371859296
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "cross",
+        "method": "Full",
+        "runs": 9,
+        "tpr": 0.06005412820206941,
+        "fpr": 0.009433333333333334,
+        "pauc": 0.517862364196276
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "cross",
+        "method": "Reduced",
+        "runs": 9,
+        "tpr": 2.3143326621768615e-05,
+        "fpr": 0.009777777777777778,
+        "pauc": 0.49749025741543
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "restricted",
+        "method": "VMC",
+        "runs": 3,
+        "tpr": 0.6035583600220719,
+        "fpr": 0.01,
+        "pauc": 0.7565425412608171
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "restricted",
+        "method": "BPG",
+        "runs": 3,
+        "tpr": 0.49087386886858453,
+        "fpr": 0.01,
+        "pauc": 0.6851770739580703
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "restricted",
+        "method": "BGS",
+        "runs": 3,
+        "tpr": 0.06658620596385321,
+        "fpr": 0.01,
+        "pauc": 0.5167120022573471
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "restricted",
+        "method": "SHAP-IF",
+        "runs": 3,
+        "tpr": 0.0003597644812493345,
+        "fpr": 0.01,
+        "pauc": 0.4975575719104213
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "restricted",
+        "method": "STRIP",
+        "runs": 3,
+        "tpr": 0.0,
+        "fpr": 0.01,
+        "pauc": 0.49748743718592964
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "restricted",
+        "method": "STRIP inverse",
+        "runs": 3,
+        "tpr": 0.09457778102075624,
+        "fpr": 0.01,
+        "pauc": 0.5184894042402101
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "restricted",
+        "method": "Shadow",
+        "runs": 3,
+        "tpr": 0.9998211411196566,
+        "fpr": 0.01,
+        "pauc": 0.9989908570557416
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "restricted",
+        "method": "TADR",
+        "runs": 3,
+        "tpr": 0.0,
+        "fpr": 0.01,
+        "pauc": 0.49748743718592964
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "restricted",
+        "method": "Full",
+        "runs": 3,
+        "tpr": 0.6013370538319341,
+        "fpr": 0.009533333333333333,
+        "pauc": 0.7684102036035689
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "restricted",
+        "method": "Reduced",
+        "runs": 3,
+        "tpr": 0.5282217707328063,
+        "fpr": 0.009733333333333333,
+        "pauc": 0.6838008652201727
+      }
+    ]
+  },
+  "clean_budgets": {
+    "budgets": [
+      1000,
+      5000,
+      10000,
+      50000,
+      200000
+    ],
+    "cohort": "confirmed_restricted",
+    "fpr_cap": 0.01,
+    "reference_and_calibration_additional": true,
+    "rows": [
+      {
+        "dataset": "EMBER2018",
+        "cohort": "restricted",
+        "budget": 1000,
+        "method": "BPG",
+        "runs": 12,
+        "tpr": 0.08285149271113534,
+        "fpr": 0.01
+      },
+      {
+        "dataset": "EMBER2018",
+        "cohort": "restricted",
+        "budget": 1000,
+        "method": "Shadow",
+        "runs": 12,
+        "tpr": 0.16904685835561153,
+        "fpr": 0.01
+      },
+      {
+        "dataset": "EMBER2018",
+        "cohort": "restricted",
+        "budget": 1000,
+        "method": "Full",
+        "runs": 12,
+        "tpr": 0.33595255298080096,
+        "fpr": 0.009816666666666666
+      },
+      {
+        "dataset": "EMBER2018",
+        "cohort": "restricted",
+        "budget": 5000,
+        "method": "BPG",
+        "runs": 12,
+        "tpr": 0.17499759101501797,
+        "fpr": 0.009991666666666668
+      },
+      {
+        "dataset": "EMBER2018",
+        "cohort": "restricted",
+        "budget": 5000,
+        "method": "Shadow",
+        "runs": 12,
+        "tpr": 0.41356177573617403,
+        "fpr": 0.01
+      },
+      {
+        "dataset": "EMBER2018",
+        "cohort": "restricted",
+        "budget": 5000,
+        "method": "Full",
+        "runs": 12,
+        "tpr": 0.42056988635057774,
+        "fpr": 0.00985
+      },
+      {
+        "dataset": "EMBER2018",
+        "cohort": "restricted",
+        "budget": 10000,
+        "method": "BPG",
+        "runs": 12,
+        "tpr": 0.2297889634955185,
+        "fpr": 0.009725
+      },
+      {
+        "dataset": "EMBER2018",
+        "cohort": "restricted",
+        "budget": 10000,
+        "method": "Shadow",
+        "runs": 12,
+        "tpr": 0.645655920230102,
+        "fpr": 0.01
+      },
+      {
+        "dataset": "EMBER2018",
+        "cohort": "restricted",
+        "budget": 10000,
+        "method": "Full",
+        "runs": 12,
+        "tpr": 0.43472709775482593,
+        "fpr": 0.00985
+      },
+      {
+        "dataset": "EMBER2018",
+        "cohort": "restricted",
+        "budget": 50000,
+        "method": "BPG",
+        "runs": 12,
+        "tpr": 0.3402541405425801,
+        "fpr": 0.009883333333333333
+      },
+      {
+        "dataset": "EMBER2018",
+        "cohort": "restricted",
+        "budget": 50000,
+        "method": "Shadow",
+        "runs": 12,
+        "tpr": 0.9874700373016815,
+        "fpr": 0.009983333333333334
+      },
+      {
+        "dataset": "EMBER2018",
+        "cohort": "restricted",
+        "budget": 50000,
+        "method": "Full",
+        "runs": 12,
+        "tpr": 0.44399508169641644,
+        "fpr": 0.009791666666666667
+      },
+      {
+        "dataset": "EMBER2018",
+        "cohort": "restricted",
+        "budget": 200000,
+        "method": "BPG",
+        "runs": 12,
+        "tpr": 0.38156147527881895,
+        "fpr": 0.0099
+      },
+      {
+        "dataset": "EMBER2018",
+        "cohort": "restricted",
+        "budget": 200000,
+        "method": "Shadow",
+        "runs": 12,
+        "tpr": 0.999885371042814,
+        "fpr": 0.01
+      },
+      {
+        "dataset": "EMBER2018",
+        "cohort": "restricted",
+        "budget": 200000,
+        "method": "Full",
+        "runs": 12,
+        "tpr": 0.44723601009164154,
+        "fpr": 0.009625
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "restricted",
+        "budget": 1000,
+        "method": "BPG",
+        "runs": 3,
+        "tpr": 0.1555910564733226,
+        "fpr": 0.01
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "restricted",
+        "budget": 1000,
+        "method": "Shadow",
+        "runs": 3,
+        "tpr": 0.5129039838909759,
+        "fpr": 0.01
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "restricted",
+        "budget": 1000,
+        "method": "Full",
+        "runs": 3,
+        "tpr": 0.5624269726373378,
+        "fpr": 0.0099
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "restricted",
+        "budget": 5000,
+        "method": "BPG",
+        "runs": 3,
+        "tpr": 0.3484721990973107,
+        "fpr": 0.01
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "restricted",
+        "budget": 5000,
+        "method": "Shadow",
+        "runs": 3,
+        "tpr": 0.673743997739157,
+        "fpr": 0.01
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "restricted",
+        "budget": 5000,
+        "method": "Full",
+        "runs": 3,
+        "tpr": 0.63058784847188,
+        "fpr": 0.0097
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "restricted",
+        "budget": 10000,
+        "method": "BPG",
+        "runs": 3,
+        "tpr": 0.41280770103349146,
+        "fpr": 0.01
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "restricted",
+        "budget": 10000,
+        "method": "Shadow",
+        "runs": 3,
+        "tpr": 0.8049542099806003,
+        "fpr": 0.01
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "restricted",
+        "budget": 10000,
+        "method": "Full",
+        "runs": 3,
+        "tpr": 0.6090417979845654,
+        "fpr": 0.009666666666666665
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "restricted",
+        "budget": 50000,
+        "method": "BPG",
+        "runs": 3,
+        "tpr": 0.4811154370567507,
+        "fpr": 0.01
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "restricted",
+        "budget": 50000,
+        "method": "Shadow",
+        "runs": 3,
+        "tpr": 0.9840996129482683,
+        "fpr": 0.01
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "restricted",
+        "budget": 50000,
+        "method": "Full",
+        "runs": 3,
+        "tpr": 0.5999467370328749,
+        "fpr": 0.009233333333333335
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "restricted",
+        "budget": 200000,
+        "method": "BPG",
+        "runs": 3,
+        "tpr": 0.49087386886858453,
+        "fpr": 0.01
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "restricted",
+        "budget": 200000,
+        "method": "Shadow",
+        "runs": 3,
+        "tpr": 0.9998211411196566,
+        "fpr": 0.01
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "restricted",
+        "budget": 200000,
+        "method": "Full",
+        "runs": 3,
+        "tpr": 0.6013370538319341,
+        "fpr": 0.009533333333333333
+      }
+    ]
+  },
+  "seeds": {
+    "dataset": "EMBER2024",
+    "family": "spread_structural",
+    "poison_rate": 0.02,
+    "additional_seeds": [
+      59,
+      71
+    ],
+    "attempt_count": 5,
+    "confirmed_count": 4,
+    "rows": [
+      {
+        "seed": 17,
+        "origin": "original",
+        "confirmed": true,
+        "confirmation_asr": 0.5745901639344262,
+        "confirmation_paired_gain": 0.5502049180327869,
+        "asr": 0.5939280903533313,
+        "reduced_recall": 0.4884856943475227,
+        "reduced_fpr": 0.0085,
+        "full_recall": 0.6278785764131193,
+        "full_fpr": 0.0061
+      },
+      {
+        "seed": 29,
+        "origin": "original",
+        "confirmed": true,
+        "confirmation_asr": 0.5581061692969871,
+        "confirmation_paired_gain": 0.538430006148801,
+        "asr": 0.5783593669183821,
+        "reduced_recall": 0.48864246109819354,
+        "reduced_fpr": 0.0081,
+        "full_recall": 0.6367376140225363,
+        "full_fpr": 0.0071
+      },
+      {
+        "seed": 43,
+        "origin": "original",
+        "confirmed": true,
+        "confirmation_asr": 0.521819299323909,
+        "confirmation_paired_gain": 0.49846342962507684,
+        "asr": 0.5342167926286365,
+        "reduced_recall": 0.47267441860465115,
+        "reduced_fpr": 0.0067,
+        "full_recall": 0.5279069767441861,
+        "full_fpr": 0.0116
+      },
+      {
+        "seed": 59,
+        "origin": "additional",
+        "confirmed": true,
+        "confirmation_asr": 0.5333060053289609,
+        "confirmation_paired_gain": 0.511990161918426,
+        "asr": 0.5454828014919187,
+        "reduced_recall": 0.543019943019943,
+        "reduced_fpr": 0.0079,
+        "full_recall": 0.6005698005698006,
+        "full_fpr": 0.0093
+      },
+      {
+        "seed": 71,
+        "origin": "additional",
+        "confirmed": false,
+        "confirmation_asr": 0.49815800245599673,
+        "confirmation_paired_gain": 0.47073270568972575,
+        "asr": 0.5149725417055228,
+        "reduced_recall": 0.4593561368209256,
+        "reduced_fpr": 0.0067,
+        "full_recall": 0.52897384305835,
+        "full_fpr": 0.0098
+      }
+    ]
+  },
+  "adaptive": {
+    "cell_count": 24,
+    "sources_per_dataset": 100,
+    "max_queries_including_initial": 32,
+    "additional_coordinates_per_view": 8,
+    "target": "Reduced",
+    "views": [
+      "structural",
+      "behavioral",
+      "metadata"
+    ],
+    "rows": [
+      {
+        "dataset": "EMBER2018",
+        "cohort": "restricted",
+        "runs": 12,
+        "before": 0.4425393380358112,
+        "after": 0.5950352685838307,
+        "main_before": 0.715111231687466,
+        "main_after": 0.8093416531018267,
+        "gain_pp": 15.249593054801952
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "cross",
+        "runs": 9,
+        "before": 1.0,
+        "after": 1.0,
+        "main_before": 1.0,
+        "main_after": 1.0,
+        "gain_pp": 0.0
+      },
+      {
+        "dataset": "EMBER2024",
+        "cohort": "restricted",
+        "runs": 3,
+        "before": 0.36769759450171824,
+        "after": 0.45017182130584193,
+        "main_before": 0.6151202749140894,
+        "main_after": 0.6666666666666666,
+        "gain_pp": 8.24742268041237
+      }
+    ]
+  },
+  "training_filtering": {
+    "configuration_count": 2,
+    "per_input_detector": false,
+    "rows": [
+      {
+        "dataset": "EMBER2018",
+        "method": "IF_top32",
+        "seed": 17,
+        "family": "spread_structural",
+        "poison_rate": 0.02,
+        "removed": 5000,
+        "poisons_total": 4000,
+        "poisons_removed": 977,
+        "benign_unpoisoned_removed": 4023,
+        "asr_before": 0.9781324489584412,
+        "asr_after": 0.9575085501088196,
+        "accuracy_before": 0.9631,
+        "accuracy_after": 0.95925
+      },
+      {
+        "dataset": "EMBER2018",
+        "method": "random_control",
+        "seed": 17,
+        "family": "spread_structural",
+        "poison_rate": 0.02,
+        "removed": 5000,
+        "poisons_total": 4000,
+        "poisons_removed": 169,
+        "benign_unpoisoned_removed": 4831,
+        "asr_before": 0.9781324489584412,
+        "asr_after": 0.9885998549072442,
+        "accuracy_before": 0.9631,
+        "accuracy_after": 0.96075
+      },
+      {
+        "dataset": "EMBER2024",
+        "method": "IF_top32",
+        "seed": 17,
+        "family": "spread_structural",
+        "poison_rate": 0.02,
+        "removed": 5000,
+        "poisons_total": 4000,
+        "poisons_removed": 1845,
+        "benign_unpoisoned_removed": 3155,
+        "asr_before": 0.5939280903533313,
+        "asr_after": 0.3584084550823749,
+        "accuracy_before": 0.9736,
+        "accuracy_after": 0.9731
+      },
+      {
+        "dataset": "EMBER2024",
+        "method": "random_control",
+        "seed": 17,
+        "family": "spread_structural",
+        "poison_rate": 0.02,
+        "removed": 5000,
+        "poisons_total": 4000,
+        "poisons_removed": 169,
+        "benign_unpoisoned_removed": 4831,
+        "asr_before": 0.5939280903533313,
+        "asr_after": 0.5978655061651642,
+        "accuracy_before": 0.9736,
+        "accuracy_after": 0.9736
+      }
+    ]
+  },
+  "cross_confirmation": {
+    "pool": "confirmation",
+    "denominator": "clean_original_eligible",
+    "rows": [
+      {
+        "dataset": "EMBER2018",
+        "runs": 9,
+        "clean_asr": 0.9294608144505756,
+        "poisoned_asr": 0.9986887363425693,
+        "new_evasion": 0.06922792189199374,
+        "lost_evasion": 0.0,
+        "net_gain": 0.06922792189199374
+      },
+      {
+        "dataset": "EMBER2024",
+        "runs": 9,
+        "clean_asr": 0.17870072162673944,
+        "poisoned_asr": 0.9955830225271838,
+        "new_evasion": 0.8168823009004442,
+        "lost_evasion": 0.0,
+        "net_gain": 0.8168823009004442
+      }
+    ]
+  },
+  "binary_audit": {
+    "variant_count": 10,
+    "original_count": 2,
+    "modified_count": 8,
+    "overlay_bytes": 246,
+    "edited_schema_cases": 16,
+    "functionality_cases": 40,
+    "windows_pass": 32,
+    "windows_error": 8,
+    "recorded_environments": [
+      "Windows_x86_64_Native"
+    ],
+    "wine_evidence": false,
+    "source_and_executables_in_export": false,
+    "referenced_source_files_found": 0,
+    "referenced_executables_found": 0,
+    "complete_binary_trigger_demonstrated": false,
+    "independent_binary_execution_by_this_build": false,
+    "scoring_rows": 240,
+    "unique_file_main_model_pairs": 120,
+    "main_model_count": 12,
+    "mode_bundle_count": 24,
+    "reduced_alerts": 0,
+    "full_scored_rows": 120,
+    "full_alerts": 0,
+    "feature_shift_rows": [
+      {
+        "fixture": "C x64",
+        "edit": "Timestamp 0",
+        "schema": "V2",
+        "total_changed": 11,
+        "structural": 1,
+        "behavioral": 0,
+        "metadata": 10,
+        "collateral": 10
+      },
+      {
+        "fixture": "C x64",
+        "edit": "Timestamp 0",
+        "schema": "V3",
+        "total_changed": 12,
+        "structural": 1,
+        "behavioral": 0,
+        "metadata": 11,
+        "collateral": 11
+      },
+      {
+        "fixture": "C x64",
+        "edit": "Target 2018",
+        "schema": "V2",
+        "total_changed": 12,
+        "structural": 1,
+        "behavioral": 0,
+        "metadata": 11,
+        "collateral": 11
+      },
+      {
+        "fixture": "C x64",
+        "edit": "Target 2018",
+        "schema": "V3",
+        "total_changed": 13,
+        "structural": 1,
+        "behavioral": 0,
+        "metadata": 12,
+        "collateral": 12
+      },
+      {
+        "fixture": "C x64",
+        "edit": "Target 2024",
+        "schema": "V2",
+        "total_changed": 15,
+        "structural": 1,
+        "behavioral": 0,
+        "metadata": 14,
+        "collateral": 14
+      },
+      {
+        "fixture": "C x64",
+        "edit": "Target 2024",
+        "schema": "V3",
+        "total_changed": 16,
+        "structural": 1,
+        "behavioral": 0,
+        "metadata": 15,
+        "collateral": 15
+      },
+      {
+        "fixture": "C x64",
+        "edit": "Overlay +246 B",
+        "schema": "V2",
+        "total_changed": 348,
+        "structural": 1,
+        "behavioral": 0,
+        "metadata": 347,
+        "collateral": 347
+      },
+      {
+        "fixture": "C x64",
+        "edit": "Overlay +246 B",
+        "schema": "V3",
+        "total_changed": 353,
+        "structural": 5,
+        "behavioral": 0,
+        "metadata": 348,
+        "collateral": 352
+      },
+      {
+        "fixture": ".NET C#",
+        "edit": "Timestamp 0",
+        "schema": "V2",
+        "total_changed": 11,
+        "structural": 1,
+        "behavioral": 0,
+        "metadata": 10,
+        "collateral": 10
+      },
+      {
+        "fixture": ".NET C#",
+        "edit": "Timestamp 0",
+        "schema": "V3",
+        "total_changed": 12,
+        "structural": 1,
+        "behavioral": 0,
+        "metadata": 11,
+        "collateral": 11
+      },
+      {
+        "fixture": ".NET C#",
+        "edit": "Target 2018",
+        "schema": "V2",
+        "total_changed": 14,
+        "structural": 1,
+        "behavioral": 0,
+        "metadata": 13,
+        "collateral": 13
+      },
+      {
+        "fixture": ".NET C#",
+        "edit": "Target 2018",
+        "schema": "V3",
+        "total_changed": 15,
+        "structural": 1,
+        "behavioral": 0,
+        "metadata": 14,
+        "collateral": 14
+      },
+      {
+        "fixture": ".NET C#",
+        "edit": "Target 2024",
+        "schema": "V2",
+        "total_changed": 15,
+        "structural": 1,
+        "behavioral": 0,
+        "metadata": 14,
+        "collateral": 14
+      },
+      {
+        "fixture": ".NET C#",
+        "edit": "Target 2024",
+        "schema": "V3",
+        "total_changed": 16,
+        "structural": 1,
+        "behavioral": 0,
+        "metadata": 15,
+        "collateral": 15
+      },
+      {
+        "fixture": ".NET C#",
+        "edit": "Overlay +246 B",
+        "schema": "V2",
+        "total_changed": 232,
+        "structural": 1,
+        "behavioral": 0,
+        "metadata": 231,
+        "collateral": 231
+      },
+      {
+        "fixture": ".NET C#",
+        "edit": "Overlay +246 B",
+        "schema": "V3",
+        "total_changed": 238,
+        "structural": 6,
+        "behavioral": 0,
+        "metadata": 232,
+        "collateral": 237
+      }
+    ],
+    "windows_rows": [
+      {
+        "variant": "native_original",
+        "fixture": "C x64",
+        "edit": "Original",
+        "case_count": 4,
+        "pass_count": 4,
+        "error_count": 0
+      },
+      {
+        "variant": "native_coff_ts_zero",
+        "fixture": "C x64",
+        "edit": "Timestamp 0",
+        "case_count": 4,
+        "pass_count": 4,
+        "error_count": 0
+      },
+      {
+        "variant": "native_coff_ts_target_2018",
+        "fixture": "C x64",
+        "edit": "Target 2018",
+        "case_count": 4,
+        "pass_count": 4,
+        "error_count": 0
+      },
+      {
+        "variant": "native_coff_ts_target_2024",
+        "fixture": "C x64",
+        "edit": "Target 2024",
+        "case_count": 4,
+        "pass_count": 4,
+        "error_count": 0
+      },
+      {
+        "variant": "native_benign_overlay",
+        "fixture": "C x64",
+        "edit": "Overlay +246 B",
+        "case_count": 4,
+        "pass_count": 4,
+        "error_count": 0
+      },
+      {
+        "variant": "dotnet_original",
+        "fixture": ".NET C#",
+        "edit": "Original",
+        "case_count": 4,
+        "pass_count": 4,
+        "error_count": 0
+      },
+      {
+        "variant": "dotnet_coff_ts_zero",
+        "fixture": ".NET C#",
+        "edit": "Timestamp 0",
+        "case_count": 4,
+        "pass_count": 4,
+        "error_count": 0
+      },
+      {
+        "variant": "dotnet_coff_ts_target_2018",
+        "fixture": ".NET C#",
+        "edit": "Target 2018",
+        "case_count": 4,
+        "pass_count": 0,
+        "error_count": 4
+      },
+      {
+        "variant": "dotnet_coff_ts_target_2024",
+        "fixture": ".NET C#",
+        "edit": "Target 2024",
+        "case_count": 4,
+        "pass_count": 0,
+        "error_count": 4
+      },
+      {
+        "variant": "dotnet_benign_overlay",
+        "fixture": ".NET C#",
+        "edit": "Overlay +246 B",
+        "case_count": 4,
+        "pass_count": 4,
+        "error_count": 0
+      }
+    ]
+  },
+  "limitations": [
+    "Đây là số liệu nghiên cứu cố định ngày 28/10/2026, không phải trạng thái dịch vụ hiện tại.",
+    "Các thí nghiệm đầu độc và thích nghi chỉ sửa vector đặc trưng; Cross/adaptive vẫn là điểm yếu.",
+    "Ngưỡng ROC từ final đã quan sát chỉ dùng so sánh hồi cứu; ngưỡng triển khai không thay đổi.",
+    "Full không luôn tốt hơn Shadow; tại 200.000 mẫu sạch, Shadow vượt trội và có quan hệ với cách định nghĩa nhóm đánh giá.",
+    "Hai seed mới chỉ kiểm tra một điều kiện; nguồn dữ liệu lặp lại không phải các tập độc lập.",
+    "Audit binary dùng tệp lành và log xuất; không có source/EXE để tái dựng, không chứng minh trigger đầy đủ hay recall backdoor thực tế.",
+    "Kiểm thử phần mềm và hash không chứng minh hiệu quả phát hiện mọi backdoor."
+  ],
+  "provenance": {
+    "paths_relative_to": "repository_root",
+    "sources": [
+      {
+        "path": "output/teacher_revision_2026_10_27/fixed_threshold_per_run.csv",
+        "sha256": "ecaefd211c893a72683baa2c83d888cbfee255ca9395417ca20145e0089dee19",
+        "rows": 540
+      },
+      {
+        "path": "outputs/primary/EMBER2018/protocol_v2/results.json",
+        "sha256": "ebaf1398ce35e1b9fcf8d36d48222448d7ff08732409ea64feafafc4b6081c50"
+      },
+      {
+        "path": "outputs/primary/EMBER2024/protocol_v2/results.json",
+        "sha256": "ecdf317f54e2d9ced649c50dd6615a1e40dea984f3ebd574866d7857891b0c2d"
+      },
+      {
+        "path": "output/teacher_revision_2026_10_27/same_fpr_summary.csv",
+        "sha256": "8e047e19057a4ae8b660da12151a84d7d342ee57b5c397a8f48945ad9bdf5c92",
+        "rows": 120
+      },
+      {
+        "path": "output/teacher_revision_2026_10_27/clean_budget_summary.csv",
+        "sha256": "f165251dd2dc6e499c387c92e0842efaa8a08b954e96d853d662286477469374",
+        "rows": 45
+      },
+      {
+        "path": "output/teacher_revision_2026_10_27/ember2024_seed_runs.csv",
+        "sha256": "798ef621da161fea3adbd1219daaba0a5790830b49197c0f6e7ba41952d7bdaa",
+        "rows": 5
+      },
+      {
+        "path": "output/teacher_revision_2026_10_27/adaptive_summary.csv",
+        "sha256": "d97ec6edbb8559bfba43634ed9b32d2710f3d726302386b2d1e1a7eda5175c0e",
+        "rows": 3
+      },
+      {
+        "path": "outputs/teacher_revision_2026_10_27/adaptive_multiview/protocol.json",
+        "sha256": "e808b0731ec18b9f4efe5a6a897f7766037e456af40ccf192c7756c3cc6a3664"
+      },
+      {
+        "path": "output/teacher_revision_2026_10_27/training_defense_results.csv",
+        "sha256": "67790b3d390886c74d0c699eca98bfc6503889993bff14a9c2c2d7aa69608a75",
+        "rows": 4
+      },
+      {
+        "path": "output/teacher_revision_2026_10_27/cross_confirmation_summary.csv",
+        "sha256": "77666e71fd87238879b8efdb64967ff5c6f33f2a379a42436cb87ee369fd1797",
+        "rows": 2
+      },
+      {
+        "path": "phuc_pe_trigger_2026_10_27/phuc_pe_trigger_2026_10_27/manifest.csv",
+        "sha256": "24a1eefa629d7329adde35b35c5ddeafa7c56a605df0281bc0ace511338932d2",
+        "rows": 10
+      },
+      {
+        "path": "phuc_pe_trigger_2026_10_27/phuc_pe_trigger_2026_10_27/functionality_results.csv",
+        "sha256": "eca6cf78c839ea6f61ac07753515d86a6eb424499e26a78f5310528890cf14a6",
+        "rows": 40
+      },
+      {
+        "path": "phuc_pe_trigger_2026_10_27/phuc_pe_trigger_2026_10_27/xsentinel_scores.csv",
+        "sha256": "22a114a83d8c5fc7cde1aff87e4260d9675b6a481fe123ab099144f8a8771363",
+        "rows": 240
+      },
+      {
+        "path": "phuc_pe_trigger_2026_10_27/phuc_pe_trigger_2026_10_27/feature_change_summary.csv",
+        "sha256": "bea3c1b3378b8e2b12f41d52b2be58d4be764871ac79c4d9d3ff9cb2d5f60111",
+        "rows": 16
+      },
+      {
+        "path": "src/xsentinel/schema.py",
+        "sha256": "75e5cdc7fd6133ee56f33818b0c72bc5a339ae11d92fb2a59aa8439d5003ced0"
+      },
+      {
+        "path": "src/xsentinel/detection/components.py",
+        "sha256": "f55204cc32eb54c418b74f123f1dc262e78646053089562d6ae80f578919e744"
+      },
+      {
+        "path": "src/xsentinel/detection/calibration.py",
+        "sha256": "875eab8cf21e6c8a3c01d0b32d9b5de28b24b41ac51ab3fbe44c123e8b0933d4"
+      },
+      {
+        "path": "src/xsentinel/detection/detector.py",
+        "sha256": "dd3d810c9cae150f4171880ddc797fbbdcf7b41eb50a9e9e7c8d9479eecead93"
+      }
+    ],
+    "runtime_source_verification": false,
+    "build_policy": "Read exported evidence only; no training, inference, service calls or binary execution."
+  },
+  "content_sha256": "0073cd1bd9ea0b76ca3fec16ab29f903ea2c578f89ddcb82a4d8c9af89c9dbf5"
+}

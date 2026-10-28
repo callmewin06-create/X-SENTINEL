@@ -75,17 +75,18 @@ DARK = (
 @st.dialog('Giới thiệu X-SENTINEL')
 def about():
     st.markdown('''
-    ### 🛡️ Hệ Thống Phòng Thủ X-SENTINEL (Apex SOC)
-    **Phát hiện cửa hậu (Backdoor) trên bộ phân loại mã độc PE bằng tính nhất quán ngữ nghĩa đa góc nhìn.**
+    ### X-SENTINEL · Demo nghiên cứu
+    **Phân loại PE và chấm dấu hiệu đáng ngờ theo từng đầu vào.**
 
     - **Đơn vị thực hiện**: Nhóm 4 — Khoa An toàn Thông tin, Đại học FPT (Học kỳ Fall 2026).
-    - **Cốt lõi khoa học & Bằng chứng kiểm toán**:
-      1. Phân rã tệp PE thành 3 góc nhìn trực giao: **Cấu trúc ($V_S$)**, **Hành vi API ($V_B$)** và **Metadata ($V_M$)**.
-      2. Module **$M_3$ (View-Mass Dominance)**: Khắc phục sự sụp đổ của TADR trước đòn tấn công phân tán $T_{\\text{spread}}$.
-      3. Module **$M_4$ (Cross-View Semantic Consistency)**: Khai thác mâu thuẫn khi Header bị lừa là lành tính nhưng Import Table API kiên quyết tố cáo mã độc.
-    - **Kiến trúc phân tán**: Backend FastAPI hiệu năng cao, CSDL kiểm toán PostgreSQL, Streamlit SOC Dashboard.
+    - **Dữ liệu nghiên cứu**: EMBER2018/V2 và EMBER2024/V3; 54 cấu hình primary cố định, 108 bundle Reduced/Full. M5 chưa được đánh giá trong primary.
+    - **Ba nhóm đặc trưng không chồng lặp**: Structural (cấu trúc PE), Behavioral (import/export tĩnh), Metadata (byte, entropy và chuỗi). Behavioral không phải nhật ký thực thi.
+    - **Reduced — VMC + BGS**: tập trung SHAP theo nhóm và tín hiệu SHAP Behavioral có điều kiện, không cần mô hình sạch bổ trợ.
+    - **Full — VMC + BPG**: thêm chênh lệch dự đoán của mô hình Behavioral sạch; cần tài nguyên sạch và không luôn hơn Shadow.
+    - **Giới hạn**: các đòn đầu độc/thích nghi được đánh giá trong không gian đặc trưng. Trigger phân tán và thích nghi đa view vẫn làm detector thất bại trong các trường hợp đã thử. Audit binary lành chưa chứng minh trigger đầy đủ trên malware hoạt động.
+    - **Ứng dụng**: Streamlit, FastAPI và lịch sử PostgreSQL. Kết quả nghiên cứu ngày 28/10/2026 được tổng hợp tại trang Nghiên cứu; không phải phép đo live của lượt phân tích hiện tại.
     ''')
-    st.caption('Hai quyết định phân loại file và cảnh báo trigger được tính toán độc lập. Chưa có cảnh báo không đồng nghĩa file tuyệt đối an toàn.')
+    st.caption('Phân loại file và cảnh báo trigger là hai kết quả riêng, có dùng chung tín hiệu của mô hình. Chưa có cảnh báo không chứng nhận file an toàn; mục tiêu FPR chỉ được hiệu chỉnh trên calibration.')
     st.link_button('Mở Repository GitHub của nhóm', GITHUB)
 
 
@@ -106,10 +107,10 @@ def controls(api_connected=False):
                 '<span class="xs-brand-shield">🛡️</span>'
                 '<div class="xs-brand-text-group">'
                 '<span class="xs-brand-title">X-SENTINEL</span>'
-                '<span class="xs-brand-badge">SOC APEX v2.4</span>'
+                '<span class="xs-brand-badge">DEMO NGHIÊN CỨU</span>'
                 '</div>'
                 '</div>'
-                '<div class="xs-brand-sub">HỆ THỐNG PHÁT HIỆN CỬA HẬU MÃ ĐỘC PE BẰNG TÍNH NHẤT QUÁN NGỮ NGHĨA ĐA GÓC NHÌN</div>'
+                '<div class="xs-brand-sub">PHÂN LOẠI PE VÀ DẤU HIỆU TRIGGER THEO TỪNG ĐẦU VÀO</div>'
                 '</div>',
                 unsafe_allow_html=True
             )
@@ -129,11 +130,11 @@ def controls(api_connected=False):
     automatic = f'@media(prefers-color-scheme:dark){{:root{{{DARK}}}}}' if choice == 'Theo hệ thống' else ''
     st.markdown('<style>:root{' + base + '}' + automatic + CSS + '</style>', unsafe_allow_html=True)
 
-    # Live SOC Status & Telemetry Bar
+    # Configuration status is not a live API/database health check.
     api_status_html = (
-        '<div class="xs-telemetry-badge xs-pulse-green">'
+        '<div class="xs-telemetry-badge xs-pulse-amber">'
         '<span class="xs-pulse-dot"></span><span class="xs-pulse-wave"></span>'
-        '<span>API & PostgreSQL Trực tuyến</span>'
+        '<span>Đã cấu hình API · xác nhận lưu sau phân tích</span>'
         '</div>'
         if api_connected else
         '<div class="xs-telemetry-badge xs-pulse-amber">'
@@ -145,13 +146,13 @@ def controls(api_connected=False):
         f'<div class="xs-status-bar">'
         f'<div class="xs-status-left">'
         f'{api_status_html}'
-        f'<span class="xs-pill xs-pill-blue">🔒 Kiểm toán tĩnh (Zero-Execution)</span>'
+        f'<span class="xs-pill xs-pill-blue">🔒 Đọc PE tĩnh · không chạy file</span>'
         f'<span class="xs-pill xs-pill-purple">⚡ LightGBM TreeSHAP</span>'
-        f'<span class="xs-pill xs-pill-cyan">🎯 3 Góc nhìn trực giao (Vs, Vb, Vm)</span>'
+        f'<span class="xs-pill xs-pill-cyan">🎯 3 nhóm đặc trưng (Vs, Vb, Vm)</span>'
         f'</div>'
         f'<div class="xs-status-right">'
-        f'<span class="xs-status-meta">Tệp tối đa: <strong>50 MB</strong></span>'
-        f'<span class="xs-status-meta">FPR mục tiêu: <strong>&le; 1.0%</strong></span>'
+        f'<span class="xs-status-meta">Tệp tối đa: <strong>50 MiB</strong></span>'
+        f'<span class="xs-status-meta">FPR tại calibration: <strong>&le; 1%</strong></span>'
         f'</div>'
         f'</div>',
         unsafe_allow_html=True
@@ -234,7 +235,7 @@ def contribution_chart(contributions, names):
     }
     view_codes = {
         'structural': 'V_S · Cấu trúc PE',
-        'behavioral': 'V_B · Hành vi API',
+        'behavioral': 'V_B · Import/export tĩnh',
         'metadata': 'V_M · Siêu dữ liệu',
     }
 
@@ -265,13 +266,13 @@ def contribution_chart(contributions, names):
         f'<div class="xs-chart-head">'
         f'<div class="xs-chart-title-group">'
         f'<span class="xs-chart-title">📊 Tỷ Trọng Đóng Góp Theo 3 Góc Nhìn (View-Mass Distribution)</span>'
-        f'<span class="xs-chart-sub">Đo lường phân bố khối lượng giải thích tuyệt đối TreeSHAP theo 3 không gian trực giao</span>'
+        f'<span class="xs-chart-sub">Phân bố SHAP tuyệt đối theo ba nhóm đặc trưng không chồng lặp</span>'
         f'</div>'
-        f'<span class="xs-chart-badge">M3 Metric · View Attribution</span>'
+        f'<span class="xs-chart-badge">VMC · View Mass Concentration</span>'
         f'</div>'
         f'<div class="xs-chart-body">{"".join(rows)}</div>'
         f'<div class="xs-chart-foot">'
-        f'<strong>Cách đọc M3:</strong> lấy tỷ trọng SHAP tuyệt đối lớn nhất trong ba nhóm. '
+        f'<strong>Cách đọc VMC:</strong> lấy tỷ trọng SHAP tuyệt đối lớn nhất trong ba nhóm. '
         f'Tỷ trọng cao cho biết nhóm có ảnh hưởng lớn; riêng biểu đồ này chưa chứng minh file mang trigger hay backdoor.'
         f'</div>'
         f'</div>',

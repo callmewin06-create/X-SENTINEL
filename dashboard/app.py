@@ -17,6 +17,7 @@ from xsentinel.dashboard_catalog import primary_catalog, experiment_label, prefe
 from xsentinel.dashboard_input import context_key, prepare_input, reader_signature
 from xsentinel.dashboard_presentation import explain_result, feature_rows, friendly_error, method_name, format_size, VIEW_NAMES, VIEW_HELP
 from xsentinel.dashboard_chrome import controls, contribution_chart, render_verdict_card
+from xsentinel.dashboard_research import render_research_summary
 from xsentinel.demo_provenance import demo_ground_truth, demo_comparison
 from xsentinel.service.client import api_request
 from xsentinel.service.scoring import score_input,input_digest
@@ -116,7 +117,7 @@ def render_result(result, timings=None, key_prefix='result'):
     )
 
     right_card = render_verdict_card(
-        title='Quyết định 2 · Giám Sát Cửa Hậu',
+        title='Quyết định 2 · Dấu hiệu trigger',
         subtitle=explanation['method_label'],
         verdict_text=explanation['alert'],
         is_danger=is_backdoor,
@@ -240,7 +241,7 @@ def render_result(result, timings=None, key_prefix='result'):
 
 if page == 'Lịch sử':
     st.title('Lịch sử phân tích')
-    st.caption('Xem lại các bản ghi phân tích đã được lưu trữ an toàn trong PostgreSQL Audit Log.')
+    st.caption('Xem lại các kết quả đã lưu trong PostgreSQL; danh sách giới hạn 100 bản ghi gần nhất.')
     if not api_base:
         st.info('Chế độ local chưa kết nối database. Kết quả của phiên hiện tại chưa có lịch sử lưu.')
         st.stop()
@@ -259,22 +260,22 @@ if page == 'Lịch sử':
             st.markdown(f'''
             <div class="xs-kpi-grid">
                 <div class="xs-kpi-card">
-                    <div class="xs-kpi-label">🗄️ Tổng Lượt Phân Tích</div>
+                    <div class="xs-kpi-label">🗄️ Bản ghi đang hiển thị</div>
                     <div class="xs-kpi-val">{total_scans}</div>
                     <div class="xs-kpi-sub">Lưu trữ kiểm toán trong PostgreSQL</div>
                 </div>
                 <div class="xs-kpi-card xs-kpi-danger">
-                    <div class="xs-kpi-label">🚨 Phát Hiện Mã Độc</div>
+                    <div class="xs-kpi-label">🚨 Dự đoán mã độc</div>
                     <div class="xs-kpi-val">{malware_count}</div>
-                    <div class="xs-kpi-sub">{malware_rate:.1f}% tổng số tệp đã quét</div>
+                    <div class="xs-kpi-sub">{malware_rate:.1f}% bản ghi đang hiển thị</div>
                 </div>
                 <div class="xs-kpi-card xs-kpi-alert">
-                    <div class="xs-kpi-label">⚡ Cảnh Báo Backdoor</div>
+                    <div class="xs-kpi-label">⚡ Cảnh báo dấu hiệu trigger</div>
                     <div class="xs-kpi-val">{backdoor_count}</div>
                     <div class="xs-kpi-sub">Vượt ngưỡng kiểm soát trigger &tau;</div>
                 </div>
                 <div class="xs-kpi-card xs-kpi-safe">
-                    <div class="xs-kpi-label">🛡️ Tệp Lành Tính</div>
+                    <div class="xs-kpi-label">🛡️ Dự đoán lành</div>
                     <div class="xs-kpi-val">{benign_count}</div>
                     <div class="xs-kpi-sub">Dự đoán lành theo bản ghi đã lưu</div>
                 </div>
@@ -318,6 +319,8 @@ if page == 'Lịch sử':
     st.stop()
 
 st.title('Nghiên cứu' if page == 'Nghiên cứu' else 'Phân tích file PE')
+if page == 'Nghiên cứu':
+    render_research_summary(themed_table)
 st.caption('Chọn đầu vào, đọc hai kết luận và mở giải thích khi cần.')
 st.markdown('<div class="xs-section-title"><span>BƯỚC 1</span> CẤU HÌNH BỘ MÔ HÌNH VÀ CHẾ ĐỘ PHÒNG THỦ</div>', unsafe_allow_html=True)
 model_column, variant_column = st.columns(2)
@@ -340,9 +343,9 @@ if page == 'Nghiên cứu':
 variants = [v for v in ('reduced', 'full') if v in catalog[experiment]]
 variant = variant_column.selectbox('Chế độ', variants,
                         index=variants.index(prefs['variant']) if prefs['variant'] in variants else 0,
-                        format_func=lambda value: 'Reduced · dùng mô hình chính' if value == 'reduced' else 'Full · thêm mô hình sạch theo nhóm',
+                        format_func=lambda value: 'Reduced · VMC + BGS' if value == 'reduced' else 'Full · VMC + BPG',
                         key='variant_' + dataset,
-                        help='Hai chế độ cùng thí nghiệm dùng chung mô hình phân loại chính. Full dùng thêm mô hình sạch để tính cảnh báo trigger.')
+                        help='Hai chế độ dùng chung mô hình chính. Reduced không cần mô hình sạch bổ trợ; Full dùng chênh lệch dự đoán Behavioral sạch để tính BPG.')
 if experiment != prefs['experiment'] or variant != prefs['variant']:
     prefs['method'] = None
     st.session_state.pop('method_' + dataset, None)
@@ -377,7 +380,7 @@ except Exception as error:
     st.stop()
 
 st.caption(dataset + ' · ' + prefs['variant'].capitalize() + ' · ' + method_name(method))
-st.caption('Bộ mô hình nghiên cứu đã được đầu độc có chủ đích. Dự đoán mã độc và cảnh báo backdoor là hai kết quả riêng.')
+st.caption('Bộ mô hình nghiên cứu được huấn luyện với đầu độc trong không gian đặc trưng. Dự đoán mã độc và cảnh báo trigger là hai kết quả riêng.')
 with st.expander('Thông tin bộ mô hình đang dùng'):
     st.write('Cấu hình thí nghiệm:', experiment_label(prefs['experiment']))
     st.write('Schema:', schema, '· Protocol:', state.get('method_version', 'archive'))
@@ -398,12 +401,12 @@ kind = labels[mode]
 uploaded = None
 if kind != 'demo':
     extensions = {'pe': ['exe', 'dll', 'sys'], 'vector': ['npy'], 'raw_json': ['json']}[kind]
-    uploaded = st.file_uploader('Chọn một file · tối đa 50 MB', type=extensions, key='upload_' + page + '_' + kind)
+    uploaded = st.file_uploader('Chọn một file · tối đa 50 MiB', type=extensions, key='upload_' + page + '_' + kind)
     if uploaded is None:
         st.info('Chọn một file để bắt đầu. Bạn cũng có thể dùng mẫu demo.')
         st.stop()
     if uploaded.size > MAX_UPLOAD_BYTES:
-        st.error('File vượt giới hạn 50 MB.')
+        st.error('File vượt giới hạn 50 MiB.')
         st.stop()
     marker = (uploaded.file_id, uploaded.name, uploaded.size)
     if st.session_state.get('file_marker') != marker:

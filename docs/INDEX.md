@@ -2,6 +2,15 @@
 
 Báo cáo, tiến độ, kế hoạch và tài liệu nghiên cứu tập trung trong `docs/`. README ở gốc Project và trong gói baseline giữ nguyên vị trí. Đường dẫn trong mục lục này tính từ chính thư mục `docs/`; các đường dẫn code/dataset trong tài liệu thường tính từ gốc Project.
 
+## Bản hiện hành ngày 28/10/2026
+
+- [Đồng bộ web demo, kiểm tra và đính chính mô tả schema](WEB_DEMO_SYNC_2026_10_28.md)
+- [Trạng thái hiện tại, kết quả và giới hạn bằng chứng](STATUS_2026_10_28.md)
+- [README chạy hệ thống và phân biệt workflow primary/archived](../README.md)
+- [Bàn giao nghiên cứu ngày 27/10 — snapshot trước khi ghép Word/binary](REVIEW_REPAIR_2026_10_27.md)
+
+Bản Word một file mới nhất nằm cục bộ tại `output/ieee_merged_2026_10_28/X_SENTINEL_Merged_ReferenceStyle_Fixed.docx` tính từ gốc Project. File này bị Git bỏ qua; cần gửi riêng khi nộp. Các tài liệu theo ngày bên dưới là mốc lịch sử, không mặc định phản ánh trạng thái runtime hiện tại.
+
 ## Tiến độ và kế hoạch
 
 - [Bàn giao sửa 10 mục giao diện ngày 16/10](UI_REVISION_2026_10_16.md)
@@ -11,7 +20,7 @@ Báo cáo, tiến độ, kế hoạch và tài liệu nghiên cứu tập trung 
 - [Triển khai hiện tại và các quyết định đã duyệt](PRIMARY_IMPLEMENTATION_2026_10_06.md)
 - [Bàn giao ngày 06/10](X_SENTINEL_HANDOFF_2026_10_06.md)
 - [Kế hoạch hai dataset](plans/DUAL_DATASET_PLAN_2026_10_05.md)
-- [Trạng thái hệ thống](IMPLEMENTATION_STATUS.md)
+- [Trạng thái triển khai cũ — mốc pilot](IMPLEMENTATION_STATUS.md)
 - [Bàn giao kế hoạch ngày 04/10 — tài liệu lịch sử](X_SENTINEL_PLAN_HANDOFF.md)
 - [Báo cáo kế hoạch IAM — Word](<báo cáo kế hoạch IAM.docx>)
 
