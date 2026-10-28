@@ -1,9 +1,9 @@
 """Vietnamese explanations derived only from measured detector outputs."""
 METHOD_NAMES = {
     'X_primary_reduced': 'X-SENTINEL Reduced', 'X_primary_full': 'X-SENTINEL Full',
-    'M3_view_mass': 'M3 · Tỷ trọng SHAP theo nhóm',
-    'M4_shap_behavioral_conflict': 'M4-R · Bất đồng từ SHAP',
-    'M4_prob_gap': 'M4-F · Chênh lệch dự đoán', 'TADR': 'TADR', 'STRIP': 'STRIP',
+    'M3_view_mass': 'VMC · Tỷ trọng SHAP theo nhóm',
+    'M4_shap_behavioral_conflict': 'BGS · Tín hiệu SHAP Behavioral',
+    'M4_prob_gap': 'BPG · Chênh lệch dự đoán Behavioral', 'TADR': 'TADR', 'STRIP': 'STRIP',
 }
 VIEW_NAMES = {'structural': 'Structural · Cấu trúc PE', 'behavioral': 'Behavioral · Import/export',
               'metadata': 'Metadata · Byte và chuỗi'}
@@ -19,7 +19,7 @@ def method_name(value):
 
 
 def format_size(size):
-    return f'{size / 1024:.1f} KB' if size < 1024 * 1024 else f'{size / 1024 / 1024:.2f} MB'
+    return f'{size / 1024:.1f} KiB' if size < 1024 * 1024 else f'{size / 1024 / 1024:.2f} MiB'
 
 
 def decision_numbers(value, threshold):
@@ -51,11 +51,11 @@ def explain_result(result):
         (True, True): 'Mô hình chính dự đoán mã độc và phương pháp đang chọn cũng phát cảnh báo dấu hiệu trigger. Cảnh báo chưa chứng minh file chứa backdoor.',
     }
     descriptions = {
-        'X_primary_reduced': 'Reduced dùng hai tín hiệu: ảnh hưởng tập trung vào một nhóm và dấu hiệu mô hình nghiêng về lành trong khi thông tin import/export kéo về mã độc. Hai tín hiệu được so với mẫu tham chiếu lành rồi ghép thành điểm cảnh báo (M3 và M4-R).',
-        'X_primary_full': 'Full dùng mức tập trung ảnh hưởng và phần mô hình sạch theo nhóm import/export nghiêng về mã độc hơn mô hình chính. Hai tín hiệu được so với mẫu tham chiếu lành rồi ghép thành điểm cảnh báo (M3 và M4-F).',
-        'M3_view_mass': 'M3 đo tỷ trọng SHAP tuyệt đối của nhóm có ảnh hưởng lớn nhất đến mô hình chính.',
-        'M4_shap_behavioral_conflict': 'M4-R kết hợp dự đoán nghiêng về lành với tổng SHAP Behavioral dương; tổng dương đẩy raw margin về mã độc.',
-        'M4_prob_gap': 'M4-F đo phần chênh lệch dương giữa dự đoán mã độc của mô hình Behavioral sạch và mô hình chính.',
+        'X_primary_reduced': 'Reduced ghép VMC và BGS bằng trung bình hạng tham chiếu lành. VMC đo mức tập trung SHAP theo nhóm; BGS kết hợp dự đoán nghiêng về lành với tổng SHAP import/export dương. Chế độ này không cần mô hình sạch bổ trợ. Trigger phân tán hoặc thích nghi đa view vẫn có thể vượt qua các tín hiệu này.',
+        'X_primary_full': 'Full ghép VMC và BPG bằng trung bình hạng tham chiếu lành. BPG lấy phần chênh lệch dương khi mô hình Behavioral sạch nghiêng về mã độc hơn mô hình chính. Full cần thêm tài nguyên sạch; không có ưu thế phổ quát trước Shadow hoặc trigger thích nghi.',
+        'M3_view_mass': 'VMC đo tỷ trọng SHAP tuyệt đối của nhóm có ảnh hưởng lớn nhất đến mô hình chính. Đây là M3_view_mass trong định danh bundle; mức tập trung không tự chứng minh có trigger.',
+        'M4_shap_behavioral_conflict': 'BGS kết hợp (1 − p_mã_độc) với phần dương của tổng SHAP Behavioral, chia cho tổng SHAP tuyệt đối. Tổng SHAP có dấu được cộng trước khi lấy phần dương; đây là M4_shap_behavioral_conflict trong bundle.',
+        'M4_prob_gap': 'BPG = max(0, p_Behavioral_sạch − p_mô_hình_chính). Đây là M4_prob_gap trong bundle; dự đoán sạch bổ trợ dùng đặc trưng import/export tĩnh.',
         'TADR': 'TADR đo tỷ trọng SHAP tuyệt đối tập trung ở một đặc trưng mạnh nhất.',
         'STRIP': 'STRIP dùng 1 trừ entropy nhị phân trung bình khi trộn vector với mẫu reference. Các vector trộn chưa chắc tương ứng file PE hợp lệ.',
     }
@@ -63,7 +63,7 @@ def explain_result(result):
     contributions = result.get('view_contributions') or {}
     if result['method'].startswith('X_primary') and contributions:
         view = max(contributions, key=contributions.get)
-        signal_lines.append(f"M3: nhóm ảnh hưởng nhiều nhất là {VIEW_NAMES.get(view, view)}, chiếm {100*contributions[view]:.2f}% SHAP tuyệt đối.")
+        signal_lines.append(f"VMC: nhóm ảnh hưởng nhiều nhất là {VIEW_NAMES.get(view, view)}, chiếm {100*contributions[view]:.2f}% SHAP tuyệt đối.")
         component = 'M4_prob_gap' if result['method'] == 'X_primary_full' else 'M4_shap_behavioral_conflict'
         row = next((r for r in result['scores'] if r['Method'] == component), None)
         if row is not None:
@@ -132,7 +132,7 @@ def friendly_error(error):
         return 'Không phân tích được: dữ liệu trả về từ bộ đọc không hợp lệ. Hệ thống chưa chấm điểm file này.'
     text = str(error)
     if 'exceeds' in text or '50 MiB' in text:
-        return 'File vượt giới hạn 50 MB. Hãy chọn file nhỏ hơn.'
+        return 'File vượt giới hạn 50 MiB. Hãy chọn file nhỏ hơn.'
     if 'MZ' in text or 'PE signature' in text or 'parse' in text or 'LIEF' in text:
         return 'Không đọc được cấu trúc PE của file. Hãy kiểm tra định dạng .exe, .dll hoặc .sys.'
     if 'finite' in text or 'schema' in text.lower() or 'dataset mismatch' in text or 'columns' in text or 'one vector' in text:

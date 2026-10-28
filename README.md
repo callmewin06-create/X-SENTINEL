@@ -1,109 +1,105 @@
 # X-SENTINEL
 
-The teacher-feedback revision is in [the revision guide](docs/REVISION_2026_10_13.md). It preserves the primary models, triggers and thresholds, aligns the manuscript with the implemented M3/M4 formulas, separates restricted edits from cross-view stress, and adds source audits, component analysis, fresh source-ID validation, clean shadow comparisons, a bounded Structural vector optimizer and benign binary extraction checks. The revised manuscript is a Word document under `output/revision_2026_10_13/`; raw datasets are excluded from its local reproduction package. M5 remains unassessed. New baselines have additional access and do not replace primary results.
+X-SENTINEL studies per-input backdoor suspicion in static PE malware classifiers on **EMBER2018/V2** and **EMBER2024/V3**. It combines LightGBM predictions and TreeSHAP feature-view signals, with a Vietnamese Streamlit dashboard, a FastAPI service and PostgreSQL analysis history. Malware classification and backdoor suspicion are separate outputs; an absence of suspicion does not certify that a file or model is safe.
 
-The primary dual-dataset run completed on 2026-10-07: 27/27 final experiments per dataset, with paired full/reduced bundles. Read the [results review (Vietnamese)](docs/results/PRIMARY_RESULTS_REVIEW_2026_10_07.md), [dashboard and Docker verification](docs/DASHBOARD_DOCKER_CHECK_2026_10_07.md), and [approved protocol](configs/primary_protocol.json). The experiment commands below retain the archived V2 workflow; they do not run the new primary matrix.
+## Current status — 28 October 2026
 
-The [primary run guide and progress update for 2026-10-07](docs/PRIMARY_RUN_GUIDE_2026_10_07.md) documents the new `prepare-v3`, `develop-primary`, `lock-selector`, `confirm-primary`, `run-primary` and `report-primary` commands. M3 remains view_mass; M5 is deferred. Full has higher mean recall and FPR on the confirmed runs; EMBER2024 detection remains limited. All weak runs are retained.
+The original primary benchmark contains **54 frozen configurations** (27 per dataset), with **108 calibrated Reduced/Full bundles**. Primary models, triggers and calibration thresholds are preserved. M5 is not assessed in this primary benchmark.
 
-Raw EMBER2018 files now live in `data/ember2018`; prepared arrays remain in `data/ember2018_full`. The move is recorded in `data/ember2018_relocation.json`. Historical source manifests retain the paths recorded when data were prepared.
+The 27 October revision adds signed-SHAP Isolation Forest comparisons, retrospective low-FPR metrics, paired Cross diagnostics, bounded **multiview** adaptation, five clean-fit budgets and a two-configuration training-filtering experiment. Two additional EMBER2024 seeds, **59 and 71**, give five attempts in the spread-2% condition; four are confirmed and the unsuccessful attempt is retained. These additions expose limitations rather than establish resistance to distributed or adaptive backdoors. Final evaluation pools had already been observed before the supplemental analyses.
 
-Reports, progress records, plans and research source documents are collected under `docs/`. See the [document index](docs/INDEX.md) for their current locations.
+Start with the [current status and evidence boundaries](docs/STATUS_2026_10_28.md). The [27 October research handoff](docs/REVIEW_REPAIR_2026_10_27.md) records that revision; its then-pending Word/binary integration was completed as described in the current status. The [13 October revision](docs/REVISION_2026_10_13.md) and older implementation records are historical snapshots.
 
-Complete feature-space research pipeline for per-input backdoor suspicion on EMBER2018: streaming data preparation, clean-label attacks, clean/poisoned LightGBM models, TADR, STRIP, reduced/full cross-view detection, limited M5, threshold locking, E0–E5 evaluation, a Streamlit demo and CPU Docker packaging.
+The [28 October web-demo synchronization](docs/WEB_DEMO_SYNC_2026_10_28.md) updates the Research page, VMC/BGS/BPG explanations and PDF wording without changing model decisions. Its dated research snapshot is packaged with the app. The handoff also records an outstanding schema-description correction in the manuscript and the local/Docker verification boundary.
 
-Read [method specification](docs/METHOD_SPEC.md) and [Vietnamese walkthrough](docs/HUONG_DAN_TUNG_BUOC.md) first. Current completion evidence is recorded in [implementation status](docs/IMPLEMENTATION_STATUS.md). Hypotheses are not asserted as findings.
+## Run the dashboard
 
-## Local setup
+Run commands from the repository root. Scoring an existing calibrated bundle does not require the original datasets or retraining. This checkout already tracks frozen primary artifacts under `outputs/primary/`; preserve the matching model files, reference arrays, schema metadata and thresholds together. `.gitignore` does not remove files that are already tracked.
 
-Python 3.11–3.12. The existing `.venv` is usable. Commands below run from the repository root in PowerShell. New-machine setup:
+### Docker with API and history
 
-```powershell
-python -m venv .venv
-.venv/Scripts/python.exe -m pip install '.[service]' pytest==8.3.5
-.venv/Scripts/python.exe -m pytest -q
-```
-
-Direct dependencies are pinned in pyproject.toml. `requirements-lock.txt` captures the validated Windows environment. Docker was built and tested on Linux via Docker Desktop; the dependency snapshot and validation evidence are recorded in the Docker verification guide. Transitive dependencies are not fully locked for future rebuilds.
-
-## Pilot
+Docker Desktop must be running. Create `.env` only if it does not already exist:
 
 ```powershell
-.venv/Scripts/python.exe scripts/xsentinel.py prepare --raw data/ember2018 --out data/pilot --limit 2000
-.venv/Scripts/python.exe scripts/xsentinel.py split --data data/pilot --reference 100 --calibration 400
-.venv/Scripts/python.exe scripts/xsentinel.py run --data data/pilot --out outputs/pilot --config configs/pilot.json
-.venv/Scripts/python.exe scripts/xsentinel.py report --run outputs/pilot
-.venv/Scripts/python.exe -m streamlit run dashboard/app.py
+if (-not (Test-Path -LiteralPath '.env')) {
+    Copy-Item -LiteralPath '.env.example' -Destination '.env'
+}
 ```
 
-`--limit` takes the first records of EACH source file for fast integration validation. It is a biased pilot sampling rule, not a representative research dataset. Fresh output directories are required to prevent accidental overwriting of locked experiments.
-
-An interrupted run can continue with `--resume` if configuration, data/splits, source-code checksums and model checkpoints still match. Source changes require a new run directory. Plot real results with `pip install '.[plots]'` then `python scripts/plot_results.py --run outputs/pilot`.
-
-## Train-only attack development
-
-Before launching the large matrix, screen attack viability on disjoint subsets of official **train**:
-
-```powershell
-.venv/Scripts/python.exe scripts/xsentinel.py develop-attack --data data/ember2018_full --out outputs/attack_development_v1 --config configs/attack_development.json
-```
-
-This command opens only training arrays. It freezes balanced fit/selection/development partitions (40000/5000/10000), two concentrated feasible selectors and three poison rates before development predictions. The existing rare-value selector is compared with an experimental observed-benign-tuple selector using negative joint SHAP. Both use the same feature pair. It saves source snapshots, IDs, trigger/model checksums, per-sample predictions, ASR intervals, clean-trigger controls, clean performance and an English report. A predeclared screening rule is a development heuristic, not a research result or proof of binary realizability. New runs require fresh output directories; this command does not implement resume. Do not tune attacks on official final test.
-
-Both completed screens retain negative findings: no candidate passed, and the joint selector did not improve ASR. Read the [comparison and next research steps](docs/results/ATTACK_DEVELOPMENT_SUMMARY.md), [first screen report](docs/results/attack_development_v1/report.md) and [capacity follow-up](docs/results/attack_development_500rounds_v2/report.md). The 500-round config uses research model capacity on the same subsets (`configs/attack_development_500rounds.json`); it explicitly reuses observed development data and is exploratory. The [selector audit](docs/ATTACK_AUDIT.md) distinguishes local adaptations from the authors' source algorithm.
-
-## Official research data and matrix
-
-```powershell
-.venv/Scripts/python.exe scripts/xsentinel.py prepare --raw data/ember2018 --out data/ember2018_full
-.venv/Scripts/python.exe scripts/xsentinel.py split --data data/ember2018_full --reference 500 --calibration 2000
-.venv/Scripts/python.exe scripts/xsentinel.py run --data data/ember2018_full --out outputs/research --config configs/research.json --allow-vector-stress
-.venv/Scripts/python.exe scripts/xsentinel.py report --run outputs/research
-```
-
-The research matrix has 3 seeds × 3 trigger types × 3 rates = 27 poisoned models, plus clean and view models. It is explicitly a **vector stress-test**. The authors' feasible set cannot produce 24-feature Metadata spread or Behavioral-view modifications. `feasible` never silently expands its allowed set; unsupported configurations raise errors. Neither profile proves the selected vector modifications can be realized in PE files. Read the documented methodological decision before launching. Full official evaluation and training may take many hours; 4 CPU threads and sequential models are the default. Ensure adequate free disk/RAM and benchmark the pilot first.
-
-The detector is blind: clean models, poisoning manifests, labels and trigger identities remain in attack/evaluation modules. Main-model hashes, reference data and per-variant thresholds live in portable detector bundles. Calibration FPR ≤1% is empirical; final FPR can differ. No claims of speedups, detection success or latency <10 ms are made without measured evidence.
-
-## D0 and scoring
-
-```powershell
-.venv/Scripts/python.exe scripts/xsentinel.py score --bundle outputs/pilot/seed_17/concentrated_0.01/bundle --vector data/demo_vector.npy
-.venv/Scripts/python.exe scripts/xsentinel.py d0 --model models/main.txt --vectors data/demo_batch.npy --q 0.01
-```
-
-D0 reports raw TADR/M3/M4r and a fixed top-q batch budget; it has no calibrated FPR and no STRIP reference. D1 uses separate reference/calibration. Full requires three pre-trained clean view models, an additional preparation assumption.
-
-## Dashboard and Docker
-
-The [16 October UI revision handoff](docs/UI_REVISION_2026_10_16.md) records the readable light/dark results, direct Reduced/Full selector, Vietnamese explanations and controls, source-verified demo label comparison, and downloadable Vietnamese result PDF. The revision passed 80 tests and API/history/Linux Docker checks on this physical machine. Second-machine acceptance and actual screen recording remain unverified. Existing primary models, thresholds and research artifacts are unchanged.
-
-The current Docker stack includes PostgreSQL history and a FastAPI adapter for the real primary detector. Read the [database integration guide (Vietnamese)](docs/database/INTEGRATION_2026_10_07.md). New machines need a local `.env` password; Analyze/History pages save only when you click the analysis button. The standalone local dashboard remains available without database. Users/roles are schema only; authentication is not implemented.
-
-The Vietnamese dashboard separates Analysis, History and Research. Analysis accepts PE uploads up to 50 MiB or labelled reference-vector demos. Research exposes all 27 primary experiments per dataset, reduced/full, finite vectors with 2381 columns (EMBER2018) or 2568 (EMBER2024), and matching raw EMBER JSON. V2/V3 PE extraction is connected and fixture-tested; V2 compatibility caveats and the lack of original-dataset binary parity remain explicit. Classification and the selected method's trigger alert are separate. Result explanations and SHAP views reuse existing output. History retains optional client-declared input metadata and supports older records.
-
-Read the [14 October deployment handoff and second-machine checklist](docs/DELIVERY_2026_10_14.md). The updated Word report and demo slides are in `output/delivery_2026_10_14`; runtime evidence is under `outputs/delivery_2026_10_14/stack_v10`. A real isolated backup restore, four PE/service cases and Windows/Linux Docker UI checks passed on the current physical machine. The teammate's physical-machine check is pending for 15 October. The 10 ms research target remains unmet.
+Set your own `POSTGRES_PASSWORD` in `.env` using `.env.example` as the guide, then start the stack:
 
 ```powershell
 docker compose up -d --build
+docker compose ps -a
 ```
 
-The Dockerfile installs third-party runtime dependencies from `pyproject.toml` before copying application code. UI/source changes reuse that dependency layer while its inputs and the builder cache remain unchanged. BuildKit also keeps pip downloads in a cache mount; installing the local package uses `--no-deps` and preserves its declared build backend. The first build, a new builder, or a dependency/base-image change can still require downloads. This does not fully lock Linux transitive dependencies or guarantee offline builds.
+Open <http://127.0.0.1:8501>. Compose starts PostgreSQL, a schema migration, the backend and the dashboard. Application ports bind to localhost, and primary artifacts are mounted read-only. Retain the `primary_history` volume when updating; `docker compose down -v` deletes that stored history. To stop while retaining it:
 
-For separate build and startup logs, run `docker compose --progress plain build dashboard`, then `docker compose up -d --no-build`, and inspect `docker compose ps -a`. All application services use the same image tag. Retain the existing PostgreSQL volume when updating.
+```powershell
+docker compose down
+```
 
-The header places navigation at the left viewport edge and settings at the right, with symmetric padding and X-SENTINEL centered. Both 44 px square buttons center their icons independently of hidden labels and the popover arrow. Validation for this revision is recorded in the [Docker cache/header handoff](docs/DOCKER_CACHE_HEADER_2026_10_21.md).
+For build diagnostics, use `docker compose --progress plain build dashboard`, followed by `docker compose up -d --no-build`. The Dockerfile installs dependencies before application source so unchanged dependencies can reuse the builder cache. First builds or changed dependencies may still require downloads; Linux transitive dependencies are not fully locked.
 
-Open http://127.0.0.1:8501. Compose mounts only `outputs/primary` read-only, binds localhost and limits CPU/RAM; raw datasets are excluded. The bundles must be present locally because generated outputs/models are excluded from Git. See the [verified setup and stop commands](docs/DASHBOARD_DOCKER_CHECK_2026_10_07.md). The user published the initial implementation to [GitHub](https://github.com/callmewin06-create/X-SENTINEL) at commit `5e96806`; inspect Git history and status for the current revision and remote synchronization. Google Drive model sharing is not configured.
+See the [database/API guide](docs/database/INTEGRATION_2026_10_07.md), [recorded dashboard/Docker checks](docs/DASHBOARD_DOCKER_CHECK_2026_10_07.md), and [Docker cache/header handoff](docs/DOCKER_CACHE_HEADER_2026_10_21.md). These are dated verification records, not a claim that the stack is running or healthy now. User/role tables exist, but authentication is not implemented.
 
-## Sharing
+### Local Python dashboard
 
-For the prepared legacy EMBER2018 demo ZIP and step-by-step Google Drive upload/download instructions, read the [Vietnamese sharing guide](docs/HUONG_DAN_CHIA_SE_DRIVE.md). The ZIP includes matching local runtime source, baseline models and the complete calibrated demo bundle; uploading to Drive is done separately.
+Use **Python 3.11–3.12**. On a new machine:
 
-`scripts/download_models.py` implements public HTTPS manifest downloads with version/profile, declared size, SHA256, temporary files and verified cache reuse. Populate `configs/model_download_manifest.example.json` only after actual sharing URLs exist. Private Drive authentication requires an authorized connector; this tool does not bypass it. Distribute all files in a detector bundle together; the thresholds are bound to those exact model bytes.
+```powershell
+python -m venv .venv
+.venv/Scripts/python.exe -m pip install '.[service,binary-v3]' pytest==8.3.5
+.venv/Scripts/python.exe -m streamlit run dashboard/app.py
+```
 
-## Artifacts
+The `binary-v3` extra supplies the additional PE V3 extraction dependencies; `service` supplies the API/database dependencies. The standalone local dashboard remains available without database history. Optional plotting dependencies are installed with `.venv/Scripts/python.exe -m pip install '.[plots]'`. Direct dependencies are pinned in [pyproject.toml](pyproject.toml); `requirements-lock.txt` records a validated Windows environment.
 
-Every experiment records configuration/data/split checksums, trigger values, poison IDs, models, threshold lock, per-input scores, distributions, ASR, clean performance, AUROC and rate intervals, paired catch/miss cases, M5/full ablations, rare-benign proxies and warmed-up per-file latency. Score CSV latency is blank for batch scoring; separately measured per-file latencies are in latency.json. Seeds are retained separately. Research report and slide outline are generated from real evaluations, including negative findings.
+The dashboard has Analysis, History and Research views. It accepts PE files (`.exe`, `.dll`, `.sys`) up to **50 MiB**, a compatible single feature vector, or a matching raw EMBER JSON object. Expected vector lengths are **2,381 for V2** and **2,568 for V3**. V2/V3 extraction has fixture checks, but parity with the original dataset binaries is not established. Uploaded PE files are parsed, not executed. Extraction runs in a disposable worker; process separation is not a complete security sandbox.
 
-Dataset directories, binaries, model files, generated outputs, credentials and the virtual environment are excluded from Git/Docker contexts. Upstream EMBER and Severi files keep original copyright and license notices; see docs/upstream. No malware binary modification or execution is part of the research pipeline.
+The dashboard prepares vectors for the backend. The current API analysis route is `POST /v1/analyze/vector`; it is not a direct binary-upload endpoint. Explanations and Vietnamese PDF exports reuse the scoring result. See the [UI revision handoff](docs/UI_REVISION_2026_10_16.md) for the dated UI/history checks.
+
+## Method and limitations
+
+| Setting | Score used by the primary method | Resources / access |
+|---|---|---|
+| Reduced | Mean reference rank of VMC and BGS | Suspicious main model, 500 benign reference records and 2,000 benign calibration records |
+| Full | Mean reference rank of VMC and BPG, using the clean Behavioral probability gap | Clean auxiliary models; the original primary fit used 200,000 labelled benign/malware records, separately from reference/calibration |
+
+The **Full formula uses the Behavioral auxiliary prediction**. The current portable Full bundle additionally retains Structural and Metadata view models, and its loader requires all three view-model files. Selected Full inference evaluates only the Behavioral auxiliary model. Loading an existing bundle does not require access to its original clean fit data.
+
+Calibration uses strict `score > threshold` and bounds the observed calibration false-positive rate, not every future FPR. Retrospective final-set FPR-cap/pAUC comparisons are ranking analyses; they do not replace deployment calibration. Full does not have a universal advantage over a clean full-feature Shadow classifier, and resource access must be stated when comparing them.
+
+All benchmark poisoning and adaptive attacks operate in **feature space**. Cross-view triggers and multiview adaptation defeat the concentration assumption in important cases. Phúc's [benign PE audit package](phuc_pe_trigger_2026_10_27.zip) adds exported feature/log evidence, with Windows functionality failures retained; it does not demonstrate complete functioning benchmark triggers in malware or detector recall against such binaries. The corrected counts and missing source/executable evidence are documented in the [current status](docs/STATUS_2026_10_28.md).
+
+## Research and reproduction
+
+The [primary run guide](docs/PRIMARY_RUN_GUIDE_2026_10_07.md), [approved protocol](configs/primary_protocol.json) and [execution configuration](configs/primary_execution.json) describe the dual-dataset workflow. Inspect command help before starting a fresh run:
+
+```powershell
+.venv/Scripts/python.exe scripts/xsentinel.py prepare-v3 --help
+.venv/Scripts/python.exe scripts/xsentinel.py split-primary --help
+.venv/Scripts/python.exe scripts/xsentinel.py develop-primary --help
+.venv/Scripts/python.exe scripts/xsentinel.py lock-selector --help
+.venv/Scripts/python.exe scripts/xsentinel.py confirm-primary --help
+.venv/Scripts/python.exe scripts/xsentinel.py run-primary --help
+.venv/Scripts/python.exe scripts/xsentinel.py report-primary --help
+```
+
+Use new output directories for new experiments. Resume is valid only when configuration, source, data/split checksums and checkpoints match. Do not tune methods on the final test or overwrite the frozen primary artifacts. Raw research datasets and supplemental experiment outputs must be supplied separately when reproducing them.
+
+The older `prepare`, `split`, `run`, `report` and `develop-attack` commands belong to the **archived EMBER2018 workflow**; they do not launch the primary dual-dataset matrix. D0 is also an archived V2/2,381-feature, fixed top-q batch-budget interface, without calibrated FPR. See the [method specification](docs/METHOD_SPEC.md), [walkthrough](docs/HUONG_DAN_TUNG_BUOC.md), [attack audit](docs/ATTACK_AUDIT.md) and [historical development results](docs/results/ATTACK_DEVELOPMENT_SUMMARY.md) for that context. The root `README_HUONG_DAN_SU_DUNG.md` describes the earlier baseline handover, not the current primary method.
+
+## Manuscript and sharing
+
+The latest merged English manuscript prepared in this workspace is a **14-page, one-column** file with appendices and references:
+
+```text
+output/ieee_merged_2026_10_28/X_SENTINEL_Merged_ReferenceStyle_Fixed.docx
+```
+
+That DOCX is a **local generated file ignored by Git**; share it separately when submitting. It preserves the corrected results, includes the binary audit and disables automatic field updating on open. Its layout follows the supplied Word reference; this is not a blanket certification of camera-ready compliance for an unspecified IEEE venue.
+
+The current checkout tracks primary bundle artifacts and Phúc's audit ZIP. Ignore rules cover new files under `output/`, `outputs/`, `data/` and `models/`, along with `.venv/`, `.env` and matching binary/document file patterns; already tracked files remain tracked. See [.gitignore](.gitignore) for the exact rules. Do not assume a local generated report is available through a repository link. Retain upstream copyright/license notices in [docs/upstream](docs/upstream).
+
+[Model sharing instructions](docs/HUONG_DAN_CHIA_SE_DRIVE.md) describe the older baseline ZIP. `scripts/download_models.py` supports declared public HTTPS manifests with size/SHA256 verification; private Drive authentication and actual sharing URLs must be configured separately. All files of a calibrated bundle must stay matched. See the [document index](docs/INDEX.md) for dated supporting records.

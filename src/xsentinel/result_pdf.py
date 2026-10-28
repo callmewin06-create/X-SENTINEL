@@ -75,6 +75,7 @@ def result_pdf(result):
     story.extend([Spacer(1, 8), p('4. Giới hạn cách đọc kết quả', heading),
                   p('File được đọc, không được thực thi. Không có cảnh báo trigger không chứng nhận file an toàn. Nhãn gốc demo chỉ đối chiếu phân loại lành/mã độc, không chấm trigger đúng/sai.'),
                   p('Đối chiếu một mẫu không thay cho đánh giá độ chính xác toàn hệ thống.'),
+                  p('Ngưỡng được hiệu chỉnh trên tập calibration lành; mục tiêu FPR 1% không bảo đảm FPR của dữ liệu mới. Trigger phân tán hoặc thích nghi đa view vẫn có thể vượt qua các tín hiệu của detector.'),
                   p(timing_description(result)+': '+(f"{result['elapsed_ms']:.2f} ms" if result.get('elapsed_ms') is not None else 'Chưa lưu')+'. Chưa gồm upload, đọc PE, API/lưu, hiển thị và tạo PDF.'),
                   p('GitHub: https://github.com/callmewin06-create/X-SENTINEL')])
     def footer(canvas, doc):
