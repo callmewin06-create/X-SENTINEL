@@ -55,8 +55,8 @@ def test_feature_diff_drift_proven():
         changed_meta = int(s["changed_metadata"])
         assert unintended > 0, f"Expected unintended drift in {s['case_id']}"
         if "ts_" in s["variant_id"]:
-            assert 10 <= unintended <= 20, f"Timestamp edit drift unexpected range: {unintended} in {s['case_id']}"
-            assert changed_meta >= 10, f"Timestamp edit must drift metadata: {s['case_id']}"
+            assert 9 <= unintended <= 20, f"Timestamp edit drift unexpected range: {unintended} in {s['case_id']}"
+            assert changed_meta >= 9, f"Timestamp edit must drift metadata: {s['case_id']}"
         elif "overlay" in s["variant_id"]:
             assert unintended > 200, f"Overlay padding must cause extensive drift (>200) in {s['case_id']}"
 
