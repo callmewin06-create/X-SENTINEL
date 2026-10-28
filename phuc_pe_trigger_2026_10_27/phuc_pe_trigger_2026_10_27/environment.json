@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-27",
+  "timestamp": "2026-10-27T09:50:21Z",
+  "user": "phucpnhse203815",
+  "hostname": "PhucPNHSE203815",
+  "pwd": "/home/phucpnhse203815/Projects/X-SENTINEL",
+  "os": "Linux PhucPNHSE203815 6.19.14+kali-amd64 #1 SMP PREEMPT_DYNAMIC Kali 6.19.14-1+kali1 (2026-05-05) x86_64 GNU/Linux",
+  "os_release": "Kali GNU/Linux Rolling (2026.2)",
+  "python3_host": "Python 3.13.12",
+  "docker_python": "Python 3.12.10",
+  "git_version": "git version 2.53.0",
+  "git_branch": "phuc/pe-trigger-validation-2026-10-27",
+  "git_latest_commit": "eb153366f8e0787759671ff34893550480902d66",
+  "git_remote": "origin\thttps://github.com/callmewin06-create/X-SENTINEL.git (fetch)\norigin\thttps://github.com/callmewin06-create/X-SENTINEL.git (push)",
+  "disk_usage": "/dev/sda1       295G  252G   30G  90% /",
+  "memory": "Mem:           5.8Gi       2.2Gi       768Mi        93Mi       3.2Gi       3.6Gi",
+  "docker_path": "/usr/bin/docker",
+  "wine_path": "/usr/bin/wine",
+  "mono_path": "NOT_INSTALLED",
+  "dotnet_path": "/usr/bin/dotnet",
+  "mingw_gcc_path": "/usr/bin/x86_64-w64-mingw32-gcc"
+}
