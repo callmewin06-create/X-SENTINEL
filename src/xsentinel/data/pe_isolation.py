@@ -107,7 +107,8 @@ def extract_pe_isolated(data, schema_version, *, timeout=None):
         verify_pe(data)
     except ValueError as exc:
         raise ExtractionError('invalid_header', str(exc)) from exc
-    if not _SLOT.acquire(blocking=False):
+    slot_timeout = float(os.environ.get('XS_PE_SLOT_TIMEOUT', '5.0'))
+    if not _SLOT.acquire(timeout=slot_timeout):
         raise ExtractionError('busy', 'Another PE extraction is running; retry after it finishes')
     start = time.perf_counter()
     try:
