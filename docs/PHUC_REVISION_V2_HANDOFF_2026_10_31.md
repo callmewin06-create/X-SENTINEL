@@ -28,14 +28,14 @@
 5. **M5 (Benchmark Toàn Diện các Baseline Mới trên Raw Features)**:
    - Triển khai `scripts/run_batch_new_baselines.py` đánh giá 7 baseline (`raw_if_full`, `raw_lof_full`, `raw_knn_full`, `raw_if_top32`, `raw_lof_top32`, `raw_knn_top32`, `rarity_score`) trên 4.000 mẫu tại trần FPR 1.0%.
    - Xuất dữ liệu CSV chuẩn hóa `outputs/new_baselines/new_baselines_benchmark.csv`.
-6. **P4 (Đo Lường Độ Trễ Hệ Thống Chuẩn Xác Thay Thế Phụ Lục D)**:
-   - Triển khai `scripts/benchmark_latency.py` đo đạc 100 lần lặp lặp lại bằng `time.perf_counter()`:
-     - Stage 1 (LIEF Extraction): $8.16 \pm 0.41\text{ ms}$
-     - Stage 2 (TreeSHAP Attribution): $12.81 \pm 1.04\text{ ms}$
-     - Stage 3 (VMC/BGS Ranking): $14.57 \pm 3.52\text{ ms}$
-     - **Tổng End-to-End**: **$34.98 \pm 0.78\text{ ms/file}$** (~35 ms)
-   - Cung cấp câu tóm tắt tiếng Anh cho Quân đưa vào bài báo thay thế toàn bộ Phụ lục D:
-     > *"Across 100 repetitions on realistic PE executables, the complete inspection pipeline incurs a mean latency of 35.0 ± 0.8 ms per binary, partitioned into static LIEF feature extraction (8.2 ± 0.4 ms), exact TreeSHAP attribution (12.8 ± 1.0 ms), and multi-view rank fusion (14.57 ± 3.52 ms), confirming real-time gateway throughput."*
+6. **P4 (Đo Lường Độ Trễ Hệ Thống Chuẩn Xác Thay Thế Phụ Lục D - Đã Khắc Phục Lỗi Tính Trùng SHAP)**:
+   - Triển khai `scripts/benchmark_latency.py` đo đạc 100 lần lặp độc lập không chồng lấn bằng `time.perf_counter()` trên bộ tệp đa dạng kích thước (4 KB - 818 KB):
+     - Stage 1 (LIEF Extraction): $12.14 \pm 1.92\text{ ms}$ (file 43.5 KB) $\rightarrow$ $68.67 \pm 1.22\text{ ms}$ (file 818 KB)
+     - Stage 2 (TreeSHAP & Inference): $18.84 \pm 7.18\text{ ms}$ (cố định trên vector 2381 chiều)
+     - Stage 3 (VMC/BGS Ranking & Fusion Scoring): $0.71 \pm 0.18\text{ ms}$ ($\approx 1.0\text{ ms}$ trên mọi tệp, không tính lặp SHAP)
+     - **Tổng End-to-End Thực Tế**: **$41.28 \pm 6.12\text{ ms/file}$** (tệp 43.5 KB) $\rightarrow$ **$97.82 \pm 1.15\text{ ms}$** (tệp 818 KB)
+   - Cung cấp câu tóm tắt tiếng Anh chuẩn xác cho Quân đưa vào bài báo thay thế toàn bộ Phụ lục D:
+     > *"Across 100 repetitions on the benchmark PE executable (43.5 KB), the complete non-redundant inspection pipeline incurs a mean end-to-end latency of 41.3 ± 6.1 ms per binary, partitioned into static LIEF feature extraction (12.1 ± 1.9 ms), exact TreeSHAP attribution and model inference (18.8 ± 7.2 ms), and multi-view rank fusion (0.71 ± 0.18 ms). When scaling to larger binaries (up to ~800 KB), scoring latency remains strictly bounded while LIEF extraction scales linearly with section complexity."*
 
 ---
 
