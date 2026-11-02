@@ -1,8 +1,9 @@
 import os
+import time
 import uuid
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, ConfigDict, Field, FiniteFloat
+from pydantic import BaseModel, ConfigDict, Field, FiniteFloat, field_validator
 from sqlalchemy.exc import SQLAlchemyError
 from xsentinel.dashboard_catalog import preferred_method
 from xsentinel.storage.connection import database_engine,readiness
@@ -21,20 +22,38 @@ class VectorRequest(BaseModel):
     demo_mode: bool = False
     input_metadata: InputMetadata | None = None
 
+    @field_validator('features')
+    @classmethod
+    def validate_features_dim(cls, v: list[float]) -> list[float]:
+        if len(v) not in (2381, 2568):
+            raise ValueError(f'Vector length must be exactly 2381 (EMBER2018) or 2568 (EMBER2024), got {len(v)}')
+        return v
+
 
 def create_app(engine=None, registry=None):
     engine = engine if engine is not None else database_engine()
     registry = registry if registry is not None else BundleRegistry(os.getenv('XS_BUNDLE_ROOT','outputs/primary'))
     app = FastAPI(title='X-SENTINEL calibrated analysis and history',version='0.2.0')
 
+    _cached_ready = None
+    _cached_ready_time = 0.0
+    READINESS_TTL = 10.0
+
     @app.exception_handler(SQLAlchemyError)
     async def database_error(request, exc):
         return JSONResponse(status_code=503,content={'detail':'Database operation failed; no saved result confirmed'})
 
-    def require_ready():
+    def require_ready(force_live=False):
+        nonlocal _cached_ready, _cached_ready_time
+        now = time.monotonic()
+        if not force_live and _cached_ready and _cached_ready.get('ok') and (now - _cached_ready_time < READINESS_TTL):
+            return _cached_ready
         health = readiness(engine)
         if not health['ok']:
+            _cached_ready = None
             raise HTTPException(503,detail=health)
+        _cached_ready = health
+        _cached_ready_time = now
         return health
 
     @app.get('/health')
@@ -43,7 +62,7 @@ def create_app(engine=None, registry=None):
 
     @app.get('/ready')
     def ready():
-        return require_ready()
+        return require_ready(force_live=True)
 
     @app.get('/v1/bundles')
     def bundles():
@@ -54,6 +73,9 @@ def create_app(engine=None, registry=None):
         require_ready()
         try:
             entry = registry.entry(req.bundle_id)
+            expected_dim = 2568 if entry['state']['schema'] == 'ember-v3-2568-views-v1' else 2381
+            if len(req.features) != expected_dim:
+                raise ValueError(f"Features length ({len(req.features)}) does not match bundle schema expected dimension ({expected_dim})")
             if req.input_metadata and req.input_metadata.schema_version != entry['state']['schema']:
                 raise ValueError('Input metadata schema does not match bundle')
             if req.input_metadata and (req.input_metadata.kind == 'demo') != req.demo_mode:
