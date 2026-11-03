@@ -1,0 +1,18 @@
+{
+  "stage": "static_preflight_only",
+  "utc": "2026-11-03T13:43:17.938732+00:00",
+  "os": "Linux",
+  "os_release": "6.19.14+kali-amd64",
+  "distribution": {
+    "PRETTY_NAME": "Kali GNU/Linux Rolling",
+    "VERSION_ID": "2026.2",
+    "ID": "kali"
+  },
+  "architecture": "x86_64",
+  "python": "3.13.12 (main, Feb  4 2026, 15:06:39) [GCC 15.2.0]",
+  "script_sha256": "9619b66fe7e3e66ea97acc14b43e48c527e6eef8a7d2063cf7a48d9de7abdeaa",
+  "sample_execution": "NEVER",
+  "functional_validation": "NOT_RUN",
+  "wine_execution": "NOT_RUN",
+  "independent_backdoor_evaluation": false
+}

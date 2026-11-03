@@ -1,0 +1,11 @@
+{
+  "status": "COMPLETE",
+  "counts": {
+    "PE_HEADER_OK": 22
+  },
+  "skipped_extensions": 0,
+  "skipped_symlink_directories": 0,
+  "traversal_errors": [],
+  "sample_execution": "NEVER",
+  "meaning": "PE_HEADER_OK means header parsing only, not functionality, benignness or trigger matching."
+}
