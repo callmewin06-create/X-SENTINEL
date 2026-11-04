@@ -18,3 +18,16 @@ def test_empty_or_duplicate_targets_cannot_pass():
     with pytest.raises(ValueError): module.check_targets(x, [], schema)
     target = {'index': 0, 'name': schema.names[0], 'value': 0}
     with pytest.raises(ValueError): module.check_targets(x, [target, target], schema)
+
+
+def test_partial_or_altered_locked_trigger_cannot_pass():
+    schema = get_schema(V2_PRIMARY)
+    attack = {'trigger': {'schema_version':schema.version, 'schema_sha256':schema.fingerprint,
+                          'indices':[691,626], 'values':[12,1053454528]}}
+    targets = [{'index':j,'name':schema.names[j],'value':v} for j,v in zip([691,626],[12,1053454528])]
+    assert len(module.locked_targets(attack,schema,targets)) == 2
+    with pytest.raises(ValueError): module.locked_targets(attack,schema,targets[1:])
+    changed = [dict(t) for t in targets];changed[0]['value']=1
+    with pytest.raises(ValueError): module.locked_targets(attack,schema,changed)
+    changed = [dict(t) for t in targets];changed[0]['atol']=99
+    with pytest.raises(ValueError): module.locked_targets(attack,schema,changed)

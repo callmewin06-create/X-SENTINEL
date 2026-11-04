@@ -1,0 +1,15 @@
+{
+  "tests": "5 passed: locked full target set, missing-runtime no false PASS, tamper refusal, schema/name/duplicate checks",
+  "test_command": "python -m pytest tests/test_m8_target_matching.py tests/test_m8_fixture_runner.py -q -p no:cacheprovider",
+  "pe_execution": "NEVER",
+  "functional_tests": "NOT_RUN",
+  "static_full_c2_matches": 2,
+  "control_variants": 6,
+  "variants_total": 8,
+  "original_section_and_entrypoint_invariants": true,
+  "extractor": "Experimental LIEF 0.16.6 adapter; no legacy 0.9 parity established",
+  "parser_warnings": [
+    "Can't read the padding"
+  ],
+  "primary_model_or_data_changed": false
+}

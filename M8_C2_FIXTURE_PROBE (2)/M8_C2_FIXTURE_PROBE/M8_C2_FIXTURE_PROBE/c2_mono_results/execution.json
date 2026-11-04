@@ -1,0 +1,498 @@
+[
+  {
+    "id": "managed_original_TC1",
+    "command": [
+      "/usr/bin/mono",
+      "/home/phucpnhse203815/M8_C2_FIXTURE_PROBE/binaries/managed_original.exe"
+    ],
+    "utc": "2026-11-03T15:57:51.024042+00:00",
+    "duration_seconds": 0.010775302000183729,
+    "result": {
+      "fixture": "managed",
+      "variant": "original",
+      "file_sha256": "eae43234c30b26578ed8efdc73df0845d060c74f78d23d6f1ac0f2976ee70f3d",
+      "runtime": "mono",
+      "test_case": "TC1",
+      "input_args": "(none)",
+      "expected_exit": 0,
+      "expected_stdout": "X_SENTINEL_BENIGN_FIXTURE:7",
+      "expected_stderr_contains": "",
+      "actual_exit": 0,
+      "actual_stdout": "X_SENTINEL_BENIGN_FIXTURE:7",
+      "actual_stderr": "",
+      "status": "PASS"
+    }
+  },
+  {
+    "id": "managed_original_TC2",
+    "command": [
+      "/usr/bin/mono",
+      "/home/phucpnhse203815/M8_C2_FIXTURE_PROBE/binaries/managed_original.exe",
+      "5"
+    ],
+    "utc": "2026-11-03T15:57:51.034992+00:00",
+    "duration_seconds": 0.015593471998727182,
+    "result": {
+      "fixture": "managed",
+      "variant": "original",
+      "file_sha256": "eae43234c30b26578ed8efdc73df0845d060c74f78d23d6f1ac0f2976ee70f3d",
+      "runtime": "mono",
+      "test_case": "TC2",
+      "input_args": "5",
+      "expected_exit": 0,
+      "expected_stdout": "X_SENTINEL_BENIGN_FIXTURE:32",
+      "expected_stderr_contains": "",
+      "actual_exit": 0,
+      "actual_stdout": "X_SENTINEL_BENIGN_FIXTURE:32",
+      "actual_stderr": "",
+      "status": "PASS"
+    }
+  },
+  {
+    "id": "managed_original_TC3",
+    "command": [
+      "/usr/bin/mono",
+      "/home/phucpnhse203815/M8_C2_FIXTURE_PROBE/binaries/managed_original.exe",
+      "-3"
+    ],
+    "utc": "2026-11-03T15:57:51.050747+00:00",
+    "duration_seconds": 0.01182487799997034,
+    "result": {
+      "fixture": "managed",
+      "variant": "original",
+      "file_sha256": "eae43234c30b26578ed8efdc73df0845d060c74f78d23d6f1ac0f2976ee70f3d",
+      "runtime": "mono",
+      "test_case": "TC3",
+      "input_args": "-3",
+      "expected_exit": 0,
+      "expected_stdout": "X_SENTINEL_BENIGN_FIXTURE:16",
+      "expected_stderr_contains": "",
+      "actual_exit": 0,
+      "actual_stdout": "X_SENTINEL_BENIGN_FIXTURE:16",
+      "actual_stderr": "",
+      "status": "PASS"
+    }
+  },
+  {
+    "id": "managed_original_TC4",
+    "command": [
+      "/usr/bin/mono",
+      "/home/phucpnhse203815/M8_C2_FIXTURE_PROBE/binaries/managed_original.exe",
+      "12"
+    ],
+    "utc": "2026-11-03T15:57:51.062747+00:00",
+    "duration_seconds": 0.012433128000338911,
+    "result": {
+      "fixture": "managed",
+      "variant": "original",
+      "file_sha256": "eae43234c30b26578ed8efdc73df0845d060c74f78d23d6f1ac0f2976ee70f3d",
+      "runtime": "mono",
+      "test_case": "TC4",
+      "input_args": "12",
+      "expected_exit": 0,
+      "expected_stdout": "X_SENTINEL_BENIGN_FIXTURE:151",
+      "expected_stderr_contains": "",
+      "actual_exit": 0,
+      "actual_stdout": "X_SENTINEL_BENIGN_FIXTURE:151",
+      "actual_stderr": "",
+      "status": "PASS"
+    }
+  },
+  {
+    "id": "managed_original_TC5",
+    "command": [
+      "/usr/bin/mono",
+      "/home/phucpnhse203815/M8_C2_FIXTURE_PROBE/binaries/managed_original.exe",
+      "abc"
+    ],
+    "utc": "2026-11-03T15:57:51.075341+00:00",
+    "duration_seconds": 0.008608269999967888,
+    "result": {
+      "fixture": "managed",
+      "variant": "original",
+      "file_sha256": "eae43234c30b26578ed8efdc73df0845d060c74f78d23d6f1ac0f2976ee70f3d",
+      "runtime": "mono",
+      "test_case": "TC5",
+      "input_args": "abc",
+      "expected_exit": 2,
+      "expected_stdout": "",
+      "expected_stderr_contains": "",
+      "actual_exit": 2,
+      "actual_stdout": "",
+      "actual_stderr": "",
+      "status": "PASS"
+    }
+  },
+  {
+    "id": "managed_timestamp_only_TC1",
+    "command": [
+      "/usr/bin/mono",
+      "/home/phucpnhse203815/M8_C2_FIXTURE_PROBE/binaries/managed_timestamp_only.exe"
+    ],
+    "utc": "2026-11-03T15:57:51.084125+00:00",
+    "duration_seconds": 0.010470623001310742,
+    "result": {
+      "fixture": "managed",
+      "variant": "timestamp_only",
+      "file_sha256": "582a14b45d3e3c725eef25bb31488a59600497063b865309158e3600359621cf",
+      "runtime": "mono",
+      "test_case": "TC1",
+      "input_args": "(none)",
+      "expected_exit": 0,
+      "expected_stdout": "X_SENTINEL_BENIGN_FIXTURE:7",
+      "expected_stderr_contains": "",
+      "actual_exit": 0,
+      "actual_stdout": "X_SENTINEL_BENIGN_FIXTURE:7",
+      "actual_stderr": "",
+      "status": "PASS"
+    }
+  },
+  {
+    "id": "managed_timestamp_only_TC2",
+    "command": [
+      "/usr/bin/mono",
+      "/home/phucpnhse203815/M8_C2_FIXTURE_PROBE/binaries/managed_timestamp_only.exe",
+      "5"
+    ],
+    "utc": "2026-11-03T15:57:51.094752+00:00",
+    "duration_seconds": 0.010500211999897147,
+    "result": {
+      "fixture": "managed",
+      "variant": "timestamp_only",
+      "file_sha256": "582a14b45d3e3c725eef25bb31488a59600497063b865309158e3600359621cf",
+      "runtime": "mono",
+      "test_case": "TC2",
+      "input_args": "5",
+      "expected_exit": 0,
+      "expected_stdout": "X_SENTINEL_BENIGN_FIXTURE:32",
+      "expected_stderr_contains": "",
+      "actual_exit": 0,
+      "actual_stdout": "X_SENTINEL_BENIGN_FIXTURE:32",
+      "actual_stderr": "",
+      "status": "PASS"
+    }
+  },
+  {
+    "id": "managed_timestamp_only_TC3",
+    "command": [
+      "/usr/bin/mono",
+      "/home/phucpnhse203815/M8_C2_FIXTURE_PROBE/binaries/managed_timestamp_only.exe",
+      "-3"
+    ],
+    "utc": "2026-11-03T15:57:51.105662+00:00",
+    "duration_seconds": 0.011008035000486416,
+    "result": {
+      "fixture": "managed",
+      "variant": "timestamp_only",
+      "file_sha256": "582a14b45d3e3c725eef25bb31488a59600497063b865309158e3600359621cf",
+      "runtime": "mono",
+      "test_case": "TC3",
+      "input_args": "-3",
+      "expected_exit": 0,
+      "expected_stdout": "X_SENTINEL_BENIGN_FIXTURE:16",
+      "expected_stderr_contains": "",
+      "actual_exit": 0,
+      "actual_stdout": "X_SENTINEL_BENIGN_FIXTURE:16",
+      "actual_stderr": "",
+      "status": "PASS"
+    }
+  },
+  {
+    "id": "managed_timestamp_only_TC4",
+    "command": [
+      "/usr/bin/mono",
+      "/home/phucpnhse203815/M8_C2_FIXTURE_PROBE/binaries/managed_timestamp_only.exe",
+      "12"
+    ],
+    "utc": "2026-11-03T15:57:51.116852+00:00",
+    "duration_seconds": 0.010727969998697517,
+    "result": {
+      "fixture": "managed",
+      "variant": "timestamp_only",
+      "file_sha256": "582a14b45d3e3c725eef25bb31488a59600497063b865309158e3600359621cf",
+      "runtime": "mono",
+      "test_case": "TC4",
+      "input_args": "12",
+      "expected_exit": 0,
+      "expected_stdout": "X_SENTINEL_BENIGN_FIXTURE:151",
+      "expected_stderr_contains": "",
+      "actual_exit": 0,
+      "actual_stdout": "X_SENTINEL_BENIGN_FIXTURE:151",
+      "actual_stderr": "",
+      "status": "PASS"
+    }
+  },
+  {
+    "id": "managed_timestamp_only_TC5",
+    "command": [
+      "/usr/bin/mono",
+      "/home/phucpnhse203815/M8_C2_FIXTURE_PROBE/binaries/managed_timestamp_only.exe",
+      "abc"
+    ],
+    "utc": "2026-11-03T15:57:51.127844+00:00",
+    "duration_seconds": 0.007716834001257666,
+    "result": {
+      "fixture": "managed",
+      "variant": "timestamp_only",
+      "file_sha256": "582a14b45d3e3c725eef25bb31488a59600497063b865309158e3600359621cf",
+      "runtime": "mono",
+      "test_case": "TC5",
+      "input_args": "abc",
+      "expected_exit": 2,
+      "expected_stdout": "",
+      "expected_stderr_contains": "",
+      "actual_exit": 2,
+      "actual_stdout": "",
+      "actual_stderr": "",
+      "status": "PASS"
+    }
+  },
+  {
+    "id": "managed_sections_only_TC1",
+    "command": [
+      "/usr/bin/mono",
+      "/home/phucpnhse203815/M8_C2_FIXTURE_PROBE/binaries/managed_sections_only.exe"
+    ],
+    "utc": "2026-11-03T15:57:51.135738+00:00",
+    "duration_seconds": 0.010284420999596477,
+    "result": {
+      "fixture": "managed",
+      "variant": "sections_only",
+      "file_sha256": "803b469b898376b7691d549e6d57a4b7434c3e3ae44bd066b640672fb5b14cd0",
+      "runtime": "mono",
+      "test_case": "TC1",
+      "input_args": "(none)",
+      "expected_exit": 0,
+      "expected_stdout": "X_SENTINEL_BENIGN_FIXTURE:7",
+      "expected_stderr_contains": "",
+      "actual_exit": 0,
+      "actual_stdout": "X_SENTINEL_BENIGN_FIXTURE:7",
+      "actual_stderr": "",
+      "status": "PASS"
+    }
+  },
+  {
+    "id": "managed_sections_only_TC2",
+    "command": [
+      "/usr/bin/mono",
+      "/home/phucpnhse203815/M8_C2_FIXTURE_PROBE/binaries/managed_sections_only.exe",
+      "5"
+    ],
+    "utc": "2026-11-03T15:57:51.146210+00:00",
+    "duration_seconds": 0.0095926319991122,
+    "result": {
+      "fixture": "managed",
+      "variant": "sections_only",
+      "file_sha256": "803b469b898376b7691d549e6d57a4b7434c3e3ae44bd066b640672fb5b14cd0",
+      "runtime": "mono",
+      "test_case": "TC2",
+      "input_args": "5",
+      "expected_exit": 0,
+      "expected_stdout": "X_SENTINEL_BENIGN_FIXTURE:32",
+      "expected_stderr_contains": "",
+      "actual_exit": 0,
+      "actual_stdout": "X_SENTINEL_BENIGN_FIXTURE:32",
+      "actual_stderr": "",
+      "status": "PASS"
+    }
+  },
+  {
+    "id": "managed_sections_only_TC3",
+    "command": [
+      "/usr/bin/mono",
+      "/home/phucpnhse203815/M8_C2_FIXTURE_PROBE/binaries/managed_sections_only.exe",
+      "-3"
+    ],
+    "utc": "2026-11-03T15:57:51.156013+00:00",
+    "duration_seconds": 0.01447559499865747,
+    "result": {
+      "fixture": "managed",
+      "variant": "sections_only",
+      "file_sha256": "803b469b898376b7691d549e6d57a4b7434c3e3ae44bd066b640672fb5b14cd0",
+      "runtime": "mono",
+      "test_case": "TC3",
+      "input_args": "-3",
+      "expected_exit": 0,
+      "expected_stdout": "X_SENTINEL_BENIGN_FIXTURE:16",
+      "expected_stderr_contains": "",
+      "actual_exit": 0,
+      "actual_stdout": "X_SENTINEL_BENIGN_FIXTURE:16",
+      "actual_stderr": "",
+      "status": "PASS"
+    }
+  },
+  {
+    "id": "managed_sections_only_TC4",
+    "command": [
+      "/usr/bin/mono",
+      "/home/phucpnhse203815/M8_C2_FIXTURE_PROBE/binaries/managed_sections_only.exe",
+      "12"
+    ],
+    "utc": "2026-11-03T15:57:51.170680+00:00",
+    "duration_seconds": 0.016653755999868736,
+    "result": {
+      "fixture": "managed",
+      "variant": "sections_only",
+      "file_sha256": "803b469b898376b7691d549e6d57a4b7434c3e3ae44bd066b640672fb5b14cd0",
+      "runtime": "mono",
+      "test_case": "TC4",
+      "input_args": "12",
+      "expected_exit": 0,
+      "expected_stdout": "X_SENTINEL_BENIGN_FIXTURE:151",
+      "expected_stderr_contains": "",
+      "actual_exit": 0,
+      "actual_stdout": "X_SENTINEL_BENIGN_FIXTURE:151",
+      "actual_stderr": "",
+      "status": "PASS"
+    }
+  },
+  {
+    "id": "managed_sections_only_TC5",
+    "command": [
+      "/usr/bin/mono",
+      "/home/phucpnhse203815/M8_C2_FIXTURE_PROBE/binaries/managed_sections_only.exe",
+      "abc"
+    ],
+    "utc": "2026-11-03T15:57:51.187506+00:00",
+    "duration_seconds": 0.00800716400044621,
+    "result": {
+      "fixture": "managed",
+      "variant": "sections_only",
+      "file_sha256": "803b469b898376b7691d549e6d57a4b7434c3e3ae44bd066b640672fb5b14cd0",
+      "runtime": "mono",
+      "test_case": "TC5",
+      "input_args": "abc",
+      "expected_exit": 2,
+      "expected_stdout": "",
+      "expected_stderr_contains": "",
+      "actual_exit": 2,
+      "actual_stdout": "",
+      "actual_stderr": "",
+      "status": "PASS"
+    }
+  },
+  {
+    "id": "managed_full_c2_TC1",
+    "command": [
+      "/usr/bin/mono",
+      "/home/phucpnhse203815/M8_C2_FIXTURE_PROBE/binaries/managed_full_c2.exe"
+    ],
+    "utc": "2026-11-03T15:57:51.195735+00:00",
+    "duration_seconds": 0.009768361000169534,
+    "result": {
+      "fixture": "managed",
+      "variant": "full_c2",
+      "file_sha256": "b2c7ff0f4c2d5fb74c9312be57e79951489fc901fca924f6639d4854dd1145d8",
+      "runtime": "mono",
+      "test_case": "TC1",
+      "input_args": "(none)",
+      "expected_exit": 0,
+      "expected_stdout": "X_SENTINEL_BENIGN_FIXTURE:7",
+      "expected_stderr_contains": "",
+      "actual_exit": 0,
+      "actual_stdout": "X_SENTINEL_BENIGN_FIXTURE:7",
+      "actual_stderr": "",
+      "status": "PASS"
+    }
+  },
+  {
+    "id": "managed_full_c2_TC2",
+    "command": [
+      "/usr/bin/mono",
+      "/home/phucpnhse203815/M8_C2_FIXTURE_PROBE/binaries/managed_full_c2.exe",
+      "5"
+    ],
+    "utc": "2026-11-03T15:57:51.205681+00:00",
+    "duration_seconds": 0.011026281001250027,
+    "result": {
+      "fixture": "managed",
+      "variant": "full_c2",
+      "file_sha256": "b2c7ff0f4c2d5fb74c9312be57e79951489fc901fca924f6639d4854dd1145d8",
+      "runtime": "mono",
+      "test_case": "TC2",
+      "input_args": "5",
+      "expected_exit": 0,
+      "expected_stdout": "X_SENTINEL_BENIGN_FIXTURE:32",
+      "expected_stderr_contains": "",
+      "actual_exit": 0,
+      "actual_stdout": "X_SENTINEL_BENIGN_FIXTURE:32",
+      "actual_stderr": "",
+      "status": "PASS"
+    }
+  },
+  {
+    "id": "managed_full_c2_TC3",
+    "command": [
+      "/usr/bin/mono",
+      "/home/phucpnhse203815/M8_C2_FIXTURE_PROBE/binaries/managed_full_c2.exe",
+      "-3"
+    ],
+    "utc": "2026-11-03T15:57:51.216907+00:00",
+    "duration_seconds": 0.009973010999601684,
+    "result": {
+      "fixture": "managed",
+      "variant": "full_c2",
+      "file_sha256": "b2c7ff0f4c2d5fb74c9312be57e79951489fc901fca924f6639d4854dd1145d8",
+      "runtime": "mono",
+      "test_case": "TC3",
+      "input_args": "-3",
+      "expected_exit": 0,
+      "expected_stdout": "X_SENTINEL_BENIGN_FIXTURE:16",
+      "expected_stderr_contains": "",
+      "actual_exit": 0,
+      "actual_stdout": "X_SENTINEL_BENIGN_FIXTURE:16",
+      "actual_stderr": "",
+      "status": "PASS"
+    }
+  },
+  {
+    "id": "managed_full_c2_TC4",
+    "command": [
+      "/usr/bin/mono",
+      "/home/phucpnhse203815/M8_C2_FIXTURE_PROBE/binaries/managed_full_c2.exe",
+      "12"
+    ],
+    "utc": "2026-11-03T15:57:51.227061+00:00",
+    "duration_seconds": 0.009954463999747531,
+    "result": {
+      "fixture": "managed",
+      "variant": "full_c2",
+      "file_sha256": "b2c7ff0f4c2d5fb74c9312be57e79951489fc901fca924f6639d4854dd1145d8",
+      "runtime": "mono",
+      "test_case": "TC4",
+      "input_args": "12",
+      "expected_exit": 0,
+      "expected_stdout": "X_SENTINEL_BENIGN_FIXTURE:151",
+      "expected_stderr_contains": "",
+      "actual_exit": 0,
+      "actual_stdout": "X_SENTINEL_BENIGN_FIXTURE:151",
+      "actual_stderr": "",
+      "status": "PASS"
+    }
+  },
+  {
+    "id": "managed_full_c2_TC5",
+    "command": [
+      "/usr/bin/mono",
+      "/home/phucpnhse203815/M8_C2_FIXTURE_PROBE/binaries/managed_full_c2.exe",
+      "abc"
+    ],
+    "utc": "2026-11-03T15:57:51.237248+00:00",
+    "duration_seconds": 0.007182448000094155,
+    "result": {
+      "fixture": "managed",
+      "variant": "full_c2",
+      "file_sha256": "b2c7ff0f4c2d5fb74c9312be57e79951489fc901fca924f6639d4854dd1145d8",
+      "runtime": "mono",
+      "test_case": "TC5",
+      "input_args": "abc",
+      "expected_exit": 2,
+      "expected_stdout": "",
+      "expected_stderr_contains": "",
+      "actual_exit": 2,
+      "actual_stdout": "",
+      "actual_stderr": "",
+      "status": "PASS"
+    }
+  }
+]

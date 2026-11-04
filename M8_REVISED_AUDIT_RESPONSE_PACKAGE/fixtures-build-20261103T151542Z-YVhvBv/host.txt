@@ -1,0 +1,1 @@
+Linux PhucPNHSE203815 6.19.14+kali-amd64 #1 SMP PREEMPT_DYNAMIC Kali 6.19.14-1+kali1 (2026-05-05) x86_64 GNU/Linux

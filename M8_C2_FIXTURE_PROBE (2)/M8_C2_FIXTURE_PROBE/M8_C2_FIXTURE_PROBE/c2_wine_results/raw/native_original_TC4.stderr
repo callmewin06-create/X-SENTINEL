@@ -1,0 +1,3 @@
+0048:err:winediag:nodrv_CreateWindow Application tried to create a window, but no driver could be loaded.
+0048:err:winediag:nodrv_CreateWindow L"The explorer process failed to start."
+0048:err:systray:initialize_systray Could not create tray window

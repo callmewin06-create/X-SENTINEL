@@ -1,0 +1,67 @@
+{
+  "counts": {
+    "PASS": 20
+  },
+  "paired_checks": [
+    {
+      "fixture": "managed",
+      "variant": "timestamp_only",
+      "bounded_function_preserved": true,
+      "before_statuses": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ],
+      "after_statuses": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "fixture": "managed",
+      "variant": "sections_only",
+      "bounded_function_preserved": true,
+      "before_statuses": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ],
+      "after_statuses": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "fixture": "managed",
+      "variant": "full_c2",
+      "bounded_function_preserved": true,
+      "before_statuses": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ],
+      "after_statuses": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    }
+  ],
+  "asr": null,
+  "backdoor_recall": null,
+  "meaning": "Arithmetic checks on benign fixtures, not malware function preservation or detector evaluation."
+}

@@ -1,0 +1,15 @@
+{
+  "utc": "2026-11-03T15:57:12.972997+00:00",
+  "platform": "Linux-6.19.14+kali-amd64-x86_64-with-glibc2.42",
+  "python": "3.13.12 (main, Feb  4 2026, 15:06:39) [GCC 15.2.0]",
+  "runtime": "wine",
+  "runtime_path": "/usr/bin/wine",
+  "manifest_sha256": "ef88170519706e0a594fcc56195e05ac1f8591320bcf374ab804f1aa4efa959e",
+  "runner_sha256": "007ab491d4fa9c074fdc0f717b0a1b100d6c2fd741521e32575132a6b17d4db9",
+  "scope": "Two benign arithmetic fixtures only; no malware/ASR/recall",
+  "runtime_version": {
+    "exit": 0,
+    "stdout": "wine-10.0 (Debian 10.0~repack-11+b1)\n",
+    "stderr": ""
+  }
+}

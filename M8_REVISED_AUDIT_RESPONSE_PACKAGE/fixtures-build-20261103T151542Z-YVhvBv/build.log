@@ -1,0 +1,7 @@
+Build started UTC: 2026-11-03T15:15:42Z
+Script directory: /home/phucpnhse203815/m8_response_audit/fixtures_src
+Output directory: /home/phucpnhse203815/m8_fixture_builds/fixtures-build-20261103T151542Z-YVhvBv
+No PE execution or claim of matching historical binary hashes.
+COMMAND: /usr/bin/x86_64-w64-mingw32-gcc -O2 -s -Wl\,--build-id=none /home/phucpnhse203815/m8_response_audit/fixtures_src/native_benign_fixture.c -o /home/phucpnhse203815/m8_fixture_builds/fixtures-build-20261103T151542Z-YVhvBv/native_original.exe 
+COMMAND: /usr/bin/mcs -target:exe -platform:x86 -optimize+ -out:/home/phucpnhse203815/m8_fixture_builds/fixtures-build-20261103T151542Z-YVhvBv/ReviewedBenignFixture.exe /home/phucpnhse203815/m8_response_audit/fixtures_src/ReviewedBenignFixture.cs 
+Build finished UTC: 2026-11-03T15:15:42Z
