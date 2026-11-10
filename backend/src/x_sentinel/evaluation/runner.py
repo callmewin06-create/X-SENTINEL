@@ -52,11 +52,25 @@ def _sha256_bytes(data: bytes) -> str:
 def _sha256_file(path: Path) -> str:
     if not path.is_file():
         return "MISSING"
-    h = hashlib.sha256()
-    with path.open("rb") as f:
-        for chunk in iter(lambda: f.read(65536), b""):
-            h.update(chunk)
-    return h.hexdigest()
+    raw = path.read_bytes()
+    return hashlib.sha256(raw).hexdigest()
+
+
+def _match_file_sha256(path: Path, expected: str) -> bool:
+    if not path.is_file():
+        return False
+    raw = path.read_bytes()
+    raw_hash = hashlib.sha256(raw).hexdigest()
+    if raw_hash.lower() == expected.lower():
+        return True
+    # Cross-platform line ending normalization (CRLF vs LF)
+    crlf_hash = hashlib.sha256(raw.replace(b"\r\n", b"\n").replace(b"\n", b"\r\n")).hexdigest()
+    if crlf_hash.lower() == expected.lower():
+        return True
+    lf_hash = hashlib.sha256(raw.replace(b"\r\n", b"\n")).hexdigest()
+    if lf_hash.lower() == expected.lower():
+        return True
+    return False
 
 
 def check_scientific_readiness(
@@ -915,8 +929,7 @@ def verify_run_artifacts(run_dir: Path) -> dict[str, Any]:
             continue
         expected_digest, fname = parts[0].strip(), parts[1].strip()
         expected_map[fname] = expected_digest
-        actual_digest = _sha256_file(run_path / fname)
-        if actual_digest != expected_digest:
+        if not _match_file_sha256(run_path / fname, expected_digest):
             mismatched_files.append(fname)
 
     for req_name in ("manifest.json", "metrics.json", "raw_predictions.jsonl"):

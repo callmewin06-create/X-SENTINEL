@@ -25,7 +25,11 @@ class VectorAnalysisRequest(BaseModel):
         if not isinstance(v, (list, tuple)):
             raise ValueError("Features must be a list of numbers.")
         if len(v) != 2381:
-            raise ValueError(f"Feature vector must contain exactly 2,381 dimensions; got {len(v)}")
+            diff = abs(2381 - len(v))
+            if len(v) < 2381:
+                raise ValueError(f"Feature vector must contain exactly 2,381 dimensions; got {len(v)} (missing {diff})")
+            else:
+                raise ValueError(f"Feature vector must contain exactly 2,381 dimensions; got {len(v)} (extra {diff})")
         import math
         clean: list[float] = []
         for idx, item in enumerate(v):

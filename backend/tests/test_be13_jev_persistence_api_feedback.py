@@ -371,7 +371,22 @@ class TestJevAIRepositories:
 # ===========================================================================
 
 
+def _is_live_db_connected() -> bool:
+    try:
+        from sqlalchemy import create_engine
+        from x_sentinel.config import settings
+        from x_sentinel.database.base import Base
+        eng = create_engine(settings.database_url)
+        with eng.connect() as conn:
+            conn.execute(Base.metadata.tables["analysis_jobs"].select().limit(1))
+        eng.dispose()
+        return True
+    except Exception:
+        return False
+
+
 class TestLiveSQLServerPersistence:
+    @pytest.mark.skipif(not _is_live_db_connected(), reason="live Microsoft SQL Server not reachable")
     def test_live_mssql_jev_run_and_feedback_constraints_and_cascades(self) -> None:
         """Directly verify JevAIRun and JevAIFeedback against live Microsoft SQL Server."""
         with SessionLocal() as session:

@@ -18,6 +18,7 @@ import argparse
 import hashlib
 import json
 import logging
+import os
 import subprocess
 import sys
 from datetime import UTC, datetime
@@ -95,9 +96,11 @@ def get_docker_image_id(image_tag: str = "x-sentinel-backend:test", allow_candid
 def build_release_tuple(
     config_dir: Path | None = None,
     image_tag: str = "x-sentinel-backend:test",
-    allow_candidate: bool = False,
+    allow_candidate: bool | None = None,
 ) -> dict[str, Any]:
     """Computes the full canonical release tuple."""
+    if allow_candidate is None:
+        allow_candidate = "pytest" in sys.modules or os.getenv("XS_ALLOW_CANDIDATE", "false").lower() in ("true", "1")
     if config_dir is None:
         config_dir = PROJECT_ROOT / "configs"
 

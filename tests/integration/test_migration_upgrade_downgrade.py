@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import subprocess
+import sys
 
 import pyodbc
 import pytest
@@ -21,6 +22,8 @@ def test_offline_sql_upgrade_0001_to_0002() -> None:
     """Verifies Alembic can generate valid offline SQL upgrade script from 0001 to 0002."""
     result = subprocess.run(
         [
+            sys.executable,
+            "-m",
             "alembic",
             "-c",
             "database/alembic.ini",
@@ -45,6 +48,8 @@ def test_offline_sql_downgrade_0002_to_0001() -> None:
     """Verifies Alembic can generate valid offline SQL downgrade script from 0002 to 0001."""
     result = subprocess.run(
         [
+            sys.executable,
+            "-m",
             "alembic",
             "-c",
             "database/alembic.ini",

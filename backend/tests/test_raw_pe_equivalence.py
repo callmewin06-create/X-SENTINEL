@@ -216,6 +216,7 @@ def test_audit_legacy_ember_lief_version_incompatibility() -> None:
     This proves why the Extractor Equivalence Gate is PREREQUISITE NO-GO for
     production raw PE activation without frozen reference fixtures.
     """
+    pytest.importorskip("ember")
     import ember
     import lief
 
@@ -261,6 +262,7 @@ def test_prerequisite_gate_remains_fail_closed_in_baseline() -> None:
 
 def test_exact_string_extractor_equivalence_to_ember() -> None:
     """Verify extract_strings produces exact bit-level match (0.0 diff) with EMBER2018 StringExtractor."""
+    pytest.importorskip("ember")
     import ember.features
 
     test_payload = (
@@ -285,6 +287,7 @@ def test_exact_string_extractor_equivalence_to_ember() -> None:
 
 def test_null_binary_feature_hasher_scalar_semantics() -> None:
     """Verify that header and section extraction with binary=None follows EMBER scalar hash semantics."""
+    pytest.importorskip("ember")
     import ember.features
 
     ref_hdr = ember.features.HeaderFileInfo()

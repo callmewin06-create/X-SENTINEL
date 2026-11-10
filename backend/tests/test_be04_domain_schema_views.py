@@ -5,6 +5,9 @@ from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy import Integer, create_engine
+from sqlalchemy.orm import Session
+from sqlalchemy.pool import StaticPool
 from x_sentinel.data.schema import (
     FEATURE_COUNT,
     DimensionMismatchError,
@@ -24,6 +27,8 @@ from x_sentinel.data.views import (
     compute_mapping_hash,
     load_view_map,
 )
+from x_sentinel.database.base import Base
+from x_sentinel.database.session import get_db
 from x_sentinel.main import app
 
 # ---------------------------------------------------------------------------
@@ -340,6 +345,34 @@ def test_view_map_integrity_validation_duplicate_indices():
 # ---------------------------------------------------------------------------
 # Integration Tests with FastAPI & Services
 # ---------------------------------------------------------------------------
+
+@pytest.fixture(autouse=True)
+def override_be04_db():
+    engine = create_engine(
+        "sqlite:///:memory:",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
+    for col in Base.metadata.tables["audit_events"].columns:
+        if col.name == "id":
+            col.type = Integer()
+    for table in Base.metadata.tables.values():
+        for col in table.columns:
+            if col.server_default is not None:
+                text_str = str(col.server_default.arg)
+                if "N'" in text_str:
+                    col.server_default.arg.text = text_str.replace("N'", "'")
+    Base.metadata.create_all(engine)
+    session = Session(engine)
+
+    def _get_test_db():
+        yield session
+
+    app.dependency_overrides[get_db] = _get_test_db
+    yield
+    app.dependency_overrides.pop(get_db, None)
+    session.close()
+    engine.dispose()
 
 
 def test_fastapi_analyze_vector_valid():
