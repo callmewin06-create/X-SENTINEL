@@ -11,6 +11,7 @@ from x_sentinel.api.routes import router
 from x_sentinel.config import settings
 from x_sentinel.database.health import database_health
 from x_sentinel.jev_ai.status import get_jev_status
+from x_sentinel.services.analysis_service import ScientificPipelineNotReadyError
 
 app = FastAPI(title="X-SENTINEL", version="0.3.0-baseline-v3")
 
@@ -71,6 +72,21 @@ app.add_middleware(
     allow_headers=["Content-Type", "X-Request-ID", "Authorization"],
 )
 app.include_router(router)
+
+
+
+@app.exception_handler(ScientificPipelineNotReadyError)
+def handle_scientific_pipeline_not_ready(request: Request, exc: ScientificPipelineNotReadyError) -> JSONResponse:
+    return JSONResponse(
+        status_code=503,
+        content={
+            "detail": {
+                "code": "SCIENTIFIC_PIPELINE_NOT_READY",
+                "message": str(exc),
+                "missing_dependencies": getattr(exc, "missing_dependencies", []),
+            }
+        },
+    )
 
 
 @app.exception_handler(RequestValidationError)
