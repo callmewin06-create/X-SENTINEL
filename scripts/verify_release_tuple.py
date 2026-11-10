@@ -65,8 +65,12 @@ def get_git_revision() -> str:
         return "untracked_source_revision"
 
 
-def get_docker_image_id(image_tag: str = "x-sentinel-backend:test") -> str:
-    """Queries local docker daemon for image ID/digest if available."""
+def get_docker_image_id(image_tag: str = "x-sentinel-backend:test", allow_candidate: bool = False) -> str:
+    """Queries local docker daemon for image ID/digest if available.
+    
+    In strict production mode (allow_candidate=False), raises RuntimeError if Docker is not running or image missing.
+    In candidate mode (allow_candidate=True), falls back to sha256:candidate_unverified_local.
+    """
     try:
         res = subprocess.run(
             ["docker", "image", "inspect", "--format", "{{.Id}}", image_tag],
@@ -74,14 +78,24 @@ def get_docker_image_id(image_tag: str = "x-sentinel-backend:test") -> str:
             text=True,
             check=True,
         )
-        return res.stdout.strip()
-    except Exception:
-        return "sha256:candidate_build_local"
+        val = res.stdout.strip()
+        if not val:
+            raise ValueError(f"Empty docker image ID returned for '{image_tag}'")
+        return val
+    except Exception as exc:
+        if allow_candidate:
+            logger.warning("Docker image query failed (%s); using unverified candidate digest", exc)
+            return "sha256:candidate_unverified_local"
+        raise RuntimeError(
+            f"Release verification failed: Docker image '{image_tag}' inspection failed: {exc}. "
+            "Production release tuple requires authentic container digest. Pass --candidate for local dev."
+        ) from exc
 
 
 def build_release_tuple(
     config_dir: Path | None = None,
     image_tag: str = "x-sentinel-backend:test",
+    allow_candidate: bool = False,
 ) -> dict[str, Any]:
     """Computes the full canonical release tuple."""
     if config_dir is None:
@@ -101,7 +115,7 @@ def build_release_tuple(
     migration_head_path = PROJECT_ROOT / "database" / "migrations" / "versions" / "0002_v3_jev_ai_audit.py"
 
     git_sha = get_git_revision()
-    image_id = get_docker_image_id(image_tag)
+    image_id = get_docker_image_id(image_tag, allow_candidate=allow_candidate)
 
     detector_cfg_hash = compute_file_sha256(detector_cfg_path)
     view_map_hash = compute_file_sha256(view_map_path)
@@ -171,11 +185,12 @@ def build_release_tuple(
             "feature_vector_dimension": 2381,
         },
         "compatibility": {
-            "code_and_config_compatible": True,
-            "database_revision_compatible": True,
-            "model_and_detector_compatible": True,
+            "code_and_config_compatible": detector_cfg_path.is_file() and view_map_path.is_file(),
+            "database_revision_compatible": migration_head_path.is_file(),
+            "model_and_detector_compatible": model_readme.is_file(),
             "jev_advisory_separation_verified": True,
         },
+        "release_status": "VERIFIED" if (not allow_candidate and not image_id.startswith("sha256:candidate_")) else "CANDIDATE_UNVERIFIED",
     }
 
     return release_tuple
@@ -204,7 +219,7 @@ def write_release_artifacts(release_tuple: dict[str, Any]) -> tuple[Path, Path]:
 
 | Component | Target Identity / Path | SHA-256 Digest | Status |
 |---|---|---|---|
-| **Container Image** | `x-sentinel-backend:test` | `{release_tuple['container_image_digest'][:19]}...` | BUILD PASS |
+| **Container Image** | `x-sentinel-backend:test` | `{release_tuple['container_image_digest'][:19]}...` | {release_tuple['release_status']} |
 | **Database Schema** | `{release_tuple['database_schema_revision']}` | `{release_tuple['database_migration_file_sha256'][:16]}...` | HEAD PASS |
 | **Detector Config** | `{release_tuple['detector_config']['path']}` | `{release_tuple['detector_config']['sha256'][:16]}...` | FROZEN |
 | **View Map** | `{release_tuple['view_map']['path']}` | `{release_tuple['view_map']['sha256'][:16]}...` | FROZEN |
@@ -229,10 +244,11 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="X-SENTINEL V3 Release Tuple Verifier")
     parser.add_argument("--image-tag", default="x-sentinel-backend:test", help="Docker image tag to inspect")
     parser.add_argument("--verify-only", action="store_true", help="Verify without writing new artifacts")
+    parser.add_argument("--candidate", "--dev-gate", action="store_true", help="Allow unverified candidate build when Docker daemon is offline")
     args = parser.parse_args()
 
     try:
-        tup = build_release_tuple(image_tag=args.image_tag)
+        tup = build_release_tuple(image_tag=args.image_tag, allow_candidate=args.candidate)
         if not tup["compatibility"]["database_revision_compatible"]:
             logger.error("Release tuple failed: database revision incompatible")
             return 2

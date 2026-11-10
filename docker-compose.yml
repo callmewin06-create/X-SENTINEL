@@ -37,7 +37,7 @@ services:
     environment:
       XS_DATABASE_URL: mssql+pyodbc://sa:${MSSQL_SA_PASSWORD:-XSentinel_Strong_Pass_2025!}@mssql:1433/xsentinel?driver=ODBC+Driver+17+for+SQL+Server&TrustServerCertificate=yes
       XS_EXPECTED_DB_REVISION: 0002_v3_jev_ai_audit
-    command: ["alembic", "-c", "database/alembic.ini", "upgrade", "head"]
+    command: ["sh", "-c", "python scripts/ensure_database.py && alembic -c database/alembic.ini upgrade head"]
     networks:
       - xsentinel_net
     depends_on:

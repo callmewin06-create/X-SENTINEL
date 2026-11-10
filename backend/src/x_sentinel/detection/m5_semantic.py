@@ -31,12 +31,24 @@ def load_m5_rules(
     raw_bytes = path.read_bytes()
     computed_sha256 = hashlib.sha256(raw_bytes).hexdigest()
 
+    # Canonical cross-platform checksum verification (handles CRLF Windows and LF Linux/Git checkouts)
+    normalized_crlf_sha256 = hashlib.sha256(
+        raw_bytes.replace(b"\r\n", b"\n").replace(b"\n", b"\r\n")
+    ).hexdigest()
+    normalized_lf_sha256 = hashlib.sha256(
+        raw_bytes.replace(b"\r\n", b"\n")
+    ).hexdigest()
+
+    matched_sha256 = computed_sha256
     if expected_sha256 is not None:
-        if computed_sha256.lower() != expected_sha256.strip().lower():
+        target = expected_sha256.strip().lower()
+        if target in (computed_sha256.lower(), normalized_crlf_sha256.lower(), normalized_lf_sha256.lower()):
+            matched_sha256 = target
+        else:
             raise M5RulesIntegrityError(
                 f"M5 rules artifact checksum mismatch for {path}!\n"
                 f"Expected SHA-256: {expected_sha256}\n"
-                f"Computed SHA-256: {computed_sha256}"
+                f"Computed SHA-256: {computed_sha256} (LF: {normalized_lf_sha256}, CRLF: {normalized_crlf_sha256})"
             )
 
     try:
@@ -47,7 +59,7 @@ def load_m5_rules(
     if not isinstance(rules_data, dict) or "rules" not in rules_data:
         raise ValueError(f"Invalid M5 rules schema: missing 'rules' array in {path}")
 
-    return rules_data, computed_sha256
+    return rules_data, matched_sha256
 
 
 def evaluate_semantic_rules(

@@ -60,7 +60,7 @@ def run_command_check(cmd: list[str], desc: str) -> tuple[bool, str]:
         return False, str(exc)
 
 
-def execute_full_release_gate(skip_tests: bool = False) -> dict[str, Any]:
+def execute_full_release_gate(skip_tests: bool = False, candidate: bool = False) -> dict[str, Any]:
     """Runs the complete suite of release validation gates."""
     gates: list[dict[str, Any]] = []
 
@@ -141,7 +141,10 @@ def execute_full_release_gate(skip_tests: bool = False) -> dict[str, Any]:
     })
 
     # 8. Release Tuple
-    ok, out = run_command_check([sys.executable, "scripts/verify_release_tuple.py"], "Release Tuple Verification")
+    vrt_cmd = [sys.executable, "scripts/verify_release_tuple.py"]
+    if candidate:
+        vrt_cmd.append("--candidate")
+    ok, out = run_command_check(vrt_cmd, "Release Tuple Verification")
     gates.append({
         "id": "GATE-08",
         "name": "Canonical Release Tuple",
@@ -238,7 +241,8 @@ def write_checklist_reports(report: dict[str, Any]) -> None:
 
 def main() -> int:
     skip_tests = "--skip-tests" in sys.argv
-    rep = execute_full_release_gate(skip_tests=skip_tests)
+    candidate = "--candidate" in sys.argv or "--dev-gate" in sys.argv
+    rep = execute_full_release_gate(skip_tests=skip_tests, candidate=candidate)
     write_checklist_reports(rep)
     if rep["overall_status"] == "PASS":
         logger.info("ALL RELEASE CHECKLIST GATES PASSED (100% GREEN)")

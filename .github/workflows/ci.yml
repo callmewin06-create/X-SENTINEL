@@ -35,7 +35,11 @@ jobs:
       - name: Install system ODBC dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y unixodbc-dev
+          sudo apt-get install -y unixodbc-dev curl gnupg
+          curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor -o /usr/share/keyrings/microsoft-prod.gpg
+          curl -fsSL https://packages.microsoft.com/config/ubuntu/22.04/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
+          sudo apt-get update
+          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql17
 
       - name: Install dependencies
         run: pip install -e '.[dev]'

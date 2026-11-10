@@ -273,13 +273,16 @@ class TestConcurrencyAndThreadSafety:
         # Multiple concurrent threads attempt to persist identical request_id simultaneously
         errors: list[Exception] = []
         successes: list[int] = []
+        engine = resilience_db.get_bind()
 
         def _worker(thread_idx: int) -> None:
-            try:
-                repo.persist(evidence)
-                successes.append(thread_idx)
-            except (AuditWriteFailureError, IntegrityError, ValueError) as exc:
-                errors.append(exc)
+            with Session(bind=engine) as worker_session:
+                worker_repo = CanonicalEvidenceRepository(worker_session)
+                try:
+                    worker_repo.persist(evidence)
+                    successes.append(thread_idx)
+                except (AuditWriteFailureError, IntegrityError, ValueError) as exc:
+                    errors.append(exc)
 
         with ThreadPoolExecutor(max_workers=4) as executor:
             futures = [executor.submit(_worker, i) for i in range(4)]
