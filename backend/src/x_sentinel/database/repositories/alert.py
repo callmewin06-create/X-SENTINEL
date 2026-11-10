@@ -33,6 +33,7 @@ class AlertRepository:
         severity: str | None = None,
         status: str | None = None,
         analysis_job_id: uuid.UUID | None = None,
+        user_id: uuid.UUID | None = None,
     ) -> tuple[Sequence[Alert], int]:
         """Lists alerts with filtering and pagination, returning items and total count.
 
@@ -46,14 +47,23 @@ class AlertRepository:
         if analysis_job_id is not None:
             conditions.append(Alert.analysis_job_id == analysis_job_id)
 
+        from x_sentinel.database.models import AnalysisJob
+
         count_stmt = select(func.count(Alert.id))
+        stmt = select(Alert).order_by(desc(Alert.created_at)).limit(limit).offset(offset)
+
+        if user_id is not None:
+            count_stmt = count_stmt.join(AnalysisJob, Alert.analysis_job_id == AnalysisJob.id).where(
+                AnalysisJob.user_id == user_id
+            )
+            stmt = stmt.join(AnalysisJob, Alert.analysis_job_id == AnalysisJob.id).where(
+                AnalysisJob.user_id == user_id
+            )
+
         if conditions:
             count_stmt = count_stmt.where(*conditions)
-        total = self.session.scalar(count_stmt) or 0
-
-        stmt = select(Alert).order_by(desc(Alert.created_at)).limit(limit).offset(offset)
-        if conditions:
             stmt = stmt.where(*conditions)
+        total = self.session.scalar(count_stmt) or 0
         items = self.session.scalars(stmt).all()
 
         return items, int(total)

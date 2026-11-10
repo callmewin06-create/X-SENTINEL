@@ -118,26 +118,22 @@ ANONYMOUS_USER = AuthUser(
 http_bearer_scheme = HTTPBearer(auto_error=False)
 
 
-def get_current_user_optional(
-    credentials: HTTPAuthorizationCredentials | None = Security(http_bearer_scheme),
-) -> AuthUser | None:
-    """Returns the authenticated user, or ANONYMOUS_USER if auth is disabled.
 
-    When settings.api_auth_mode == 'none', returns ANONYMOUS_USER without requiring credentials.
-    When auth is enabled:
-      - If credentials are missing, returns None (optional auth).
-      - If credentials are valid, returns the corresponding AuthUser.
-      - If user is inactive, raises HTTP 403 XS_FORBIDDEN.
-      - If credentials are invalid, raises HTTP 401 XS_INVALID_CREDENTIALS.
-    """
-    if settings.api_auth_mode == "none":
-        return ANONYMOUS_USER
+def _resolve_authenticated_token(token: str) -> AuthUser:
+    """Resolves token against configured production secrets or predefined development tokens."""
+    is_prod = settings.env == "production"
 
-    if credentials is None:
-        return None
-
-    token = credentials.credentials.strip()
+    # Predefined tokens are forbidden in production
     if token in PREDEFINED_TOKENS:
+        if is_prod:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail={
+                    "code": "XS_INVALID_CREDENTIALS",
+                    "message": "Predefined development tokens are disabled in production",
+                },
+                headers={"WWW-Authenticate": "Bearer"},
+            )
         user = PREDEFINED_TOKENS[token]
         if not user.is_active:
             raise HTTPException(
@@ -149,6 +145,33 @@ def get_current_user_optional(
             )
         return user
 
+    # Check configured settings.api_tokens
+    if settings.api_tokens and token in settings.api_tokens:
+        data = settings.api_tokens[token]
+        user = AuthUser(
+            user_id=uuid.UUID(str(data.get("user_id", uuid.uuid4()))),
+            email=str(data.get("email", "configured@xsentinel.local")),
+            roles=tuple(data.get("roles", [Role.ANALYST.value])),
+            is_active=bool(data.get("is_active", True)),
+        )
+        if not user.is_active:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail={
+                    "code": "XS_FORBIDDEN",
+                    "message": "Authenticated user account is inactive",
+                },
+            )
+        return user
+
+    # Check admin token if configured
+    if settings.admin_token and token == settings.admin_token:
+        return AuthUser(
+            user_id=uuid.UUID("11111111-1111-1111-1111-111111111111"),
+            email="admin@xsentinel.prod",
+            roles=(Role.ADMIN.value, Role.ANALYST.value, Role.OPERATOR.value),
+        )
+
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail={
@@ -158,19 +181,37 @@ def get_current_user_optional(
         headers={"WWW-Authenticate": "Bearer"},
     )
 
+def get_current_user_optional(
+    credentials: HTTPAuthorizationCredentials | None = Security(http_bearer_scheme),
+) -> AuthUser | None:
+    """Returns the authenticated user, or ANONYMOUS_USER if auth is disabled."""
+    if settings.api_auth_mode == "none":
+        if settings.env == "production":
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail={"code": "XS_UNAUTHENTICATED", "message": "Authentication required in production environment."},
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        return ANONYMOUS_USER
+
+    if credentials is None:
+        return None
+
+    token = credentials.credentials.strip()
+    return _resolve_authenticated_token(token)
+
 
 def get_current_user(
     credentials: HTTPAuthorizationCredentials | None = Security(http_bearer_scheme),
 ) -> AuthUser:
-    """Enforces authentication according to settings.api_auth_mode.
-
-    When settings.api_auth_mode == 'none', returns ANONYMOUS_USER.
-    When settings.api_auth_mode != 'none', requires valid credentials:
-      - Missing credentials -> 401 XS_UNAUTHENTICATED
-      - Invalid credentials -> 401 XS_INVALID_CREDENTIALS
-      - Inactive account -> 403 XS_FORBIDDEN
-    """
+    """Enforces authentication according to settings.api_auth_mode."""
     if settings.api_auth_mode == "none":
+        if settings.env == "production":
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail={"code": "XS_UNAUTHENTICATED", "message": "Authentication required in production environment."},
+                headers={"WWW-Authenticate": "Bearer"},
+            )
         return ANONYMOUS_USER
 
     if credentials is None:
@@ -181,26 +222,7 @@ def get_current_user(
         )
 
     token = credentials.credentials.strip()
-    if token in PREDEFINED_TOKENS:
-        user = PREDEFINED_TOKENS[token]
-        if not user.is_active:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail={
-                    "code": "XS_FORBIDDEN",
-                    "message": "Authenticated user account is inactive",
-                },
-            )
-        return user
-
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail={
-            "code": "XS_INVALID_CREDENTIALS",
-            "message": "Invalid or expired authentication credentials",
-        },
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    return _resolve_authenticated_token(token)
 
 
 def require_roles(*allowed_roles: str):
@@ -268,11 +290,16 @@ def require_permissions(*required_permissions: Permission | str):
 
 
 def is_admin(user: AuthUser | None) -> bool:
-    """Checks whether principal is admin or running in unauthenticated development mode."""
-    if settings.api_auth_mode == "none" or user is None:
-        return True
+    """Checks whether principal has admin role.
+
+    Never grants admin privileges to None or anonymous identity in production.
+    """
+    if user is None:
+        return False
     if user.user_id == ANONYMOUS_USER.user_id:
-        return True
+        if settings.env == "production":
+            return False
+        return settings.api_auth_mode == "none"
     return user.has_role(Role.ADMIN.value)
 
 
@@ -288,11 +315,16 @@ def assert_job_ownership(
     Admins can access any job. Evaluators can access if allow_evaluator is True.
     Non-admin users can only access jobs they own.
     """
+    if user is None:
+        raise ObjectAccessDeniedError(
+            message=f"Access denied: {resource_label} requires authenticated user",
+            code="XS_FORBIDDEN",
+        )
     if is_admin(user):
         return
-    if allow_evaluator and user is not None and user.has_role(Role.EVALUATOR.value):
+    if allow_evaluator and user.has_role(Role.EVALUATOR.value):
         return
-    if job.user_id is not None and user is not None and job.user_id != user.user_id:
+    if job.user_id is not None and job.user_id != user.user_id:
         raise ObjectAccessDeniedError(
             message=f"Access denied: {resource_label} belongs to another user",
             code="XS_FORBIDDEN",

@@ -32,6 +32,8 @@ class Settings(BaseSettings):
     db_pool_recycle_seconds: int = 1800
 
     api_auth_mode: str = "none"
+    api_tokens: dict[str, dict[str, Any]] = {}
+    admin_token: str | None = None
     allowed_origins: str = "http://localhost:8501"
     max_upload_bytes: int = 52_428_800
 
@@ -61,6 +63,14 @@ class Settings(BaseSettings):
     ai_queue_timeout_seconds: float = 10.0
     performance_monitoring_enabled: bool = True
     metrics_export_enabled: bool = True
+
+    
+    @model_validator(mode="after")
+    def validate_production_security(self) -> Settings:
+        if self.env == "production":
+            if self.api_auth_mode == "none":
+                raise ValueError("Security violation: api_auth_mode cannot be 'none' when env='production'")
+        return self
 
     @field_validator("backend_port", "frontend_port")
     @classmethod

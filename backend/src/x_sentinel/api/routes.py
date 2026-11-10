@@ -374,6 +374,7 @@ def list_alerts(
         severity=severity,
         status=status_filter,
         analysis_job_id=analysis_job_id,
+        user=user,
     )
     return AlertListResponse(
         items=items,
@@ -397,7 +398,7 @@ def get_alert_detail(
         require_roles(Role.ADMIN.value, Role.ANALYST.value, Role.OPERATOR.value)
     ),
 ) -> AlertSummary:
-    alert = alert_svc.get_alert(session=db, alert_id=alert_id)
+    alert = alert_svc.get_alert(session=db, alert_id=alert_id, user=user)
     if alert is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -427,6 +428,7 @@ def update_alert_status(
             alert_id=alert_id,
             new_status=req.status,
             actor_id=persisted_actor_id,
+            user=user,
         )
         return updated
     except LookupError as exc:
