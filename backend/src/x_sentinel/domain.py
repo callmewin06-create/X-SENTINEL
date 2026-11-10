@@ -25,3 +25,5 @@ class AnalysisResult:
     evidence_ref: str | None = None
     decision: str | None = None
     job_id: str | None = None
+    measured_latency_ms: dict[str, float] = field(default_factory=dict)
+    input_sha256: str | None = None

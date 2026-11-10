@@ -6,7 +6,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class VectorAnalysisRequest(BaseModel):
-    features: list[float] = Field(
+    features: list[Any] = Field(
         ...,
         description="2,381-dimensional normalized numerical feature vector matching EMBER",
     )
@@ -18,6 +18,26 @@ class VectorAnalysisRequest(BaseModel):
         default=None,
         description="Optional client-provided correlation or idempotency request identifier",
     )
+
+    @field_validator("features")
+    @classmethod
+    def validate_features_strict(cls, v: Any) -> list[float]:
+        if not isinstance(v, (list, tuple)):
+            raise ValueError("Features must be a list of numbers.")
+        if len(v) != 2381:
+            raise ValueError(f"Feature vector must contain exactly 2,381 dimensions; got {len(v)}")
+        import math
+        clean: list[float] = []
+        for idx, item in enumerate(v):
+            if isinstance(item, bool) or isinstance(item, str):
+                raise ValueError(f"Feature at index {idx} has invalid non-numeric type: {type(item).__name__}")
+            if not isinstance(item, (int, float)):
+                raise ValueError(f"Feature at index {idx} must be a number; got {type(item).__name__}")
+            val = float(item)
+            if math.isnan(val) or math.isinf(val):
+                raise ValueError(f"Feature at index {idx} must be finite; got {val}")
+            clean.append(val)
+        return clean
 
 
 class AnalysisResponse(BaseModel):
@@ -50,6 +70,14 @@ class AnalysisResponse(BaseModel):
     job_id: str | None = Field(
         default=None,
         description="Database primary key UUID of the persisted analysis job",
+    )
+    measured_latency_ms: dict[str, float] = Field(
+        default_factory=dict,
+        description="Measured latency breakdown in milliseconds across pipeline stages",
+    )
+    input_sha256: str | None = Field(
+        default=None,
+        description="Deterministic SHA-256 digest of input vector bytes",
     )
 
 

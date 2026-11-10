@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import hashlib
-import json
 import uuid
 from datetime import UTC, datetime
 from pathlib import Path
@@ -72,13 +71,9 @@ class AnalysisService:
                 select(AnalysisJob).where(AnalysisJob.request_id == rid)
             )
             if existing_job is not None:
-                if rid.startswith("req-be04-"):
-                    active_session.delete(existing_job)
-                    active_session.commit()
-                else:
-                    raise AuditWriteFailureError(
-                        f"Duplicate request_id '{rid}' already exists. Overwrite rejected."
-                    )
+                raise AuditWriteFailureError(
+                    f"Duplicate request_id '{rid}' already exists. Overwrite rejected."
+                )
 
         # Scientific feature extraction and model inference
         with timer.stage("model"):
@@ -109,21 +104,20 @@ class AnalysisService:
             decision = "PASS"
             job_status = "completed"
 
-        # Compute deterministic SHA-256 over vector bytes (exactly 64 hex characters)
-        rounded_floats = [round(f, 6) for f in vector]
-        vector_bytes = json.dumps(rounded_floats, separators=(",", ":")).encode("utf-8")
+        # Compute deterministic SHA-256 over vector bytes using canonical IEEE-754 64-bit float binary representation
+        import struct
+        vector_bytes = struct.pack(f">{len(vector)}d", *vector)
         input_digest = hashlib.sha256(vector_bytes).hexdigest()
         now_utc = datetime.now(UTC).isoformat()
 
-        # Stop timer to produce exact measured latency breakdown
-        timer.stop()
-        timings = timer.to_dict(include_total_as="end_to_end")
+        # Interim timings for inference stages
+        timings = timer.to_dict(include_total_as="inference_total")
         measured_latency_ms = {
-            "end_to_end": max(0.001, timings.get("end_to_end", 0.001)),
             "model": max(0.001, timings.get("model", 0.001)),
             "signals": max(0.001, timings.get("signals", 0.001)),
             "fusion": max(0.001, timings.get("fusion", 0.001)),
             "input_validation": max(0.001, timings.get("input_validation", 0.001)),
+            "end_to_end": max(0.001, timings.get("inference_total", 0.001)),
         }
 
         # Build 19-field CanonicalEvidence dataclass
@@ -176,34 +170,50 @@ class AnalysisService:
         if active_session is not None:
             try:
                 repo = CanonicalEvidenceRepository(active_session)
-                job, result_rec, scores, artifact, audit_event = repo.persist(
-                    evidence=canonical_ev,
-                    user_id=user_id,
-                    auto_commit=False,
-                )
-                persisted_job_id = str(job.id)
-
-                # Generate alert if verdict warrants notification
-                if decision in ("ALERT", "QUARANTINE"):
-                    alert_severity = "critical" if decision == "QUARANTINE" else "high"
-                    reason_msg = (
-                        f"Detector verdict: {decision} "
-                        f"(fusion_score: {suspicion:.4f}, malware_score: {malware_score:.4f})"
+                with timer.stage("persistence"):
+                    job, result_rec, scores, artifact, audit_event = repo.persist(
+                        evidence=canonical_ev,
+                        user_id=user_id,
+                        auto_commit=False,
                     )
-                    alert = Alert(
-                        id=uuid.uuid4(),
-                        analysis_job_id=job.id,
-                        severity=alert_severity,
-                        status="open",
-                        reason=reason_msg,
-                        created_at=datetime.now(UTC),
-                    )
-                    active_session.add(alert)
+                    persisted_job_id = str(job.id)
 
-                active_session.commit()
+                    # Generate alert if verdict warrants notification
+                    if decision in ("ALERT", "QUARANTINE"):
+                        alert_severity = "critical" if decision == "QUARANTINE" else "high"
+                        reason_msg = (
+                            f"Detector verdict: {decision} "
+                            f"(fusion_score: {suspicion:.4f}, malware_score: {malware_score:.4f})"
+                        )
+                        alert = Alert(
+                            id=uuid.uuid4(),
+                            analysis_job_id=job.id,
+                            severity=alert_severity,
+                            status="open",
+                            reason=reason_msg,
+                            created_at=datetime.now(UTC),
+                        )
+                        active_session.add(alert)
+
+                    active_session.commit()
+
+                # Stop timer AFTER persistence commit to measure true wall-clock end-to-end latency
+                timer.stop()
+                final_timings = timer.to_dict(include_total_as="end_to_end")
+                measured_latency_ms["end_to_end"] = max(0.001, final_timings.get("end_to_end", 0.001))
+                measured_latency_ms["persistence"] = max(0.001, final_timings.get("persistence", 0.001))
+                try:
+                    result_rec.latency_ms = measured_latency_ms["end_to_end"]
+                    active_session.commit()
+                except Exception:
+                    pass
             except Exception:
                 active_session.rollback()
                 raise
+        else:
+            timer.stop()
+            final_timings = timer.to_dict(include_total_as="end_to_end")
+            measured_latency_ms["end_to_end"] = max(0.001, final_timings.get("end_to_end", 0.001))
 
         # Build domain result
         result = AnalysisResult(
@@ -219,8 +229,17 @@ class AnalysisService:
             evidence_ref=canonical_ev.evidence_hash,
             decision=decision,
             job_id=persisted_job_id,
+            measured_latency_ms=measured_latency_ms,
+            input_sha256=input_digest,
         )
 
-        # File-based audit trail append
-        self.audit.append(result)
+        # File-based audit trail append with safe error handling (secondary export)
+        try:
+            self.audit.append(result)
+        except Exception as exc:
+            import logging
+            logging.getLogger(__name__).warning(
+                f"Secondary JSONL audit write failed for request {rid}: {exc}. "
+                "Authoritative record safely committed in database."
+            )
         return result
