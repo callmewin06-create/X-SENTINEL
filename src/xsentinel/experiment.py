@@ -26,7 +26,7 @@ def train(X,y,path,config,seed,view=None,schema=SCHEMA_VERSION):
         state=read_json(lock)
         if state['training']!=expected or state['model_sha256']!=sha256(path):
             raise ValueError('Training checkpoint mismatch')
-        loaded=lgb.Booster(model_file=str(path)); schema.check_model(loaded,view)
+        loaded=lgb.Booster(model_str=Path(path).read_text(encoding='utf8')); schema.check_model(loaded,view)
         return loaded
     started=time.perf_counter()
     if X.ndim!=2 or X.shape!=(len(y),schema.dim): raise ValueError('Training matrix/schema mismatch')
@@ -35,7 +35,10 @@ def train(X,y,path,config,seed,view=None,schema=SCHEMA_VERSION):
     cats=[i for i,j in enumerate(indices) if j in schema.categorical]
     ds=lgb.Dataset(data,label=y,free_raw_data=True,categorical_feature=cats)
     model=lgb.train(params,ds,num_boost_round=config['view_rounds'] if view else config['rounds'])
-    model.save_model(str(path)); del ds,data; gc.collect()
+    # LightGBM's native file API fails for Unicode Windows paths. Serialize via
+    # Python without changing the learned model or training parameters.
+    Path(path).write_text(model.model_to_string(),encoding='utf8',newline='')
+    del ds,data; gc.collect()
     write_json(lock,{'training':expected,'model_sha256':sha256(path),'elapsed_seconds':time.perf_counter()-started})
     return model
 

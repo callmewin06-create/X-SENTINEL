@@ -1,11 +1,58 @@
 """Versioned adaptations of legacy and Severi signed, conditioned selection."""
 import numpy as np
+from collections import Counter
 from xsentinel.schema import get_schema
 from xsentinel.baselines.scores import contributions
 from .primary import VectorTrigger
 
 SEVERI_SOURCE_COMMIT='7e3ba27fdc1db25d68ae74da334cf3bdd9eedf71'
 SEVERI_SOURCE_SHA256='5e96dbcfa856ed4e9e1fc0ef7748d9055d99b85635211847dc3f0a1eb4937b08'
+
+
+def independent_large_abs(X,phi,allowed,k,value_selector):
+    """Pinned-source LargeAbsSHAP with independent value selection.
+
+    MinPopulation ties retain first observation (Counter insertion order).
+    CountAbsSHAP uses SUM, not mean; value ties use np.unique ascending order.
+    Feature score ties follow the pinned source's NumPy/pandas argsort ordering.
+    No cross-dataset persistent value cache is permitted.
+    """
+    X,phi,allowed=_inputs(X,phi,allowed,k)
+    if value_selector not in ('min_population','count_abs_shap'):
+        raise ValueError('Unknown independent value selector')
+    order=np.argsort(np.abs(phi).sum(axis=0))
+    selected=[int(j) for j in order if j in set(allowed)][-k:]
+    values=[]; trace=[]
+    for j in selected:
+        if value_selector=='min_population':
+            counts=Counter(X[:,j]); value=min(counts,key=counts.get)
+            score=float(counts[value])
+        else:
+            vals,counts=np.unique(X[:,j],return_counts=True)
+            scores=np.array([1.0/c+np.abs(phi[X[:,j]==v,j]).sum() for v,c in zip(vals,counts)])
+            q=int(np.argmin(scores)); value=vals[q]; score=float(scores[q])
+        values.append(float(value))
+        trace.append({'index':j,'value':float(value),'objective':score})
+    return selected,values,trace
+
+
+def select_supplementary(model,X,*,schema,profile,selector,k=10,phi=None):
+    """Quota-free R/A-domain adaptation; does not claim binary feasibility."""
+    schema=get_schema(schema); X=schema.matrix(X); schema.check_model(model)
+    if profile not in ('feature_restricted','vector_stress'):
+        raise ValueError('Unknown selector profile')
+    pool=schema.restricted if profile=='feature_restricted' else range(schema.dim)
+    allowed=[int(j) for j in pool if np.ptp(X[:,j])>0]
+    phi=contributions(model,X,schema=schema) if phi is None else phi
+    if selector=='signed_shap_conditioned':
+        idx,values,trace=signed_conditioned(X,phi,allowed,k)
+    else:
+        idx,values,trace=independent_large_abs(X,phi,allowed,k,selector)
+    trigger=VectorTrigger('supplementary_noquota',profile,schema.version,schema.fingerprint,tuple(idx),tuple(values))
+    counts=trigger.validate(schema)
+    return trigger,{'selector':selector,'selection_rows':len(X),'varying_allowed_count':len(allowed),
+        'view_counts':counts,'view_quota':None,'trace':trace,'source_commit':SEVERI_SOURCE_COMMIT,
+        'source_sha256':SEVERI_SOURCE_SHA256,'interpretation':'V2/V3 adaptation; PE functionality unverified'}
 
 
 def _inputs(X,phi,allowed,k):

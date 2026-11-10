@@ -39,6 +39,9 @@ class VectorTrigger:
         elif self.family=='cross_2view_restricted':
             if self.profile!='feature_restricted' or sum(n>0 for n in counts.values())!=2:
                 raise ValueError('Cross-two-view restricted requires exactly two views')
+        elif self.family=='supplementary_noquota':
+            # R10/A10 follow-up: composition is an observed result, not a quota.
+            pass
         else:
             raise ValueError('Unknown primary family; Metadata-only stress is supplementary')
         return counts
