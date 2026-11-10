@@ -9,7 +9,6 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from sqlalchemy.pool import StaticPool
-from x_sentinel.api.schemas import AlertStatusUpdateRequest
 from x_sentinel.config import settings
 from x_sentinel.database.base import Base
 from x_sentinel.database.models import Alert, AnalysisJob, User
@@ -17,7 +16,6 @@ from x_sentinel.database.session import get_db
 from x_sentinel.main import app
 from x_sentinel.security.auth import (
     ANONYMOUS_USER,
-    AuthUser,
     Role,
     get_current_user,
     get_current_user_optional,
