@@ -10,7 +10,7 @@ COPY pyproject.toml README.md ./
 COPY backend ./backend
 COPY frontend ./frontend
 
-RUN pip install --no-cache-dir . && \
+RUN pip install --no-cache-dir streamlit httpx pandas && \
     chown -R appuser:appgroup /app
 
 ENV PYTHONPATH="/app/backend/src:/app" \

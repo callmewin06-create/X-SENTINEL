@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import functools
 import hashlib
 import json
 from collections.abc import Sequence
@@ -192,18 +193,31 @@ class ViewMap:
         }
 
 
-def load_view_map(path_or_dict: Path | dict[str, Any], allow_demo: bool = True) -> ViewMap:
+@functools.lru_cache(maxsize=16)
+def _load_view_map_cached(file_path_str: str, file_mtime: float, allow_demo: bool) -> ViewMap:
+    p = Path(file_path_str)
+    content = p.read_text(encoding="utf-8")
+    raw = yaml.safe_load(content)
+    return _parse_view_map_dict(raw, allow_demo=allow_demo)
+
+
+def load_view_map(path_or_dict: Path | str | dict[str, Any], allow_demo: bool = True) -> ViewMap:
     """Load, parse and validate a versioned view mapping from YAML file or dictionary.
 
     Enforces fail-closed security for scientific mode and validates hash integrity.
+    Uses LRU cache for file-based loads to eliminate redundant disk I/O and parsing.
     """
-    if isinstance(path_or_dict, Path):
-        content = path_or_dict.read_text(encoding="utf-8")
-        raw = yaml.safe_load(content)
+    if isinstance(path_or_dict, (Path, str)):
+        p = Path(path_or_dict)
+        mtime = p.stat().st_mtime if p.exists() else 0.0
+        return _load_view_map_cached(str(p.resolve()), mtime, allow_demo)
     elif isinstance(path_or_dict, dict):
-        raw = path_or_dict
+        return _parse_view_map_dict(path_or_dict, allow_demo=allow_demo)
     else:
-        raise TypeError(f"expected Path or dict, got {type(path_or_dict)}")
+        raise TypeError(f"expected Path, str, or dict, got {type(path_or_dict)}")
+
+
+def _parse_view_map_dict(raw: dict[str, Any], allow_demo: bool = True) -> ViewMap:
 
     status = str(raw.get("status", ""))
     if "TBD" in status:

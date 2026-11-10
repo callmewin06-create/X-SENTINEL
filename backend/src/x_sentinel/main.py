@@ -30,19 +30,37 @@ async def performance_metrics_middleware(request: Request, call_next):
             from infrastructure.monitoring.metrics import get_metrics_registry
 
             reg = get_metrics_registry()
-            raw_path = request.url.path
-            if raw_path.startswith("/v1/analysis/") and raw_path.endswith("/evidence"):
-                ep = "/v1/analysis/{id}/evidence"
-            elif raw_path.startswith("/v1/analysis/") and len(raw_path.split("/")) == 4:
-                ep = "/v1/analysis/{id}"
-            elif raw_path.startswith("/v1/alerts/") and len(raw_path.split("/")) == 4:
-                ep = "/v1/alerts/{id}"
-            elif raw_path.startswith("/v1/ai/runs/") and raw_path.endswith("/feedback"):
-                ep = "/v1/ai/runs/{id}/feedback"
-            elif raw_path.startswith("/v1/ai/runs/") and len(raw_path.split("/")) == 5:
-                ep = "/v1/ai/runs/{id}"
+            # Bound metrics endpoint cardinality (Finding 9)
+            route = request.scope.get("route")
+            if route is not None and hasattr(route, "path"):
+                ep = getattr(route, "path", "unmatched")
             else:
-                ep = raw_path
+                raw_path = request.url.path
+                if raw_path.startswith("/v1/analysis/") and raw_path.endswith("/evidence"):
+                    ep = "/v1/analysis/{id}/evidence"
+                elif raw_path.startswith("/v1/analysis/") and len(raw_path.split("/")) == 4:
+                    ep = "/v1/analysis/{id}"
+                elif raw_path.startswith("/v1/alerts/") and len(raw_path.split("/")) == 4:
+                    ep = "/v1/alerts/{id}"
+                elif raw_path.startswith("/v1/ai/runs/") and raw_path.endswith("/feedback"):
+                    ep = "/v1/ai/runs/{id}/feedback"
+                elif raw_path.startswith("/v1/ai/runs/") and len(raw_path.split("/")) == 5:
+                    ep = "/v1/ai/runs/{id}"
+                elif raw_path in (
+                    "/health",
+                    "/livez",
+                    "/ready",
+                    "/readyz",
+                    "/metrics",
+                    "/v1/analyze/vector",
+                    "/v1/analysis",
+                    "/v1/alerts",
+                    "/v1/ai/status",
+                    "/v1/ai/runs",
+                ):
+                    ep = raw_path
+                else:
+                    ep = "unmatched"
 
             reg.histogram("api_request_latency_ms").observe(
                 elapsed_ms,
